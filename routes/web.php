@@ -42,3 +42,20 @@ Route::get('/', function () {
 Route::get('/disciplines', function () {
     return view('disciplines');
 })->name('disciplines');
+
+
+/*
+|--------------------------------------------------------------------------
+| PAGE COACHS
+|--------------------------------------------------------------------------
+|
+| URL :
+| http://127.0.0.1:8000/coachs
+|
+| Cette page présente les coachs de Brussels Top Team ainsi
+| que le contenu des entraînements qu'ils encadrent.
+|
+*/
+Route::get('/coachs', function () {
+    return view('coachs');
+})->name('coachs');

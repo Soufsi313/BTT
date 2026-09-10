@@ -25,6 +25,7 @@
 
         <!-- =====================================================
              NAVIGATION DESKTOP
+             Visible uniquement sur les grands écrans.
              ===================================================== -->
         <nav
             class="hidden items-center gap-8 lg:flex"
@@ -49,9 +50,12 @@
             </a>
 
 
-            <!-- Coachs -->
+            <!--
+                Coachs
+                Le lien utilise la route Laravel nommée "coachs".
+            -->
             <a
-                href="#"
+                href="{{ route('coachs') }}"
                 class="text-sm font-semibold uppercase transition hover:text-red-500"
             >
                 Coachs
@@ -97,7 +101,8 @@
 
 
         <!-- =====================================================
-             BOUTON INSCRIPTION DESKTOP
+             BOUTON D'INSCRIPTION DESKTOP
+             La page d'inscription sera développée plus tard.
              ===================================================== -->
         <a
             href="#"
@@ -120,7 +125,8 @@
 
 
         <!-- =====================================================
-             BOUTON MENU MOBILE
+             BOUTON DU MENU MOBILE
+             Visible uniquement sur les petits écrans.
              ===================================================== -->
         <button
             id="mobile-menu-button"
@@ -163,7 +169,7 @@
             </svg>
 
 
-            <!-- Icône fermeture -->
+            <!-- Icône de fermeture -->
             <svg
                 id="menu-icon-close"
                 class="hidden h-6 w-6"
@@ -186,6 +192,7 @@
 
     <!-- =========================================================
          NAVIGATION MOBILE
+         Ce menu est affiché / masqué par resources/js/app.js.
          ========================================================= -->
     <div
         id="mobile-menu"
@@ -233,9 +240,12 @@
             </a>
 
 
-            <!-- Coachs -->
+            <!--
+                Coachs mobile
+                Utilise la même route Laravel que le menu desktop.
+            -->
             <a
-                href="#"
+                href="{{ route('coachs') }}"
                 class="
                     border-b
                     border-zinc-900

@@ -25,7 +25,6 @@
 
         <!-- =====================================================
              NAVIGATION DESKTOP
-             Visible uniquement à partir des grands écrans.
              ===================================================== -->
         <nav
             class="hidden items-center gap-8 lg:flex"
@@ -41,20 +40,7 @@
             </a>
 
 
-            <!-- Association -->
-            <a
-                href="#"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
-            >
-                Association
-            </a>
-
-
-            <!--
-                Disciplines
-                Ce lien utilise maintenant la route Laravel
-                nommée "disciplines".
-            -->
+            <!-- Disciplines -->
             <a
                 href="{{ route('disciplines') }}"
                 class="text-sm font-semibold uppercase transition hover:text-red-500"
@@ -111,8 +97,7 @@
 
 
         <!-- =====================================================
-             BOUTON D'INSCRIPTION DESKTOP
-             La page d'inscription sera créée plus tard.
+             BOUTON INSCRIPTION DESKTOP
              ===================================================== -->
         <a
             href="#"
@@ -135,8 +120,7 @@
 
 
         <!-- =====================================================
-             BOUTON DU MENU MOBILE
-             Visible uniquement sur les petits écrans.
+             BOUTON MENU MOBILE
              ===================================================== -->
         <button
             id="mobile-menu-button"
@@ -179,7 +163,7 @@
             </svg>
 
 
-            <!-- Icône de fermeture -->
+            <!-- Icône fermeture -->
             <svg
                 id="menu-icon-close"
                 class="hidden h-6 w-6"
@@ -202,7 +186,6 @@
 
     <!-- =========================================================
          NAVIGATION MOBILE
-         Ce menu est affiché / masqué par resources/js/app.js.
          ========================================================= -->
     <div
         id="mobile-menu"
@@ -232,28 +215,7 @@
             </a>
 
 
-            <!-- Association -->
-            <a
-                href="#"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Association
-            </a>
-
-
-            <!--
-                Disciplines mobile
-                Utilise la même route Laravel que le menu desktop.
-            -->
+            <!-- Disciplines -->
             <a
                 href="{{ route('disciplines') }}"
                 class="

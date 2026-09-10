@@ -14,14 +14,17 @@
          ========================================================= -->
     <section class="relative w-full overflow-hidden bg-black">
 
-        <!-- Bannière principale -->
+        <!-- Bannière principale du site BTT -->
         <img
             src="{{ asset('images/BTTbanniere.png') }}"
             alt="Brussels Top Team - Dépasse tes limites"
             class="block h-auto w-full"
         >
 
-        <!-- Bouton interactif : Découvrir nos disciplines -->
+        <!-- =====================================================
+             BOUTON : DÉCOUVRIR NOS DISCIPLINES
+             Descend directement vers la section des disciplines.
+             ===================================================== -->
         <a
             href="#disciplines"
             class="
@@ -50,6 +53,7 @@
                 Découvrir nos disciplines
             </span>
 
+            <!-- Flèche du bouton -->
             <svg
                 class="h-[35%] w-auto transition-transform duration-300 group-hover:translate-x-1"
                 viewBox="0 0 24 24"
@@ -65,7 +69,11 @@
             </svg>
         </a>
 
-        <!-- Bouton interactif : Rejoindre BTT -->
+
+        <!-- =====================================================
+             BOUTON : REJOINDRE BTT
+             Pointera vers la future page d'inscription.
+             ===================================================== -->
         <a
             href="{{ url('/inscription') }}"
             class="
@@ -95,6 +103,7 @@
                 Rejoindre BTT
             </span>
 
+            <!-- Flèche du bouton -->
             <svg
                 class="h-[35%] w-auto transition-transform duration-300 group-hover:translate-x-1"
                 viewBox="0 0 24 24"
@@ -122,20 +131,19 @@
     >
         <div class="mx-auto max-w-7xl">
 
-            <!-- En-tête de la section -->
+            <!-- =====================================================
+                 EN-TÊTE DE LA SECTION
+                 ===================================================== -->
             <div class="max-w-3xl">
 
-                <!-- Petit titre rouge -->
                 <p class="text-sm font-black uppercase tracking-[0.3em] text-red-500">
                     Brussels Top Team
                 </p>
 
-                <!-- Titre principal -->
                 <h2 class="mt-4 text-4xl font-black uppercase tracking-tight text-white sm:text-5xl lg:text-6xl">
                     Nos disciplines
                 </h2>
 
-                <!-- Présentation courte -->
                 <p class="mt-6 text-lg leading-8 text-zinc-400">
                     Brussels Top Team propose plusieurs activités sportives
                     destinées aux hommes et aux femmes, avec des séances
@@ -145,239 +153,386 @@
             </div>
 
 
-            <!-- Grille des disciplines -->
+            <!-- =====================================================
+                 GRILLE DES DISCIPLINES
+
+                 Mobile      : 1 colonne
+                 Tablette    : 2 colonnes
+                 Grand écran : 3 colonnes
+                 ===================================================== -->
             <div class="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-                <!-- =====================================================
-                     FUTSAL
-                     ===================================================== -->
+
+                <!-- =================================================
+                     DISCIPLINE : FUTSAL
+
+                     Image utilisée :
+                     public/images/BTTfutsal.png
+
+                     object-contain permet d'afficher l'image complète
+                     sans couper le haut ou les côtés.
+                     ================================================= -->
                 <article
                     class="
                         group
+                        overflow-hidden
                         border
                         border-zinc-800
                         bg-black
-                        p-8
                         transition
                         duration-300
                         hover:-translate-y-1
                         hover:border-red-600
                     "
                 >
-                    <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
-                        Sport collectif
-                    </p>
 
-                    <h3 class="mt-4 text-3xl font-black uppercase text-white">
-                        Futsal
-                    </h3>
+                    <!-- Image Futsal -->
+                    <div class="relative aspect-square overflow-hidden bg-black">
 
-                    <p class="mt-4 leading-7 text-zinc-400">
-                        L'équipe BTT Futsal évolue en minifoot et permet aux
-                        membres de pratiquer un sport collectif dynamique,
-                        technique et compétitif.
-                    </p>
+                        <img
+                            src="{{ asset('images/BTTfutsal.png') }}"
+                            alt="Équipe Futsal Brussels Top Team"
+                            class="
+                                h-full
+                                w-full
+                                object-contain
+                                transition-transform
+                                duration-500
+                                group-hover:scale-[1.02]
+                            "
+                            loading="lazy"
+                        >
 
-                    <!-- Horaires -->
-                    <div class="mt-8 border-t border-zinc-800 pt-6">
-
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
-                            Horaires
-                        </p>
-
-                        <p class="mt-2 font-bold text-white">
-                            À confirmer
-                        </p>
+                        <!-- Dégradé léger en bas de l'image -->
+                        <div
+                            class="
+                                pointer-events-none
+                                absolute
+                                inset-x-0
+                                bottom-0
+                                h-16
+                                bg-gradient-to-t
+                                from-black
+                                to-transparent
+                            "
+                        ></div>
 
                     </div>
+
+
+                    <!-- Contenu Futsal -->
+                    <div class="p-8">
+
+                        <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
+                            Sport collectif
+                        </p>
+
+                        <h3 class="mt-4 text-3xl font-black uppercase text-white">
+                            Futsal
+                        </h3>
+
+                        <p class="mt-4 leading-7 text-zinc-400">
+                            L'équipe BTT Futsal évolue en minifoot et permet aux
+                            membres de pratiquer un sport collectif dynamique,
+                            technique et compétitif.
+                        </p>
+
+                        <!-- Horaires Futsal -->
+                        <div class="mt-8 border-t border-zinc-800 pt-6">
+
+                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
+                                Horaires
+                            </p>
+
+                            <p class="mt-2 font-bold text-zinc-300">
+                                Horaires à confirmer
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </article>
 
 
-                <!-- =====================================================
-                     HYROX
-                     ===================================================== -->
+                <!-- =================================================
+                     DISCIPLINE : HYROX
+
+                     Image utilisée :
+                     public/images/BTThyrox.png
+
+                     object-contain est conservé pour empêcher
+                     le rognage de l'image.
+                     ================================================= -->
                 <article
                     class="
                         group
+                        overflow-hidden
                         border
                         border-zinc-800
                         bg-black
-                        p-8
                         transition
                         duration-300
                         hover:-translate-y-1
                         hover:border-red-600
                     "
                 >
-                    <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
-                        Fitness & endurance
-                    </p>
 
-                    <h3 class="mt-4 text-3xl font-black uppercase text-white">
-                        HYROX
-                    </h3>
+                    <!-- Image HYROX -->
+                    <div class="relative aspect-square overflow-hidden bg-black">
 
-                    <p class="mt-4 leading-7 text-zinc-400">
-                        Une séance complète combinant endurance, cardio,
-                        renforcement musculaire et exercices fonctionnels.
-                    </p>
+                        <img
+                            src="{{ asset('images/BTThyrox.png') }}"
+                            alt="Entraînement HYROX Brussels Top Team"
+                            class="
+                                h-full
+                                w-full
+                                object-contain
+                                transition-transform
+                                duration-500
+                                group-hover:scale-[1.02]
+                            "
+                            loading="lazy"
+                        >
 
-                    <!-- Horaires -->
-                    <div class="mt-8 border-t border-zinc-800 pt-6">
-
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
-                            Horaires
-                        </p>
-
-                        <p class="mt-2 font-bold text-white">
-                            Tous les mardis
-                        </p>
-
-                        <p class="mt-1 text-red-500">
-                            19h30 - 21h00
-                        </p>
+                        <!-- Dégradé léger en bas de l'image -->
+                        <div
+                            class="
+                                pointer-events-none
+                                absolute
+                                inset-x-0
+                                bottom-0
+                                h-16
+                                bg-gradient-to-t
+                                from-black
+                                to-transparent
+                            "
+                        ></div>
 
                     </div>
+
+
+                    <!-- Contenu HYROX -->
+                    <div class="p-8">
+
+                        <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
+                            Fitness & endurance
+                        </p>
+
+                        <h3 class="mt-4 text-3xl font-black uppercase text-white">
+                            HYROX
+                        </h3>
+
+                        <p class="mt-4 leading-7 text-zinc-400">
+                            Une séance complète combinant endurance, cardio,
+                            renforcement musculaire et exercices fonctionnels.
+                        </p>
+
+                        <!-- Horaires HYROX -->
+                        <div class="mt-8 border-t border-zinc-800 pt-6">
+
+                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
+                                Horaires
+                            </p>
+
+                            <p class="mt-2 font-bold text-white">
+                                Tous les mardis
+                            </p>
+
+                            <p class="mt-1 text-red-500">
+                                19h30 - 21h00
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </article>
 
 
-                <!-- =====================================================
-                     BOXE HOMMES
-                     ===================================================== -->
+                <!-- =================================================
+                     DISCIPLINE : BTT BOXE HOMMES
+
+                     Image utilisée :
+                     public/images/BTTring.jpg
+                     ================================================= -->
                 <article
                     class="
                         group
+                        overflow-hidden
                         border
                         border-zinc-800
                         bg-black
-                        p-8
                         transition
                         duration-300
                         hover:-translate-y-1
                         hover:border-red-600
                     "
                 >
-                    <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
-                        Hommes
-                    </p>
 
-                    <h3 class="mt-4 text-3xl font-black uppercase text-white">
-                        BTT Boxe
-                    </h3>
+                    <!-- Photo du ring / salle BTT -->
+                    <div class="relative aspect-square overflow-hidden bg-zinc-900">
 
-                    <p class="mt-4 leading-7 text-zinc-400">
-                        Séances de boxe anglaise destinées aux hommes,
-                        avec travail technique, condition physique,
-                        déplacements et apprentissage des fondamentaux.
-                    </p>
+                        <img
+                            src="{{ asset('images/BTTring.jpg') }}"
+                            alt="Salle de boxe Brussels Top Team"
+                            class="
+                                h-full
+                                w-full
+                                object-cover
+                                transition-transform
+                                duration-500
+                                group-hover:scale-105
+                            "
+                            loading="lazy"
+                        >
 
-                    <!-- Horaires -->
-                    <div class="mt-8 border-t border-zinc-800 pt-6">
-
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
-                            Horaires
-                        </p>
-
-                        <p class="mt-2 font-bold text-white">
-                            Tous les jeudis
-                        </p>
-
-                        <p class="mt-1 text-red-500">
-                            19h30 - 21h00
-                        </p>
+                        <!-- Dégradé entre la photo et le contenu -->
+                        <div
+                            class="
+                                pointer-events-none
+                                absolute
+                                inset-x-0
+                                bottom-0
+                                h-24
+                                bg-gradient-to-t
+                                from-black
+                                to-transparent
+                            "
+                        ></div>
 
                     </div>
+
+
+                    <!-- Contenu BTT Boxe Hommes -->
+                    <div class="p-8">
+
+                        <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
+                            Hommes
+                        </p>
+
+                        <h3 class="mt-4 text-3xl font-black uppercase text-white">
+                            BTT Boxe
+                        </h3>
+
+                        <p class="mt-4 leading-7 text-zinc-400">
+                            Séances de boxe anglaise destinées aux hommes,
+                            avec travail technique, condition physique,
+                            déplacements et apprentissage des fondamentaux.
+                        </p>
+
+                        <!-- Horaires Boxe Hommes -->
+                        <div class="mt-8 border-t border-zinc-800 pt-6">
+
+                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
+                                Horaires
+                            </p>
+
+                            <p class="mt-2 font-bold text-white">
+                                Tous les jeudis
+                            </p>
+
+                            <p class="mt-1 text-red-500">
+                                19h30 - 21h00
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </article>
 
 
-                <!-- =====================================================
-                     BOXE FEMMES
-                     ===================================================== -->
+                <!-- =================================================
+                     DISCIPLINE : BTT BOXE FEMMES
+
+                     Image utilisée :
+                     public/images/BTTgirl2.jpg
+                     ================================================= -->
                 <article
                     class="
                         group
+                        overflow-hidden
                         border
                         border-zinc-800
                         bg-black
-                        p-8
                         transition
                         duration-300
                         hover:-translate-y-1
                         hover:border-red-600
                     "
                 >
-                    <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
-                        Femmes
-                    </p>
 
-                    <h3 class="mt-4 text-3xl font-black uppercase text-white">
-                        BTT Boxe Femmes
-                    </h3>
+                    <!-- Image BTT Boxe Femmes -->
+                    <div class="relative aspect-square overflow-hidden bg-zinc-900">
 
-                    <p class="mt-4 leading-7 text-zinc-400">
-                        Des séances de boxe anglaise réservées aux femmes,
-                        dans un cadre dédié à l'apprentissage, à la progression
-                        technique et à la condition physique.
-                    </p>
+                        <img
+                            src="{{ asset('images/BTTgirl2.jpg') }}"
+                            alt="BTT Boxe et remise en forme 100% féminine"
+                            class="
+                                h-full
+                                w-full
+                                object-cover
+                                transition-transform
+                                duration-500
+                                group-hover:scale-105
+                            "
+                            loading="lazy"
+                        >
 
-                    <!-- Horaires -->
-                    <div class="mt-8 border-t border-zinc-800 pt-6">
-
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
-                            Horaires
-                        </p>
-
-                        <p class="mt-2 font-bold text-zinc-300">
-                            Horaires à confirmer
-                        </p>
+                        <!-- Dégradé entre l'image et le contenu -->
+                        <div
+                            class="
+                                pointer-events-none
+                                absolute
+                                inset-x-0
+                                bottom-0
+                                h-24
+                                bg-gradient-to-t
+                                from-black
+                                to-transparent
+                            "
+                        ></div>
 
                     </div>
+
+
+                    <!-- Contenu BTT Boxe Femmes -->
+                    <div class="p-8">
+
+                        <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
+                            Femmes
+                        </p>
+
+                        <h3 class="mt-4 text-3xl font-black uppercase text-white">
+                            BTT Boxe Femmes
+                        </h3>
+
+                        <p class="mt-4 leading-7 text-zinc-400">
+                            Des séances de boxe anglaise réservées aux femmes,
+                            dans un cadre dédié à l'apprentissage, à la progression
+                            technique et à la condition physique.
+                        </p>
+
+                        <!-- Horaires Boxe Femmes -->
+                        <div class="mt-8 border-t border-zinc-800 pt-6">
+
+                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
+                                Horaires
+                            </p>
+
+                            <p class="mt-2 font-bold text-zinc-300">
+                                Horaires à confirmer
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </article>
 
 
-                <!-- =====================================================
-                     FITNESS FEMMES
-                     ===================================================== -->
-                <article
-                    class="
-                        group
-                        border
-                        border-zinc-800
-                        bg-black
-                        p-8
-                        transition
-                        duration-300
-                        hover:-translate-y-1
-                        hover:border-red-600
-                    "
-                >
-                    <p class="text-sm font-black uppercase tracking-[0.2em] text-red-500">
-                        Femmes
-                    </p>
-
-                    <h3 class="mt-4 text-3xl font-black uppercase text-white">
-                        BTT Fitness
-                    </h3>
-
-                    <p class="mt-4 leading-7 text-zinc-400">
-                        Des séances fitness réservées aux femmes,
-                        orientées vers le cardio, le renforcement musculaire
-                        et l'amélioration de la condition physique.
-                    </p>
-
-                    <!-- Horaires -->
-                    <div class="mt-8 border-t border-zinc-800 pt-6">
-
-                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
-                            Horaires
-                        </p>
-
-                        <p class="mt-2 font-bold text-zinc-300">
-                            Horaires à confirmer
-                        </p>
-
-                    </div>
-                </article>
+                
 
             </div>
 

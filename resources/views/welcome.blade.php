@@ -2,45 +2,112 @@
 
 @section('title', 'Brussels Top Team')
 
-@section('meta_description', 'Découvrez Brussels Top Team, ses disciplines sportives, ses coachs et ses activités à Bruxelles.')
+@section(
+    'meta_description',
+    'Découvrez Brussels Top Team, ses disciplines sportives, ses coachs et ses activités à Bruxelles.'
+)
 
 @section('content')
 
-    <section class="flex min-h-[calc(100vh-6rem)] items-center justify-center px-6">
-        <div class="text-center">
+    <!-- Hero -->
+    <section class="relative w-full overflow-hidden bg-black">
 
-            <p class="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-red-500">
-                Brussels Top Team
-            </p>
+        <!-- Bannière principale -->
+        <img
+            src="{{ asset('images/BTTbanniere.png') }}"
+            alt="Brussels Top Team - Dépasse tes limites"
+            class="block h-auto w-full"
+        >
 
-            <h1 class="text-5xl font-black uppercase tracking-tight sm:text-6xl lg:text-8xl">
-                Dépasse tes limites
-            </h1>
+        <!-- Bouton : Découvrir nos disciplines -->
+        <a
+            href="{{ url('/disciplines') }}"
+            class="
+                group
+                absolute
+                left-[4.6%]
+                top-[75.1%]
+                flex
+                h-[8.1%]
+                w-[20.1%]
+                items-center
+                justify-between
+                bg-red-600
+                px-[1.8%]
+                font-black
+                uppercase
+                tracking-wide
+                text-white
+                transition-all
+                duration-300
+                hover:bg-white
+                hover:text-black
+            "
+        >
+            <span class="text-[clamp(0.35rem,1vw,1.05rem)]">
+                Découvrir nos disciplines
+            </span>
 
-            <p class="mx-auto mt-6 max-w-2xl text-lg text-zinc-400">
-                Boxe anglaise, fitness, HYROX, futsal et activités sportives
-                au cœur de Bruxelles.
-            </p>
+            <svg
+                class="h-[35%] w-auto transition-transform duration-300 group-hover:translate-x-1"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <path d="M5 12h14"></path>
+                <path d="m13 6 6 6-6 6"></path>
+            </svg>
+        </a>
 
-            <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <!-- Bouton : Rejoindre BTT -->
+        <a
+            href="{{ url('/inscription') }}"
+            class="
+                group
+                absolute
+                left-[25.9%]
+                top-[75.1%]
+                flex
+                h-[8.1%]
+                w-[14.1%]
+                items-center
+                justify-between
+                border-2
+                border-red-600
+                bg-black
+                px-[1.8%]
+                font-black
+                uppercase
+                tracking-wide
+                text-white
+                transition-all
+                duration-300
+                hover:bg-red-600
+            "
+        >
+            <span class="text-[clamp(0.35rem,1vw,1.05rem)]">
+                Rejoindre BTT
+            </span>
 
-                <a
-                    href="#"
-                    class="rounded-md bg-red-600 px-7 py-4 font-bold uppercase transition hover:bg-red-700"
-                >
-                    Découvrir nos disciplines
-                </a>
+            <svg
+                class="h-[35%] w-auto transition-transform duration-300 group-hover:translate-x-1"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <path d="M5 12h14"></path>
+                <path d="m13 6 6 6-6 6"></path>
+            </svg>
+        </a>
 
-                <a
-                    href="#"
-                    class="rounded-md border border-zinc-700 px-7 py-4 font-bold uppercase transition hover:border-white"
-                >
-                    En savoir plus
-                </a>
-
-            </div>
-
-        </div>
     </section>
 
 @endsection

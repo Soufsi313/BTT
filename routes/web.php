@@ -17,10 +17,6 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | PAGE D'ACCUEIL
 |--------------------------------------------------------------------------
-|
-| URL :
-| http://127.0.0.1:8000/
-|
 */
 Route::get('/', function () {
     return view('welcome');
@@ -31,13 +27,6 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 | PAGE DISCIPLINES
 |--------------------------------------------------------------------------
-|
-| URL :
-| http://127.0.0.1:8000/disciplines
-|
-| Cette page présente les différentes disciplines proposées
-| par Brussels Top Team.
-|
 */
 Route::get('/disciplines', function () {
     return view('disciplines');
@@ -48,14 +37,40 @@ Route::get('/disciplines', function () {
 |--------------------------------------------------------------------------
 | PAGE COACHS
 |--------------------------------------------------------------------------
-|
-| URL :
-| http://127.0.0.1:8000/coachs
-|
-| Cette page présente les coachs de Brussels Top Team ainsi
-| que le contenu des entraînements qu'ils encadrent.
-|
 */
 Route::get('/coachs', function () {
     return view('coachs');
 })->name('coachs');
+
+
+/*
+|--------------------------------------------------------------------------
+| PAGE BLOG
+|--------------------------------------------------------------------------
+|
+| La structure définitive du blog sera développée plus tard avec
+| l'espace d'administration, la gestion des articles, commentaires,
+| likes et autres fonctionnalités associées.
+|
+| Pour le moment, cette route affiche une page "En construction".
+|
+*/
+Route::get('/blog', function () {
+    return view('blog');
+})->name('blog');
+
+
+/*
+|--------------------------------------------------------------------------
+| PAGE HUMANITAIRE
+|--------------------------------------------------------------------------
+|
+| Le contenu définitif sera développé lorsque les différents projets
+| humanitaires de Brussels Top Team auront été définis avec la structure.
+|
+| Pour le moment, cette route affiche une page "En construction".
+|
+*/
+Route::get('/humanitaire', function () {
+    return view('humanitaire');
+})->name('humanitaire');

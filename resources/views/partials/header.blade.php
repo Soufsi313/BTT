@@ -8,7 +8,6 @@
 
         <!-- =====================================================
              LOGO BTT
-             Le logo renvoie vers la page d'accueil.
              ===================================================== -->
         <a
             href="{{ url('/') }}"
@@ -25,7 +24,6 @@
 
         <!-- =====================================================
              NAVIGATION DESKTOP
-             Visible uniquement sur les grands écrans.
              ===================================================== -->
         <nav
             class="hidden items-center gap-8 lg:flex"
@@ -50,10 +48,7 @@
             </a>
 
 
-            <!--
-                Coachs
-                Le lien utilise la route Laravel nommée "coachs".
-            -->
+            <!-- Coachs -->
             <a
                 href="{{ route('coachs') }}"
                 class="text-sm font-semibold uppercase transition hover:text-red-500"
@@ -64,7 +59,7 @@
 
             <!-- Blog -->
             <a
-                href="#"
+                href="{{ route('blog') }}"
                 class="text-sm font-semibold uppercase transition hover:text-red-500"
             >
                 Blog
@@ -73,7 +68,7 @@
 
             <!-- Humanitaire -->
             <a
-                href="#"
+                href="{{ route('humanitaire') }}"
                 class="text-sm font-semibold uppercase transition hover:text-red-500"
             >
                 Humanitaire
@@ -101,8 +96,7 @@
 
 
         <!-- =====================================================
-             BOUTON D'INSCRIPTION DESKTOP
-             La page d'inscription sera développée plus tard.
+             BOUTON INSCRIPTION DESKTOP
              ===================================================== -->
         <a
             href="#"
@@ -125,8 +119,7 @@
 
 
         <!-- =====================================================
-             BOUTON DU MENU MOBILE
-             Visible uniquement sur les petits écrans.
+             BOUTON MENU MOBILE
              ===================================================== -->
         <button
             id="mobile-menu-button"
@@ -169,7 +162,7 @@
             </svg>
 
 
-            <!-- Icône de fermeture -->
+            <!-- Icône fermeture -->
             <svg
                 id="menu-icon-close"
                 class="hidden h-6 w-6"
@@ -192,7 +185,6 @@
 
     <!-- =========================================================
          NAVIGATION MOBILE
-         Ce menu est affiché / masqué par resources/js/app.js.
          ========================================================= -->
     <div
         id="mobile-menu"
@@ -208,14 +200,9 @@
             <a
                 href="{{ url('/') }}"
                 class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
+                    border-b border-zinc-900 py-4
+                    text-sm font-semibold uppercase
+                    transition hover:text-red-500
                 "
             >
                 Accueil
@@ -226,35 +213,22 @@
             <a
                 href="{{ route('disciplines') }}"
                 class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
+                    border-b border-zinc-900 py-4
+                    text-sm font-semibold uppercase
+                    transition hover:text-red-500
                 "
             >
                 Disciplines
             </a>
 
 
-            <!--
-                Coachs mobile
-                Utilise la même route Laravel que le menu desktop.
-            -->
+            <!-- Coachs -->
             <a
                 href="{{ route('coachs') }}"
                 class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
+                    border-b border-zinc-900 py-4
+                    text-sm font-semibold uppercase
+                    transition hover:text-red-500
                 "
             >
                 Coachs
@@ -263,16 +237,11 @@
 
             <!-- Blog -->
             <a
-                href="#"
+                href="{{ route('blog') }}"
                 class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
+                    border-b border-zinc-900 py-4
+                    text-sm font-semibold uppercase
+                    transition hover:text-red-500
                 "
             >
                 Blog
@@ -281,16 +250,11 @@
 
             <!-- Humanitaire -->
             <a
-                href="#"
+                href="{{ route('humanitaire') }}"
                 class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
+                    border-b border-zinc-900 py-4
+                    text-sm font-semibold uppercase
+                    transition hover:text-red-500
                 "
             >
                 Humanitaire
@@ -301,14 +265,9 @@
             <a
                 href="#"
                 class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
+                    border-b border-zinc-900 py-4
+                    text-sm font-semibold uppercase
+                    transition hover:text-red-500
                 "
             >
                 Abonnements
@@ -320,11 +279,8 @@
                 href="#"
                 class="
                     py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
+                    text-sm font-semibold uppercase
+                    transition hover:text-red-500
                 "
             >
                 Contact

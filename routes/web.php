@@ -74,3 +74,21 @@ Route::get('/blog', function () {
 Route::get('/humanitaire', function () {
     return view('humanitaire');
 })->name('humanitaire');
+
+
+/*
+|--------------------------------------------------------------------------
+| PAGE ABONNEMENTS / AFFILIATION
+|--------------------------------------------------------------------------
+|
+| Cette page explique le fonctionnement de l'affiliation BTT :
+|
+| - tarif à la séance ;
+| - paiement en espèces ;
+| - possibilité de créditer plusieurs séances ;
+| - validité du crédit pendant un an.
+|
+*/
+Route::get('/abonnements', function () {
+    return view('abonnements');
+})->name('abonnements');

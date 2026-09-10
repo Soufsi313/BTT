@@ -77,7 +77,7 @@
 
             <!-- Abonnements -->
             <a
-                href="#"
+                href="{{ route('abonnements') }}"
                 class="text-sm font-semibold uppercase transition hover:text-red-500"
             >
                 Abonnements
@@ -263,7 +263,7 @@
 
             <!-- Abonnements -->
             <a
-                href="#"
+                href="{{ route('abonnements') }}"
                 class="
                     border-b border-zinc-900 py-4
                     text-sm font-semibold uppercase

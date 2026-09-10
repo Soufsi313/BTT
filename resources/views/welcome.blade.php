@@ -1,33 +1,46 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.app')
 
-    <title>BTT</title>
+@section('title', 'Brussels Top Team')
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
+@section('meta_description', 'Découvrez Brussels Top Team, ses disciplines sportives, ses coachs et ses activités à Bruxelles.')
 
-<body class="min-h-screen bg-zinc-950 text-white">
+@section('content')
 
-    <main class="flex min-h-screen items-center justify-center">
-
+    <section class="flex min-h-[calc(100vh-6rem)] items-center justify-center px-6">
         <div class="text-center">
-            <h1 class="text-6xl font-black uppercase tracking-tight">
-                Brussels Top Team
-            </h1>
 
-            <p class="mt-4 text-xl text-zinc-400">
-                Nouvelle plateforme BTT
+            <p class="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-red-500">
+                Brussels Top Team
             </p>
 
-            <button class="mt-8 rounded-lg bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700">
-                Découvrir BTT
-            </button>
+            <h1 class="text-5xl font-black uppercase tracking-tight sm:text-6xl lg:text-8xl">
+                Dépasse tes limites
+            </h1>
+
+            <p class="mx-auto mt-6 max-w-2xl text-lg text-zinc-400">
+                Boxe anglaise, fitness, HYROX, futsal et activités sportives
+                au cœur de Bruxelles.
+            </p>
+
+            <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+
+                <a
+                    href="#"
+                    class="rounded-md bg-red-600 px-7 py-4 font-bold uppercase transition hover:bg-red-700"
+                >
+                    Découvrir nos disciplines
+                </a>
+
+                <a
+                    href="#"
+                    class="rounded-md border border-zinc-700 px-7 py-4 font-bold uppercase transition hover:border-white"
+                >
+                    En savoir plus
+                </a>
+
+            </div>
+
         </div>
+    </section>
 
-    </main>
-
-</body>
-</html>
+@endsection

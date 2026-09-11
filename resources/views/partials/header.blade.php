@@ -1,7 +1,7 @@
 <header class="relative z-50 border-b border-red-600 bg-black">
 
     <!-- =========================================================
-         CONTENEUR PRINCIPAL
+         CONTENEUR PRINCIPAL DU HEADER
          ========================================================= -->
     <div class="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 lg:px-8">
 
@@ -24,57 +24,113 @@
 
         <!-- =====================================================
              NAVIGATION DESKTOP
+             Visible uniquement sur les grands écrans.
              ===================================================== -->
         <nav
             class="hidden items-center gap-8 lg:flex"
             aria-label="Navigation principale"
         >
 
+            <!-- Accueil -->
             <a
                 href="{{ url('/') }}"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
+                class="
+                    text-sm
+                    font-semibold
+                    uppercase
+                    transition
+                    hover:text-red-500
+                "
             >
                 Accueil
             </a>
 
+
+            <!-- Disciplines -->
             <a
                 href="{{ route('disciplines') }}"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
+                class="
+                    text-sm
+                    font-semibold
+                    uppercase
+                    transition
+                    hover:text-red-500
+                "
             >
                 Disciplines
             </a>
 
+
+            <!-- Coachs -->
             <a
                 href="{{ route('coachs') }}"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
+                class="
+                    text-sm
+                    font-semibold
+                    uppercase
+                    transition
+                    hover:text-red-500
+                "
             >
                 Coachs
             </a>
 
+
+            <!-- Blog -->
             <a
                 href="{{ route('blog') }}"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
+                class="
+                    text-sm
+                    font-semibold
+                    uppercase
+                    transition
+                    hover:text-red-500
+                "
             >
                 Blog
             </a>
 
+
+            <!-- Humanitaire -->
             <a
                 href="{{ route('humanitaire') }}"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
+                class="
+                    text-sm
+                    font-semibold
+                    uppercase
+                    transition
+                    hover:text-red-500
+                "
             >
                 Humanitaire
             </a>
 
+
+            <!-- Abonnements -->
             <a
                 href="{{ route('abonnements') }}"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
+                class="
+                    text-sm
+                    font-semibold
+                    uppercase
+                    transition
+                    hover:text-red-500
+                "
             >
                 Abonnements
             </a>
 
+
+            <!-- Contact -->
             <a
                 href="{{ route('contact') }}"
-                class="text-sm font-semibold uppercase transition hover:text-red-500"
+                class="
+                    text-sm
+                    font-semibold
+                    uppercase
+                    transition
+                    hover:text-red-500
+                "
             >
                 Contact
             </a>
@@ -83,17 +139,17 @@
 
 
         <!-- =====================================================
-             ZONE COMPTE DESKTOP
+             ZONE COMPTE - DESKTOP
              ===================================================== -->
         <div class="hidden shrink-0 items-center gap-3 lg:flex">
 
 
             <!-- =================================================
-                 UTILISATEUR NON CONNECTÉ
+                 VISITEUR NON CONNECTÉ
                  ================================================= -->
             @guest
 
-                <!-- Connexion -->
+                <!-- Bouton Connexion -->
                 <a
                     href="{{ route('login') }}"
                     class="
@@ -115,7 +171,7 @@
                 </a>
 
 
-                <!-- Inscription -->
+                <!-- Bouton Inscription -->
                 <a
                     href="{{ route('register') }}"
                     class="
@@ -143,10 +199,11 @@
             @auth
 
                 <!-- =============================================
-                     PSEUDO DE L'UTILISATEUR
+                     ACCÈS À L'ESPACE ADHÉRENT
+                     Le pseudo mène maintenant vers /mon-compte.
                      ============================================= -->
                 <a
-                    href="#"
+                    href="{{ route('member.dashboard') }}"
                     class="
                         flex
                         items-center
@@ -178,7 +235,7 @@
                     </svg>
 
 
-                    <!-- Pseudo public -->
+                    <!-- Pseudo public de l'utilisateur -->
                     <span class="text-sm font-bold text-white">
                         {{ auth()->user()->pseudo }}
                     </span>
@@ -187,7 +244,7 @@
 
 
                 <!-- =============================================
-                     FORMULAIRE DE DÉCONNEXION
+                     DÉCONNEXION
                      ============================================= -->
                 <form
                     action="{{ route('logout') }}"
@@ -224,7 +281,7 @@
 
 
         <!-- =====================================================
-             BOUTON MENU MOBILE
+             BOUTON DU MENU MOBILE
              ===================================================== -->
         <button
             id="mobile-menu-button"
@@ -301,6 +358,7 @@
             aria-label="Navigation mobile"
         >
 
+            <!-- Accueil -->
             <a
                 href="{{ url('/') }}"
                 class="
@@ -317,6 +375,8 @@
                 Accueil
             </a>
 
+
+            <!-- Disciplines -->
             <a
                 href="{{ route('disciplines') }}"
                 class="
@@ -333,6 +393,8 @@
                 Disciplines
             </a>
 
+
+            <!-- Coachs -->
             <a
                 href="{{ route('coachs') }}"
                 class="
@@ -349,6 +411,8 @@
                 Coachs
             </a>
 
+
+            <!-- Blog -->
             <a
                 href="{{ route('blog') }}"
                 class="
@@ -365,6 +429,8 @@
                 Blog
             </a>
 
+
+            <!-- Humanitaire -->
             <a
                 href="{{ route('humanitaire') }}"
                 class="
@@ -381,6 +447,8 @@
                 Humanitaire
             </a>
 
+
+            <!-- Abonnements -->
             <a
                 href="{{ route('abonnements') }}"
                 class="
@@ -397,6 +465,8 @@
                 Abonnements
             </a>
 
+
+            <!-- Contact -->
             <a
                 href="{{ route('contact') }}"
                 class="
@@ -415,7 +485,7 @@
 
 
             <!-- =================================================
-                 UTILISATEUR NON CONNECTÉ
+                 VISITEUR NON CONNECTÉ - MOBILE
                  ================================================= -->
             @guest
 
@@ -472,13 +542,15 @@
 
 
             <!-- =================================================
-                 UTILISATEUR CONNECTÉ
+                 UTILISATEUR CONNECTÉ - MOBILE
                  ================================================= -->
             @auth
 
-                <!-- Pseudo -->
+                <!-- =============================================
+                     ACCÈS À L'ESPACE ADHÉRENT
+                     ============================================= -->
                 <a
-                    href="#"
+                    href="{{ route('member.dashboard') }}"
                     class="
                         mt-5
                         flex
@@ -495,6 +567,7 @@
                     "
                 >
 
+                    <!-- Icône utilisateur -->
                     <svg
                         class="h-5 w-5 text-red-500"
                         viewBox="0 0 24 24"
@@ -510,6 +583,7 @@
                     </svg>
 
 
+                    <!-- Pseudo public -->
                     <span class="text-sm font-bold text-white">
                         {{ auth()->user()->pseudo }}
                     </span>
@@ -517,7 +591,9 @@
                 </a>
 
 
-                <!-- Déconnexion -->
+                <!-- =============================================
+                     DÉCONNEXION MOBILE
+                     ============================================= -->
                 <form
                     action="{{ route('logout') }}"
                     method="POST"

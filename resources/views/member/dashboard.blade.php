@@ -115,10 +115,6 @@
                     "
                 >
 
-
-                    <!-- =========================================
-                         PSEUDO
-                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -140,9 +136,6 @@
                     </div>
 
 
-                    <!-- =========================================
-                         PRÉNOM ET NOM
-                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -165,9 +158,6 @@
                     </div>
 
 
-                    <!-- =========================================
-                         EMAIL
-                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -189,9 +179,6 @@
                     </div>
 
 
-                    <!-- =========================================
-                         CATÉGORIE
-                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -324,25 +311,37 @@
                             </h3>
 
                             <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                Modifiez prochainement vos informations,
-                                votre email et votre mot de passe.
+                                Modifiez votre nom, votre prénom,
+                                votre pseudo et votre catégorie.
                             </p>
 
                         </div>
 
 
-                        <span
+                        <a
+                            href="{{ route('member.profile') }}"
                             class="
+                                inline-flex
                                 shrink-0
+                                items-center
+                                justify-center
+                                rounded-md
+                                border
+                                border-red-600/50
+                                px-5
+                                py-3
                                 text-xs
                                 font-black
                                 uppercase
                                 tracking-wider
-                                text-zinc-600
+                                text-red-500
+                                transition
+                                hover:bg-red-600
+                                hover:text-white
                             "
                         >
-                            Prochainement
-                        </span>
+                            Modifier mon profil
+                        </a>
 
                     </div>
 

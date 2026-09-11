@@ -133,21 +133,9 @@ class AuthController extends Controller
     |--------------------------------------------------------------------------
     | CONNECTER UN UTILISATEUR
     |--------------------------------------------------------------------------
-    |
-    | 5 mauvaises tentatives maximum.
-    |
-    | Après la cinquième mauvaise tentative :
-    |
-    | blocage pendant 90 secondes.
-    |
     */
     public function login(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION
-        |--------------------------------------------------------------------------
-        */
         $credentials = $request->validate([
             'email' => [
                 'required',
@@ -165,12 +153,6 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | CLÉ DU LIMITEUR
         |--------------------------------------------------------------------------
-        |
-        | Le compteur dépend :
-        |
-        | - de l'adresse email ;
-        | - de l'adresse IP.
-        |
         */
         $throttleKey =
             Str::lower($credentials['email'])
@@ -212,11 +194,6 @@ class AuthController extends Controller
         */
         if (Auth::attempt($credentials, $remember)) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | CONNEXION RÉUSSIE
-            |--------------------------------------------------------------------------
-            */
             RateLimiter::clear($throttleKey);
 
             $request->session()->regenerate();
@@ -229,10 +206,6 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | MAUVAISE TENTATIVE
         |--------------------------------------------------------------------------
-        |
-        | On ajoute une tentative et Laravel conserve ce compteur
-        | pendant 90 secondes.
-        |
         */
         RateLimiter::hit(
             $throttleKey,
@@ -244,10 +217,6 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | CINQUIÈME MAUVAISE TENTATIVE
         |--------------------------------------------------------------------------
-        |
-        | Si nous venons d'atteindre cinq erreurs,
-        | on affiche immédiatement le blocage.
-        |
         */
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
 
@@ -265,7 +234,7 @@ class AuthController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | ERREUR CLASSIQUE AVANT LE BLOCAGE
+        | ERREUR DE CONNEXION
         |--------------------------------------------------------------------------
         */
         return back()
@@ -273,6 +242,100 @@ class AuthController extends Controller
             ->withErrors([
                 'email' => 'Adresse email ou mot de passe incorrect.',
             ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AFFICHER LE PROFIL DE L'ADHÉRENT
+    |--------------------------------------------------------------------------
+    */
+    public function showProfile()
+    {
+        return view('member.profile');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | METTRE À JOUR LE PROFIL DE L'ADHÉRENT
+    |--------------------------------------------------------------------------
+    */
+    public function updateProfile(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | UTILISATEUR CONNECTÉ
+        |--------------------------------------------------------------------------
+        */
+        $user = $request->user();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        |
+        | Pour le pseudo, on vérifie qu'il reste unique.
+        |
+        | Mais Laravel doit ignorer le pseudo de l'utilisateur actuel,
+        | sinon il considérerait son propre pseudo comme un doublon.
+        |
+        */
+        $validated = $request->validate([
+            'nom' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'prenom' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'pseudo' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('users', 'pseudo')->ignore($user->id),
+            ],
+
+            'genre' => [
+                'required',
+                Rule::in([
+                    'homme',
+                    'femme',
+                ]),
+            ],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MISE À JOUR DES INFORMATIONS
+        |--------------------------------------------------------------------------
+        */
+        $user->update([
+            'nom' => $validated['nom'],
+            'prenom' => $validated['prenom'],
+            'pseudo' => $validated['pseudo'],
+            'genre' => $validated['genre'],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETOUR SUR LA PAGE PROFIL
+        |--------------------------------------------------------------------------
+        */
+        return redirect()
+            ->route('member.profile')
+            ->with(
+                'success',
+                'Vos informations ont bien été mises à jour.'
+            );
     }
 
 

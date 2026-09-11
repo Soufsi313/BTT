@@ -144,12 +144,6 @@ Route::post(
 |--------------------------------------------------------------------------
 | ESPACE ADHÉRENT
 |--------------------------------------------------------------------------
-|
-| Cette page est protégée par le middleware "auth".
-|
-| Cela signifie qu'un visiteur non connecté ne peut pas accéder
-| directement à l'espace adhérent.
-|
 */
 Route::get('/mon-compte', function () {
 
@@ -158,3 +152,30 @@ Route::get('/mon-compte', function () {
 })
     ->middleware('auth')
     ->name('member.dashboard');
+
+
+/*
+|--------------------------------------------------------------------------
+| PROFIL ADHÉRENT
+|--------------------------------------------------------------------------
+|
+| Ces deux routes sont protégées.
+|
+| Un visiteur non connecté ne peut donc ni afficher,
+| ni modifier un profil.
+|
+*/
+Route::get(
+    '/mon-compte/profil',
+    [AuthController::class, 'showProfile']
+)
+    ->middleware('auth')
+    ->name('member.profile');
+
+
+Route::put(
+    '/mon-compte/profil',
+    [AuthController::class, 'updateProfile']
+)
+    ->middleware('auth')
+    ->name('member.profile.update');

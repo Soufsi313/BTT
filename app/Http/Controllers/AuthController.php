@@ -110,7 +110,7 @@ class AuthController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | PAGE DE CONFIRMATION
+    | PAGE DE CONFIRMATION D'INSCRIPTION
     |--------------------------------------------------------------------------
     */
     public function registerSuccess()
@@ -152,7 +152,7 @@ class AuthController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | CLÉ DU LIMITEUR
+        | CLÉ DU LIMITEUR DE TENTATIVES
         |--------------------------------------------------------------------------
         */
         $throttleKey =
@@ -329,19 +329,8 @@ class AuthController extends Controller
     */
     public function updateEmail(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | UTILISATEUR CONNECTÉ
-        |--------------------------------------------------------------------------
-        */
         $user = $request->user();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION DES CHAMPS
-        |--------------------------------------------------------------------------
-        */
         $validated = $request->validate([
             'email' => [
                 'required',
@@ -361,10 +350,6 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | VÉRIFICATION DU MOT DE PASSE ACTUEL
         |--------------------------------------------------------------------------
-        |
-        | On compare le mot de passe saisi avec le mot de passe chiffré
-        | enregistré en base de données.
-        |
         */
         if (! Hash::check(
             $validated['current_password'],
@@ -390,17 +375,142 @@ class AuthController extends Controller
             'email' => $validated['email'],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | RETOUR AVEC MESSAGE DE CONFIRMATION
-        |--------------------------------------------------------------------------
-        */
         return redirect()
             ->route('member.email')
             ->with(
                 'success',
                 'Votre adresse email a bien été mise à jour.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AFFICHER LA PAGE DE MODIFICATION DU MOT DE PASSE
+    |--------------------------------------------------------------------------
+    */
+    public function showPassword()
+    {
+        return view('member.password');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | METTRE À JOUR LE MOT DE PASSE
+    |--------------------------------------------------------------------------
+    */
+    public function updatePassword(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | UTILISATEUR CONNECTÉ
+        |--------------------------------------------------------------------------
+        */
+        $user = $request->user();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION DU FORMULAIRE
+        |--------------------------------------------------------------------------
+        |
+        | "confirmed" vérifie automatiquement que :
+        |
+        | password
+        |
+        | correspond bien à :
+        |
+        | password_confirmation
+        |
+        */
+        $validated = $request->validate([
+            'current_password' => [
+                'required',
+                'string',
+            ],
+
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                Password::min(8),
+            ],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VÉRIFICATION DU MOT DE PASSE ACTUEL
+        |--------------------------------------------------------------------------
+        */
+        if (! Hash::check(
+            $validated['current_password'],
+            $user->password
+        )) {
+            return back()
+                ->withErrors([
+                    'current_password' =>
+                        'Le mot de passe actuel est incorrect.',
+                ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | EMPÊCHER DE RÉUTILISER LE MÊME MOT DE PASSE
+        |--------------------------------------------------------------------------
+        */
+        if (Hash::check(
+            $validated['password'],
+            $user->password
+        )) {
+            return back()
+                ->withErrors([
+                    'password' =>
+                        'Le nouveau mot de passe doit être différent du mot de passe actuel.',
+                ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MISE À JOUR DU MOT DE PASSE
+        |--------------------------------------------------------------------------
+        |
+        | Le modèle User possède le cast "hashed".
+        |
+        | Laravel chiffre donc automatiquement le nouveau mot de passe
+        | avant son enregistrement dans la base de données.
+        |
+        */
+        $user->update([
+            'password' => $validated['password'],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RENOUVELLEMENT DE LA SESSION
+        |--------------------------------------------------------------------------
+        |
+        | On régénère l'identifiant de session après cette opération
+        | sensible.
+        |
+        */
+        $request->session()->regenerate();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONFIRMATION
+        |--------------------------------------------------------------------------
+        */
+        return redirect()
+            ->route('member.password')
+            ->with(
+                'success',
+                'Votre mot de passe a bien été modifié.'
             );
     }
 

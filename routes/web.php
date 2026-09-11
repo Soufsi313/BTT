@@ -194,3 +194,24 @@ Route::put(
 )
     ->middleware('auth')
     ->name('member.email.update');
+
+
+/*
+|--------------------------------------------------------------------------
+| MODIFICATION DU MOT DE PASSE
+|--------------------------------------------------------------------------
+*/
+Route::get(
+    '/mon-compte/mot-de-passe',
+    [AuthController::class, 'showPassword']
+)
+    ->middleware('auth')
+    ->name('member.password');
+
+
+Route::put(
+    '/mon-compte/mot-de-passe',
+    [AuthController::class, 'updatePassword']
+)
+    ->middleware('auth')
+    ->name('member.password.update');

@@ -461,7 +461,7 @@
 
 
                     <!-- =========================================
-                         MOT DE PASSE
+                         MODIFICATION DU MOT DE PASSE
                          ========================================= -->
                     <div
                         class="
@@ -481,26 +481,39 @@
                                 Mot de passe
                             </h3>
 
+
                             <p class="mt-2 text-sm text-zinc-500">
-                                La modification du mot de passe sera ajoutée
-                                à la prochaine étape.
+                                Modifiez votre mot de passe en confirmant
+                                d'abord votre mot de passe actuel.
                             </p>
 
                         </div>
 
 
-                        <span
+                        <a
+                            href="{{ route('member.password') }}"
                             class="
+                                inline-flex
                                 shrink-0
+                                items-center
+                                justify-center
+                                rounded-md
+                                border
+                                border-red-600/50
+                                px-5
+                                py-3
                                 text-xs
                                 font-black
                                 uppercase
                                 tracking-wider
-                                text-zinc-600
+                                text-red-500
+                                transition
+                                hover:bg-red-600
+                                hover:text-white
                             "
                         >
-                            Prochainement
-                        </span>
+                            Modifier mon mot de passe
+                        </a>
 
                     </div>
 

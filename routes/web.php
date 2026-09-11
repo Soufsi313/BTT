@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MemberCourseController;
 use Illuminate\Support\Facades\Route;
@@ -265,27 +266,52 @@ Route::get(
 
 /*
 |--------------------------------------------------------------------------
-| ESPACE ADMINISTRATION
+| ADMINISTRATION
 |--------------------------------------------------------------------------
-|
-| Cette route est protégée par deux niveaux :
-|
-| 1. "auth"
-|    L'utilisateur doit être connecté.
-|
-| 2. "admin"
-|    L'utilisateur doit posséder le rôle :
-|    - admin
-|    - super_admin
-|
 */
-Route::get('/admin', function () {
+Route::middleware([
+    'auth',
+    'admin',
+])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    return view('admin.dashboard');
 
-})
-    ->middleware([
-        'auth',
-        'admin',
-    ])
-    ->name('admin.dashboard');
+        /*
+        |--------------------------------------------------------------------------
+        | TABLEAU DE BORD
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/', function () {
+
+            return view('admin.dashboard');
+
+        })->name('dashboard');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTE DES ADHÉRENTS
+        |--------------------------------------------------------------------------
+        */
+        Route::get(
+            '/adherents',
+            [AdminMemberController::class, 'index']
+        )->name('members.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉACTIVATION D'UN ADHÉRENT
+        |--------------------------------------------------------------------------
+        |
+        | La sécurité Super Admin est également vérifiée dans le contrôleur.
+        |
+        */
+        Route::patch(
+            '/adherents/{id}/reactiver',
+            [AdminMemberController::class, 'restore']
+        )->name('members.restore');
+
+    });

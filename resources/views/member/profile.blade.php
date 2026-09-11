@@ -74,8 +74,8 @@
 
 
                 <p class="mt-5 max-w-2xl leading-7 text-zinc-400">
-                    Modifiez vos informations personnelles et votre identité
-                    publique sur Brussels Top Team.
+                    Gérez vos informations personnelles et les paramètres
+                    principaux de votre compte Brussels Top Team.
                 </p>
 
             </div>
@@ -107,7 +107,7 @@
 
 
             <!-- =================================================
-                 FORMULAIRE
+                 FORMULAIRE DU PROFIL
                  ================================================= -->
             <div
                 class="
@@ -144,7 +144,6 @@
                             <span class="text-red-500">*</span>
                         </label>
 
-
                         <input
                             id="nom"
                             name="nom"
@@ -157,6 +156,7 @@
                                 w-full
                                 rounded-lg
                                 border
+                                border-zinc-700
                                 bg-black
                                 px-4
                                 py-3.5
@@ -166,22 +166,13 @@
                                 focus:border-red-600
                                 focus:ring-2
                                 focus:ring-red-600/20
-
-                                @error('nom')
-                                    border-red-600
-                                @else
-                                    border-zinc-700
-                                @enderror
                             "
                         >
 
-
                         @error('nom')
-
                             <p class="mt-2 text-sm text-red-500">
                                 {{ $message }}
                             </p>
-
                         @enderror
 
                     </div>
@@ -200,7 +191,6 @@
                             <span class="text-red-500">*</span>
                         </label>
 
-
                         <input
                             id="prenom"
                             name="prenom"
@@ -213,6 +203,7 @@
                                 w-full
                                 rounded-lg
                                 border
+                                border-zinc-700
                                 bg-black
                                 px-4
                                 py-3.5
@@ -222,22 +213,13 @@
                                 focus:border-red-600
                                 focus:ring-2
                                 focus:ring-red-600/20
-
-                                @error('prenom')
-                                    border-red-600
-                                @else
-                                    border-zinc-700
-                                @enderror
                             "
                         >
 
-
                         @error('prenom')
-
                             <p class="mt-2 text-sm text-red-500">
                                 {{ $message }}
                             </p>
-
                         @enderror
 
                     </div>
@@ -256,7 +238,6 @@
                             <span class="text-red-500">*</span>
                         </label>
 
-
                         <input
                             id="pseudo"
                             name="pseudo"
@@ -269,6 +250,7 @@
                                 w-full
                                 rounded-lg
                                 border
+                                border-zinc-700
                                 bg-black
                                 px-4
                                 py-3.5
@@ -278,35 +260,25 @@
                                 focus:border-red-600
                                 focus:ring-2
                                 focus:ring-red-600/20
-
-                                @error('pseudo')
-                                    border-red-600
-                                @else
-                                    border-zinc-700
-                                @enderror
                             "
                         >
-
 
                         <p class="mt-2 text-sm leading-6 text-zinc-500">
                             Votre pseudo est votre identité publique sur
                             Brussels Top Team.
                         </p>
 
-
                         @error('pseudo')
-
                             <p class="mt-2 text-sm text-red-500">
                                 {{ $message }}
                             </p>
-
                         @enderror
 
                     </div>
 
 
                     <!-- =========================================
-                         GENRE / CATÉGORIE
+                         CATÉGORIE
                          ========================================= -->
                     <div>
 
@@ -318,7 +290,6 @@
                             <span class="text-red-500">*</span>
                         </label>
 
-
                         <select
                             id="genre"
                             name="genre"
@@ -327,6 +298,7 @@
                                 w-full
                                 rounded-lg
                                 border
+                                border-zinc-700
                                 bg-black
                                 px-4
                                 py-3.5
@@ -336,12 +308,6 @@
                                 focus:border-red-600
                                 focus:ring-2
                                 focus:ring-red-600/20
-
-                                @error('genre')
-                                    border-red-600
-                                @else
-                                    border-zinc-700
-                                @enderror
                             "
                         >
 
@@ -371,66 +337,17 @@
 
                         </select>
 
-
-                        <p class="mt-2 text-sm leading-6 text-zinc-500">
-                            Cette catégorie servira notamment à afficher
-                            les entraînements correspondant à votre profil.
-                        </p>
-
-
                         @error('genre')
-
                             <p class="mt-2 text-sm text-red-500">
                                 {{ $message }}
                             </p>
-
                         @enderror
 
                     </div>
 
 
                     <!-- =========================================
-                         EMAIL
-                         ========================================= -->
-                    <div
-                        class="
-                            rounded-xl
-                            border
-                            border-zinc-800
-                            bg-black/40
-                            px-5
-                            py-4
-                        "
-                    >
-
-                        <p
-                            class="
-                                text-xs
-                                font-bold
-                                uppercase
-                                tracking-wider
-                                text-zinc-500
-                            "
-                        >
-                            Adresse email
-                        </p>
-
-
-                        <p class="mt-2 font-bold text-white">
-                            {{ auth()->user()->email }}
-                        </p>
-
-
-                        <p class="mt-2 text-sm leading-6 text-zinc-500">
-                            La modification de l'adresse email sera gérée
-                            séparément pour des raisons de sécurité.
-                        </p>
-
-                    </div>
-
-
-                    <!-- =========================================
-                         BOUTON
+                         ENREGISTREMENT DU PROFIL
                          ========================================= -->
                     <div class="flex justify-end border-t border-zinc-800 pt-7">
 
@@ -456,6 +373,138 @@
                     </div>
 
                 </form>
+
+            </div>
+
+
+            <!-- =================================================
+                 SÉCURITÉ DU COMPTE
+                 ================================================= -->
+            <div class="mt-12">
+
+                <p
+                    class="
+                        text-xs
+                        font-black
+                        uppercase
+                        tracking-[0.3em]
+                        text-red-500
+                    "
+                >
+                    Sécurité
+                </p>
+
+
+                <h2 class="mt-3 text-2xl font-black uppercase text-white">
+                    Sécurité du compte
+                </h2>
+
+
+                <div class="mt-6 divide-y divide-zinc-800 border-y border-zinc-800">
+
+
+                    <!-- =========================================
+                         MODIFICATION EMAIL
+                         ========================================= -->
+                    <div
+                        class="
+                            flex
+                            flex-col
+                            gap-5
+                            py-7
+                            sm:flex-row
+                            sm:items-center
+                            sm:justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <h3 class="font-black uppercase text-white">
+                                Adresse email
+                            </h3>
+
+
+                            <p class="mt-2 break-all text-sm text-zinc-500">
+                                {{ auth()->user()->email }}
+                            </p>
+
+                        </div>
+
+
+                        <a
+                            href="{{ route('member.email') }}"
+                            class="
+                                inline-flex
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-md
+                                border
+                                border-red-600/50
+                                px-5
+                                py-3
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-wider
+                                text-red-500
+                                transition
+                                hover:bg-red-600
+                                hover:text-white
+                            "
+                        >
+                            Modifier mon email
+                        </a>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         MOT DE PASSE
+                         ========================================= -->
+                    <div
+                        class="
+                            flex
+                            flex-col
+                            gap-5
+                            py-7
+                            sm:flex-row
+                            sm:items-center
+                            sm:justify-between
+                        "
+                    >
+
+                        <div>
+
+                            <h3 class="font-black uppercase text-white">
+                                Mot de passe
+                            </h3>
+
+                            <p class="mt-2 text-sm text-zinc-500">
+                                La modification du mot de passe sera ajoutée
+                                à la prochaine étape.
+                            </p>
+
+                        </div>
+
+
+                        <span
+                            class="
+                                shrink-0
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-wider
+                                text-zinc-600
+                            "
+                        >
+                            Prochainement
+                        </span>
+
+                    </div>
+
+                </div>
 
             </div>
 

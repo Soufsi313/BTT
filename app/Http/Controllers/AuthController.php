@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -263,25 +264,8 @@ class AuthController extends Controller
     */
     public function updateProfile(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | UTILISATEUR CONNECTÉ
-        |--------------------------------------------------------------------------
-        */
         $user = $request->user();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION
-        |--------------------------------------------------------------------------
-        |
-        | Pour le pseudo, on vérifie qu'il reste unique.
-        |
-        | Mais Laravel doit ignorer le pseudo de l'utilisateur actuel,
-        | sinon il considérerait son propre pseudo comme un doublon.
-        |
-        */
         $validated = $request->validate([
             'nom' => [
                 'required',
@@ -311,12 +295,6 @@ class AuthController extends Controller
             ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | MISE À JOUR DES INFORMATIONS
-        |--------------------------------------------------------------------------
-        */
         $user->update([
             'nom' => $validated['nom'],
             'prenom' => $validated['prenom'],
@@ -324,17 +302,105 @@ class AuthController extends Controller
             'genre' => $validated['genre'],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | RETOUR SUR LA PAGE PROFIL
-        |--------------------------------------------------------------------------
-        */
         return redirect()
             ->route('member.profile')
             ->with(
                 'success',
                 'Vos informations ont bien été mises à jour.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AFFICHER LA PAGE DE MODIFICATION DE L'EMAIL
+    |--------------------------------------------------------------------------
+    */
+    public function showEmail()
+    {
+        return view('member.email');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | METTRE À JOUR L'ADRESSE EMAIL
+    |--------------------------------------------------------------------------
+    */
+    public function updateEmail(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | UTILISATEUR CONNECTÉ
+        |--------------------------------------------------------------------------
+        */
+        $user = $request->user();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION DES CHAMPS
+        |--------------------------------------------------------------------------
+        */
+        $validated = $request->validate([
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+
+            'current_password' => [
+                'required',
+                'string',
+            ],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VÉRIFICATION DU MOT DE PASSE ACTUEL
+        |--------------------------------------------------------------------------
+        |
+        | On compare le mot de passe saisi avec le mot de passe chiffré
+        | enregistré en base de données.
+        |
+        */
+        if (! Hash::check(
+            $validated['current_password'],
+            $user->password
+        )) {
+            return back()
+                ->withInput(
+                    $request->only('email')
+                )
+                ->withErrors([
+                    'current_password' =>
+                        'Le mot de passe actuel est incorrect.',
+                ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MISE À JOUR DE L'EMAIL
+        |--------------------------------------------------------------------------
+        */
+        $user->update([
+            'email' => $validated['email'],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETOUR AVEC MESSAGE DE CONFIRMATION
+        |--------------------------------------------------------------------------
+        */
+        return redirect()
+            ->route('member.email')
+            ->with(
+                'success',
+                'Votre adresse email a bien été mise à jour.'
             );
     }
 

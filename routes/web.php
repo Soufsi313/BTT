@@ -158,12 +158,6 @@ Route::get('/mon-compte', function () {
 |--------------------------------------------------------------------------
 | PROFIL ADHÉRENT
 |--------------------------------------------------------------------------
-|
-| Ces deux routes sont protégées.
-|
-| Un visiteur non connecté ne peut donc ni afficher,
-| ni modifier un profil.
-|
 */
 Route::get(
     '/mon-compte/profil',
@@ -179,3 +173,24 @@ Route::put(
 )
     ->middleware('auth')
     ->name('member.profile.update');
+
+
+/*
+|--------------------------------------------------------------------------
+| MODIFICATION DE L'ADRESSE EMAIL
+|--------------------------------------------------------------------------
+*/
+Route::get(
+    '/mon-compte/email',
+    [AuthController::class, 'showEmail']
+)
+    ->middleware('auth')
+    ->name('member.email');
+
+
+Route::put(
+    '/mon-compte/email',
+    [AuthController::class, 'updateEmail']
+)
+    ->middleware('auth')
+    ->name('member.email.update');

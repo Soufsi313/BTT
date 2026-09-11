@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MemberCourseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -219,6 +220,25 @@ Route::put(
 
 /*
 |--------------------------------------------------------------------------
+| CALENDRIER PRIVÉ DES ENTRAÎNEMENTS
+|--------------------------------------------------------------------------
+|
+| Cette page est réservée aux utilisateurs connectés.
+|
+| Le contrôleur filtrera les entraînements selon la catégorie
+| homme ou femme de l'adhérent.
+|
+*/
+Route::get(
+    '/mon-compte/calendrier',
+    [MemberCourseController::class, 'index']
+)
+    ->middleware('auth')
+    ->name('member.courses');
+
+
+/*
+|--------------------------------------------------------------------------
 | SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
 */
@@ -243,8 +263,8 @@ Route::delete(
 | CONFIRMATION DE SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
 |
-| Cette page n'est pas protégée par auth car l'utilisateur vient justement
-| d'être déconnecté.
+| Cette page n'est pas protégée par le middleware auth car l'utilisateur
+| vient d'être déconnecté après la suppression de son compte.
 |
 */
 Route::get(

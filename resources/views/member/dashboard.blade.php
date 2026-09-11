@@ -115,6 +115,9 @@
                     "
                 >
 
+                    <!-- =========================================
+                         PSEUDO
+                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -136,6 +139,9 @@
                     </div>
 
 
+                    <!-- =========================================
+                         IDENTITÉ
+                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -158,6 +164,9 @@
                     </div>
 
 
+                    <!-- =========================================
+                         EMAIL
+                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -179,6 +188,9 @@
                     </div>
 
 
+                    <!-- =========================================
+                         CATÉGORIE
+                         ========================================= -->
                     <div class="bg-zinc-900 p-6">
 
                         <p
@@ -245,7 +257,7 @@
 
 
                     <!-- =========================================
-                         CALENDRIER
+                         CALENDRIER DES ENTRAÎNEMENTS
                          ========================================= -->
                     <div
                         class="
@@ -266,25 +278,37 @@
                             </h3>
 
                             <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                Consultez prochainement les entraînements
+                                Consultez les prochains entraînements
                                 correspondant à votre catégorie.
                             </p>
 
                         </div>
 
 
-                        <span
+                        <a
+                            href="{{ route('member.courses') }}"
                             class="
+                                inline-flex
                                 shrink-0
+                                items-center
+                                justify-center
+                                rounded-md
+                                border
+                                border-red-600/50
+                                px-5
+                                py-3
                                 text-xs
                                 font-black
                                 uppercase
                                 tracking-wider
-                                text-zinc-600
+                                text-red-500
+                                transition
+                                hover:bg-red-600
+                                hover:text-white
                             "
                         >
-                            Prochainement
-                        </span>
+                            Voir mon calendrier
+                        </a>
 
                     </div>
 

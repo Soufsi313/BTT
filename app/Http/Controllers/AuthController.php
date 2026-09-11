@@ -402,28 +402,8 @@ class AuthController extends Controller
     */
     public function updatePassword(Request $request)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | UTILISATEUR CONNECTÉ
-        |--------------------------------------------------------------------------
-        */
         $user = $request->user();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION DU FORMULAIRE
-        |--------------------------------------------------------------------------
-        |
-        | "confirmed" vérifie automatiquement que :
-        |
-        | password
-        |
-        | correspond bien à :
-        |
-        | password_confirmation
-        |
-        */
         $validated = $request->validate([
             'current_password' => [
                 'required',
@@ -458,7 +438,7 @@ class AuthController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | EMPÊCHER DE RÉUTILISER LE MÊME MOT DE PASSE
+        | EMPÊCHER LA RÉUTILISATION DU MÊME MOT DE PASSE
         |--------------------------------------------------------------------------
         */
         if (Hash::check(
@@ -477,12 +457,6 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | MISE À JOUR DU MOT DE PASSE
         |--------------------------------------------------------------------------
-        |
-        | Le modèle User possède le cast "hashed".
-        |
-        | Laravel chiffre donc automatiquement le nouveau mot de passe
-        | avant son enregistrement dans la base de données.
-        |
         */
         $user->update([
             'password' => $validated['password'],
@@ -493,25 +467,126 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | RENOUVELLEMENT DE LA SESSION
         |--------------------------------------------------------------------------
-        |
-        | On régénère l'identifiant de session après cette opération
-        | sensible.
-        |
         */
         $request->session()->regenerate();
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | CONFIRMATION
-        |--------------------------------------------------------------------------
-        */
         return redirect()
             ->route('member.password')
             ->with(
                 'success',
                 'Votre mot de passe a bien été modifié.'
             );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AFFICHER LA PAGE DE SUPPRESSION DU COMPTE
+    |--------------------------------------------------------------------------
+    */
+    public function showDeleteAccount()
+    {
+        return view('member.delete-account');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUPPRIMER LOGIQUEMENT LE COMPTE
+    |--------------------------------------------------------------------------
+    */
+    public function deleteAccount(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | UTILISATEUR CONNECTÉ
+        |--------------------------------------------------------------------------
+        */
+        $user = $request->user();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        */
+        $validated = $request->validate([
+            'current_password' => [
+                'required',
+                'string',
+            ],
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VÉRIFICATION DU MOT DE PASSE
+        |--------------------------------------------------------------------------
+        */
+        if (! Hash::check(
+            $validated['current_password'],
+            $user->password
+        )) {
+            return back()
+                ->withErrors([
+                    'current_password' =>
+                        'Le mot de passe actuel est incorrect.',
+                ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUPPRESSION LOGIQUE
+        |--------------------------------------------------------------------------
+        |
+        | Comme le modèle User utilise SoftDeletes, Laravel ne supprime
+        | pas immédiatement la ligne de la base de données.
+        |
+        | La colonne deleted_at reçoit une date.
+        |
+        | Le compte n'est ensuite plus considéré comme actif par Laravel.
+        |
+        */
+        $user->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DÉCONNEXION IMMÉDIATE
+        |--------------------------------------------------------------------------
+        */
+        Auth::logout();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | INVALIDATION DE LA SESSION
+        |--------------------------------------------------------------------------
+        */
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGE DE CONFIRMATION
+        |--------------------------------------------------------------------------
+        */
+        return redirect()->route('account.deleted');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PAGE DE CONFIRMATION DE SUPPRESSION
+    |--------------------------------------------------------------------------
+    */
+    public function accountDeleted()
+    {
+        return view('member.account-deleted');
     }
 
 

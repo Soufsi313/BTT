@@ -521,6 +521,82 @@
 
             </div>
 
+
+            <!-- =================================================
+                 ZONE DANGEREUSE
+                 ================================================= -->
+            <div class="mt-14">
+
+                <p
+                    class="
+                        text-xs
+                        font-black
+                        uppercase
+                        tracking-[0.3em]
+                        text-red-500
+                    "
+                >
+                    Zone dangereuse
+                </p>
+
+
+                <div
+                    class="
+                        mt-5
+                        flex
+                        flex-col
+                        gap-6
+                        border-y
+                        border-red-600/30
+                        py-7
+                        sm:flex-row
+                        sm:items-center
+                        sm:justify-between
+                    "
+                >
+
+                    <div class="max-w-xl">
+
+                        <h2 class="text-xl font-black uppercase text-white">
+                            Supprimer mon compte
+                        </h2>
+
+
+                        <p class="mt-2 text-sm leading-6 text-zinc-500">
+                            Cette action désactivera votre compte et vous
+                            déconnectera immédiatement du site.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="{{ route('member.delete-account') }}"
+                        class="
+                            inline-flex
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-md
+                            bg-red-600
+                            px-5
+                            py-3
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-wider
+                            text-white
+                            transition
+                            hover:bg-red-700
+                        "
+                    >
+                        Supprimer mon compte
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
 
     </section>

@@ -215,3 +215,39 @@ Route::put(
 )
     ->middleware('auth')
     ->name('member.password.update');
+
+
+/*
+|--------------------------------------------------------------------------
+| SUPPRESSION DU COMPTE
+|--------------------------------------------------------------------------
+*/
+Route::get(
+    '/mon-compte/supprimer',
+    [AuthController::class, 'showDeleteAccount']
+)
+    ->middleware('auth')
+    ->name('member.delete-account');
+
+
+Route::delete(
+    '/mon-compte/supprimer',
+    [AuthController::class, 'deleteAccount']
+)
+    ->middleware('auth')
+    ->name('member.delete-account.destroy');
+
+
+/*
+|--------------------------------------------------------------------------
+| CONFIRMATION DE SUPPRESSION DU COMPTE
+|--------------------------------------------------------------------------
+|
+| Cette page n'est pas protégée par auth car l'utilisateur vient justement
+| d'être déconnecté.
+|
+*/
+Route::get(
+    '/compte-supprime',
+    [AuthController::class, 'accountDeleted']
+)->name('account.deleted');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MemberCourseController;
@@ -347,5 +348,59 @@ Route::middleware([
             '/administrateurs/{id}/retrograder',
             [AdminMemberController::class, 'demoteAdmin']
         )->name('administrators.demote');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CALENDRIER - LISTE DES COURS
+        |--------------------------------------------------------------------------
+        |
+        | Affiche les cours que l'administrateur est autorisé à consulter.
+        |
+        | Super Admin :
+        | - Homme
+        | - Femme
+        |
+        | Admin normal :
+        | - uniquement sa propre catégorie
+        |
+        */
+        Route::get(
+            '/calendrier',
+            [AdminCourseController::class, 'index']
+        )->name('courses.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CALENDRIER - FORMULAIRE D'AJOUT D'UN COURS
+        |--------------------------------------------------------------------------
+        |
+        | Cette route affichera le formulaire permettant de créer
+        | un nouvel entraînement.
+        |
+        */
+        Route::get(
+            '/calendrier/ajouter',
+            [AdminCourseController::class, 'create']
+        )->name('courses.create');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CALENDRIER - ENREGISTRER UN NOUVEAU COURS
+        |--------------------------------------------------------------------------
+        |
+        | Cette route recevra les informations envoyées par le
+        | formulaire d'ajout.
+        |
+        | La sécurité concernant la catégorie Homme / Femme sera
+        | contrôlée côté serveur dans AdminCourseController.
+        |
+        */
+        Route::post(
+            '/calendrier',
+            [AdminCourseController::class, 'store']
+        )->name('courses.store');
 
     });

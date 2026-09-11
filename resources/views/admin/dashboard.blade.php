@@ -130,21 +130,26 @@
 
 
                         <!-- =========================================
-                             CALENDRIER
+                             GESTION DU CALENDRIER
                              ========================================= -->
-                        <span
+                        <a
+                            href="{{ route('admin.courses.index') }}"
                             class="
-                                block
+                                flex
+                                items-center
                                 rounded-md
                                 px-4
                                 py-3
                                 text-sm
                                 font-bold
-                                text-zinc-500
+                                text-zinc-600
+                                transition
+                                hover:bg-zinc-200
+                                hover:text-red-600
                             "
                         >
                             Calendrier
-                        </span>
+                        </a>
 
 
                         <!-- =========================================
@@ -396,6 +401,9 @@
                             "
                         >
 
+                            <!-- =====================================
+                                 STATISTIQUE ADHÉRENTS
+                                 ===================================== -->
                             <div
                                 class="
                                     border
@@ -431,6 +439,9 @@
                             </div>
 
 
+                            <!-- =====================================
+                                 STATISTIQUE COURS
+                                 ===================================== -->
                             <div
                                 class="
                                     border
@@ -466,6 +477,9 @@
                             </div>
 
 
+                            <!-- =====================================
+                                 STATISTIQUE ARTICLES
+                                 ===================================== -->
                             <div
                                 class="
                                     border
@@ -501,6 +515,9 @@
                             </div>
 
 
+                            <!-- =====================================
+                                 STATISTIQUE MESSAGES
+                                 ===================================== -->
                             <div
                                 class="
                                     border
@@ -581,17 +598,25 @@
                             "
                         >
 
-                            <button
-                                type="button"
-                                disabled
+
+                            <!-- =====================================
+                                 AJOUTER UN COURS
+                                 FONCTIONNALITÉ ACTIVE
+                                 ===================================== -->
+                            <a
+                                href="{{ route('admin.courses.create') }}"
                                 class="
+                                    block
+                                    cursor-pointer
                                     border
                                     border-zinc-200
-                                    bg-zinc-50
+                                    bg-white
                                     px-5
                                     py-5
                                     text-left
-                                    opacity-60
+                                    transition
+                                    hover:border-red-600
+                                    hover:bg-red-50
                                 "
                             >
 
@@ -607,12 +632,16 @@
                                 </p>
 
                                 <p class="mt-2 text-sm text-zinc-500">
-                                    Gestion du calendrier prochainement.
+                                    Ajouter un entraînement au calendrier des adhérents.
                                 </p>
 
-                            </button>
+                            </a>
 
 
+                            <!-- =====================================
+                                 PUBLIER UN ARTICLE
+                                 Fonctionnalité prochainement.
+                                 ===================================== -->
                             <button
                                 type="button"
                                 disabled
@@ -645,6 +674,10 @@
                             </button>
 
 
+                            <!-- =====================================
+                                 AJOUTER UN PRODUIT
+                                 Fonctionnalité prochainement.
+                                 ===================================== -->
                             <button
                                 type="button"
                                 disabled

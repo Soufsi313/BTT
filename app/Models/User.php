@@ -11,22 +11,27 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
 
+
     /*
     |--------------------------------------------------------------------------
     | CHAMPS AUTORISÉS À L'ENREGISTREMENT
     |--------------------------------------------------------------------------
     |
-    | Ces champs pourront être renseignés lors de la création
-    | ou de la modification d'un utilisateur.
+    | Ces informations peuvent être enregistrées depuis
+    | les formulaires prévus par l'application.
+    |
+    | Le rôle n'est volontairement pas présent.
+    | Un utilisateur ne peut donc jamais choisir lui-même
+    | de devenir administrateur.
     |
     */
     protected $fillable = [
         'nom',
         'prenom',
+        'pseudo',
+        'genre',
         'email',
         'password',
-        'role',
-        'genre',
     ];
 
 
@@ -34,10 +39,6 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | CHAMPS CACHÉS
     |--------------------------------------------------------------------------
-    |
-    | Ces informations ne doivent pas apparaître lorsque
-    | l'utilisateur est transformé en tableau ou en JSON.
-    |
     */
     protected $hidden = [
         'password',
@@ -49,10 +50,6 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | CONVERSIONS AUTOMATIQUES
     |--------------------------------------------------------------------------
-    |
-    | Laravel convertira automatiquement certaines valeurs
-    | dans le bon type.
-    |
     */
     protected function casts(): array
     {
@@ -61,12 +58,8 @@ class User extends Authenticatable
 
             /*
             |--------------------------------------------------------------------------
-            | MOT DE PASSE
+            | HASHAGE AUTOMATIQUE DU MOT DE PASSE
             |--------------------------------------------------------------------------
-            |
-            | Laravel hash automatiquement le mot de passe
-            | grâce au cast "hashed".
-            |
             */
             'password' => 'hashed',
         ];
@@ -77,13 +70,6 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | VÉRIFIER SI L'UTILISATEUR EST ADMIN
     |--------------------------------------------------------------------------
-    |
-    | Exemple futur :
-    |
-    | if ($user->isAdmin()) {
-    |     // accès à l'espace admin
-    | }
-    |
     */
     public function isAdmin(): bool
     {
@@ -106,9 +92,6 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | VÉRIFIER SI L'UTILISATEUR EST UN HOMME
     |--------------------------------------------------------------------------
-    |
-    | Sera notamment utilisé pour filtrer le calendrier.
-    |
     */
     public function isHomme(): bool
     {
@@ -120,9 +103,6 @@ class User extends Authenticatable
     |--------------------------------------------------------------------------
     | VÉRIFIER SI L'UTILISATEUR EST UNE FEMME
     |--------------------------------------------------------------------------
-    |
-    | Sera notamment utilisé pour filtrer le calendrier.
-    |
     */
     public function isFemme(): bool
     {

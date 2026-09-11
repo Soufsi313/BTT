@@ -1,42 +1,72 @@
-<header class="relative z-50 border-b border-red-600 bg-black">
+<!-- =========================================================
+     HEADER GLOBAL
+     ========================================================= -->
+<header
+    class="
+        border-b-2
+        border-red-600
+        bg-black
+        text-white
+    "
+>
 
-    <!-- =========================================================
-         CONTENEUR PRINCIPAL DU HEADER
-         ========================================================= -->
-    <div class="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 lg:px-8">
+    <div
+        class="
+            mx-auto
+            flex
+            min-h-[90px]
+            max-w-7xl
+            items-center
+            justify-between
+            gap-6
+            px-4
+            sm:px-6
+            lg:px-8
+        "
+    >
 
 
         <!-- =====================================================
-             LOGO BTT
+             LOGO
              ===================================================== -->
         <a
             href="{{ url('/') }}"
-            class="flex shrink-0 items-center"
-            aria-label="Brussels Top Team - Accueil"
+            class="shrink-0"
+            aria-label="Accueil Brussels Top Team"
         >
+
             <img
                 src="{{ asset('images/BTTboxe.png') }}"
-                alt="Brussels Top Team"
-                class="h-16 w-auto object-contain"
+                alt="Logo Brussels Top Team"
+                class="
+                    h-16
+                    w-16
+                    object-contain
+                    sm:h-20
+                    sm:w-20
+                "
             >
+
         </a>
 
 
         <!-- =====================================================
              NAVIGATION DESKTOP
-             Visible uniquement sur les grands écrans.
              ===================================================== -->
         <nav
-            class="hidden items-center gap-8 lg:flex"
-            aria-label="Navigation principale"
+            class="
+                hidden
+                items-center
+                gap-7
+                lg:flex
+            "
         >
 
-            <!-- Accueil -->
             <a
                 href="{{ url('/') }}"
                 class="
                     text-sm
-                    font-semibold
+                    font-bold
                     uppercase
                     transition
                     hover:text-red-500
@@ -46,12 +76,11 @@
             </a>
 
 
-            <!-- Disciplines -->
             <a
                 href="{{ route('disciplines') }}"
                 class="
                     text-sm
-                    font-semibold
+                    font-bold
                     uppercase
                     transition
                     hover:text-red-500
@@ -61,12 +90,11 @@
             </a>
 
 
-            <!-- Coachs -->
             <a
                 href="{{ route('coachs') }}"
                 class="
                     text-sm
-                    font-semibold
+                    font-bold
                     uppercase
                     transition
                     hover:text-red-500
@@ -76,12 +104,11 @@
             </a>
 
 
-            <!-- Blog -->
             <a
                 href="{{ route('blog') }}"
                 class="
                     text-sm
-                    font-semibold
+                    font-bold
                     uppercase
                     transition
                     hover:text-red-500
@@ -91,12 +118,11 @@
             </a>
 
 
-            <!-- Humanitaire -->
             <a
                 href="{{ route('humanitaire') }}"
                 class="
                     text-sm
-                    font-semibold
+                    font-bold
                     uppercase
                     transition
                     hover:text-red-500
@@ -106,12 +132,11 @@
             </a>
 
 
-            <!-- Abonnements -->
             <a
                 href="{{ route('abonnements') }}"
                 class="
                     text-sm
-                    font-semibold
+                    font-bold
                     uppercase
                     transition
                     hover:text-red-500
@@ -121,12 +146,11 @@
             </a>
 
 
-            <!-- Contact -->
             <a
                 href="{{ route('contact') }}"
                 class="
                     text-sm
-                    font-semibold
+                    font-bold
                     uppercase
                     transition
                     hover:text-red-500
@@ -139,17 +163,24 @@
 
 
         <!-- =====================================================
-             ZONE COMPTE - DESKTOP
+             ACTIONS DESKTOP
              ===================================================== -->
-        <div class="hidden shrink-0 items-center gap-3 lg:flex">
+        <div
+            class="
+                hidden
+                items-center
+                gap-3
+                lg:flex
+            "
+        >
 
 
-            <!-- =================================================
-                 VISITEUR NON CONNECTÉ
-                 ================================================= -->
             @guest
 
-                <!-- Bouton Connexion -->
+                <!-- =================================================
+                     UTILISATEUR NON CONNECTÉ
+                     ================================================= -->
+
                 <a
                     href="{{ route('login') }}"
                     class="
@@ -157,10 +188,11 @@
                         border
                         border-zinc-700
                         px-4
-                        py-3
+                        py-2.5
                         text-xs
-                        font-bold
+                        font-black
                         uppercase
+                        tracking-wider
                         text-white
                         transition
                         hover:border-red-600
@@ -171,17 +203,17 @@
                 </a>
 
 
-                <!-- Bouton Inscription -->
                 <a
                     href="{{ route('register') }}"
                     class="
                         rounded-md
                         bg-red-600
                         px-4
-                        py-3
+                        py-2.5
                         text-xs
-                        font-bold
+                        font-black
                         uppercase
+                        tracking-wider
                         text-white
                         transition
                         hover:bg-red-700
@@ -190,56 +222,56 @@
                     Inscription
                 </a>
 
-            @endguest
+            @else
 
+                <!-- =================================================
+                     UTILISATEUR CONNECTÉ
+                     ================================================= -->
 
-            <!-- =================================================
-                 UTILISATEUR CONNECTÉ
-                 ================================================= -->
-            @auth
 
                 <!-- =============================================
-                     ACCÈS À L'ESPACE ADHÉRENT
-                     Le pseudo mène maintenant vers /mon-compte.
+                     ACCÈS ADMINISTRATION
+                     Visible uniquement pour Admin / Super Admin
+                     ============================================= -->
+                @if (auth()->user()->canAccessAdmin())
+
+                    <a
+                        href="{{ route('admin.dashboard') }}"
+                        class="
+                            rounded-md
+                            bg-white
+                            px-4
+                            py-2.5
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-wider
+                            text-black
+                            transition
+                            hover:bg-red-600
+                            hover:text-white
+                        "
+                    >
+                        Administration
+                    </a>
+
+                @endif
+
+
+                <!-- =============================================
+                     ESPACE ADHÉRENT
                      ============================================= -->
                 <a
                     href="{{ route('member.dashboard') }}"
                     class="
-                        flex
-                        items-center
-                        gap-3
-                        rounded-md
-                        border
-                        border-zinc-800
-                        bg-zinc-900
-                        px-4
-                        py-3
+                        text-sm
+                        font-black
+                        text-white
                         transition
-                        hover:border-red-600
+                        hover:text-red-500
                     "
                 >
-
-                    <!-- Icône utilisateur -->
-                    <svg
-                        class="h-5 w-5 text-red-500"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <path d="M20 21a8 8 0 0 0-16 0"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-
-
-                    <!-- Pseudo public de l'utilisateur -->
-                    <span class="text-sm font-bold text-white">
-                        {{ auth()->user()->pseudo }}
-                    </span>
-
+                    {{ auth()->user()->pseudo }}
                 </a>
 
 
@@ -260,10 +292,11 @@
                             border
                             border-red-600/50
                             px-4
-                            py-3
+                            py-2.5
                             text-xs
-                            font-bold
+                            font-black
                             uppercase
+                            tracking-wider
                             text-red-500
                             transition
                             hover:bg-red-600
@@ -275,17 +308,19 @@
 
                 </form>
 
-            @endauth
+            @endguest
 
         </div>
 
 
         <!-- =====================================================
-             BOUTON DU MENU MOBILE
+             BOUTON MENU MOBILE
              ===================================================== -->
         <button
             id="mobile-menu-button"
             type="button"
+            aria-label="Ouvrir le menu"
+            aria-expanded="false"
             class="
                 flex
                 h-11
@@ -298,46 +333,47 @@
                 text-white
                 transition
                 hover:border-red-600
-                hover:text-red-500
                 lg:hidden
             "
-            aria-label="Ouvrir le menu"
-            aria-expanded="false"
-            aria-controls="mobile-menu"
         >
 
-            <!-- Icône hamburger -->
+            <!-- =================================================
+                 ICÔNE MENU
+                 ================================================= -->
             <svg
                 id="menu-icon-open"
-                class="h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
+                class="h-6 w-6"
             >
-                <path d="M4 6h16"></path>
-                <path d="M4 12h16"></path>
-                <path d="M4 18h16"></path>
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                />
             </svg>
 
 
-            <!-- Icône fermeture -->
+            <!-- =================================================
+                 ICÔNE FERMETURE
+                 ================================================= -->
             <svg
                 id="menu-icon-close"
-                class="hidden h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
+                class="hidden h-6 w-6"
             >
-                <path d="M18 6 6 18"></path>
-                <path d="m6 6 12 12"></path>
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                />
             </svg>
 
         </button>
@@ -350,285 +386,321 @@
          ========================================================= -->
     <div
         id="mobile-menu"
-        class="hidden border-t border-zinc-900 bg-black lg:hidden"
+        class="
+            hidden
+            border-t
+            border-zinc-800
+            bg-black
+            lg:hidden
+        "
     >
 
         <nav
-            class="mx-auto flex max-w-7xl flex-col px-6 py-6"
-            aria-label="Navigation mobile"
+            class="
+                mx-auto
+                max-w-7xl
+                px-4
+                py-5
+                sm:px-6
+            "
         >
 
-            <!-- Accueil -->
-            <a
-                href="{{ url('/') }}"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Accueil
-            </a>
+            <div class="flex flex-col">
 
 
-            <!-- Disciplines -->
-            <a
-                href="{{ route('disciplines') }}"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Disciplines
-            </a>
-
-
-            <!-- Coachs -->
-            <a
-                href="{{ route('coachs') }}"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Coachs
-            </a>
-
-
-            <!-- Blog -->
-            <a
-                href="{{ route('blog') }}"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Blog
-            </a>
-
-
-            <!-- Humanitaire -->
-            <a
-                href="{{ route('humanitaire') }}"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Humanitaire
-            </a>
-
-
-            <!-- Abonnements -->
-            <a
-                href="{{ route('abonnements') }}"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Abonnements
-            </a>
-
-
-            <!-- Contact -->
-            <a
-                href="{{ route('contact') }}"
-                class="
-                    border-b
-                    border-zinc-900
-                    py-4
-                    text-sm
-                    font-semibold
-                    uppercase
-                    transition
-                    hover:text-red-500
-                "
-            >
-                Contact
-            </a>
-
-
-            <!-- =================================================
-                 VISITEUR NON CONNECTÉ - MOBILE
-                 ================================================= -->
-            @guest
-
-                <div class="grid grid-cols-2 gap-3 pt-5">
-
-                    <!-- Connexion -->
-                    <a
-                        href="{{ route('login') }}"
-                        class="
-                            flex
-                            items-center
-                            justify-center
-                            rounded-md
-                            border
-                            border-zinc-700
-                            px-4
-                            py-4
-                            text-sm
-                            font-bold
-                            uppercase
-                            transition
-                            hover:border-red-600
-                            hover:text-red-500
-                        "
-                    >
-                        Connexion
-                    </a>
-
-
-                    <!-- Inscription -->
-                    <a
-                        href="{{ route('register') }}"
-                        class="
-                            flex
-                            items-center
-                            justify-center
-                            rounded-md
-                            bg-red-600
-                            px-4
-                            py-4
-                            text-sm
-                            font-bold
-                            uppercase
-                            transition
-                            hover:bg-red-700
-                        "
-                    >
-                        Inscription
-                    </a>
-
-                </div>
-
-            @endguest
-
-
-            <!-- =================================================
-                 UTILISATEUR CONNECTÉ - MOBILE
-                 ================================================= -->
-            @auth
-
-                <!-- =============================================
-                     ACCÈS À L'ESPACE ADHÉRENT
-                     ============================================= -->
+                <!-- =================================================
+                     NAVIGATION PRINCIPALE
+                     ================================================= -->
                 <a
-                    href="{{ route('member.dashboard') }}"
+                    href="{{ url('/') }}"
                     class="
-                        mt-5
-                        flex
-                        items-center
-                        gap-3
-                        rounded-md
-                        border
-                        border-zinc-800
-                        bg-zinc-900
-                        px-4
+                        border-b
+                        border-zinc-900
                         py-4
+                        text-sm
+                        font-bold
+                        uppercase
                         transition
-                        hover:border-red-600
+                        hover:text-red-500
                     "
                 >
-
-                    <!-- Icône utilisateur -->
-                    <svg
-                        class="h-5 w-5 text-red-500"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                    >
-                        <path d="M20 21a8 8 0 0 0-16 0"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-
-
-                    <!-- Pseudo public -->
-                    <span class="text-sm font-bold text-white">
-                        {{ auth()->user()->pseudo }}
-                    </span>
-
+                    Accueil
                 </a>
 
 
-                <!-- =============================================
-                     DÉCONNEXION MOBILE
-                     ============================================= -->
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                    class="mt-3"
+                <a
+                    href="{{ route('disciplines') }}"
+                    class="
+                        border-b
+                        border-zinc-900
+                        py-4
+                        text-sm
+                        font-bold
+                        uppercase
+                        transition
+                        hover:text-red-500
+                    "
                 >
+                    Disciplines
+                </a>
 
-                    @csrf
 
-                    <button
-                        type="submit"
-                        class="
-                            flex
-                            w-full
-                            items-center
-                            justify-center
-                            rounded-md
-                            border
-                            border-red-600/50
-                            px-4
-                            py-4
-                            text-sm
-                            font-bold
-                            uppercase
-                            text-red-500
-                            transition
-                            hover:bg-red-600
-                            hover:text-white
-                        "
-                    >
-                        Déconnexion
-                    </button>
+                <a
+                    href="{{ route('coachs') }}"
+                    class="
+                        border-b
+                        border-zinc-900
+                        py-4
+                        text-sm
+                        font-bold
+                        uppercase
+                        transition
+                        hover:text-red-500
+                    "
+                >
+                    Coachs
+                </a>
 
-                </form>
 
-            @endauth
+                <a
+                    href="{{ route('blog') }}"
+                    class="
+                        border-b
+                        border-zinc-900
+                        py-4
+                        text-sm
+                        font-bold
+                        uppercase
+                        transition
+                        hover:text-red-500
+                    "
+                >
+                    Blog
+                </a>
+
+
+                <a
+                    href="{{ route('humanitaire') }}"
+                    class="
+                        border-b
+                        border-zinc-900
+                        py-4
+                        text-sm
+                        font-bold
+                        uppercase
+                        transition
+                        hover:text-red-500
+                    "
+                >
+                    Humanitaire
+                </a>
+
+
+                <a
+                    href="{{ route('abonnements') }}"
+                    class="
+                        border-b
+                        border-zinc-900
+                        py-4
+                        text-sm
+                        font-bold
+                        uppercase
+                        transition
+                        hover:text-red-500
+                    "
+                >
+                    Abonnements
+                </a>
+
+
+                <a
+                    href="{{ route('contact') }}"
+                    class="
+                        border-b
+                        border-zinc-900
+                        py-4
+                        text-sm
+                        font-bold
+                        uppercase
+                        transition
+                        hover:text-red-500
+                    "
+                >
+                    Contact
+                </a>
+
+
+                <!-- =================================================
+                     COMPTE UTILISATEUR
+                     ================================================= -->
+                <div class="mt-5">
+
+
+                    @guest
+
+                        <!-- =========================================
+                             VISITEUR
+                             ========================================= -->
+                        <div class="flex flex-col gap-3">
+
+                            <a
+                                href="{{ route('login') }}"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    rounded-md
+                                    border
+                                    border-zinc-700
+                                    px-4
+                                    py-3
+                                    text-xs
+                                    font-black
+                                    uppercase
+                                    tracking-wider
+                                    text-white
+                                    transition
+                                    hover:border-red-600
+                                    hover:text-red-500
+                                "
+                            >
+                                Connexion
+                            </a>
+
+
+                            <a
+                                href="{{ route('register') }}"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    rounded-md
+                                    bg-red-600
+                                    px-4
+                                    py-3
+                                    text-xs
+                                    font-black
+                                    uppercase
+                                    tracking-wider
+                                    text-white
+                                    transition
+                                    hover:bg-red-700
+                                "
+                            >
+                                Inscription
+                            </a>
+
+                        </div>
+
+                    @else
+
+                        <!-- =========================================
+                             UTILISATEUR CONNECTÉ
+                             ========================================= -->
+                        <div class="flex flex-col gap-3">
+
+
+                            <!-- =====================================
+                                 ADMINISTRATION
+                                 ===================================== -->
+                            @if (auth()->user()->canAccessAdmin())
+
+                                <a
+                                    href="{{ route('admin.dashboard') }}"
+                                    class="
+                                        flex
+                                        items-center
+                                        justify-center
+                                        rounded-md
+                                        bg-white
+                                        px-4
+                                        py-3
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-black
+                                        transition
+                                        hover:bg-red-600
+                                        hover:text-white
+                                    "
+                                >
+                                    Administration
+                                </a>
+
+                            @endif
+
+
+                            <!-- =====================================
+                                 ESPACE PERSONNEL
+                                 ===================================== -->
+                            <a
+                                href="{{ route('member.dashboard') }}"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    rounded-md
+                                    border
+                                    border-zinc-700
+                                    px-4
+                                    py-3
+                                    text-sm
+                                    font-black
+                                    text-white
+                                    transition
+                                    hover:border-red-600
+                                    hover:text-red-500
+                                "
+                            >
+                                {{ auth()->user()->pseudo }}
+                            </a>
+
+
+                            <!-- =====================================
+                                 DÉCONNEXION
+                                 ===================================== -->
+                            <form
+                                action="{{ route('logout') }}"
+                                method="POST"
+                            >
+
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    class="
+                                        flex
+                                        w-full
+                                        items-center
+                                        justify-center
+                                        rounded-md
+                                        border
+                                        border-red-600/50
+                                        px-4
+                                        py-3
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-red-500
+                                        transition
+                                        hover:bg-red-600
+                                        hover:text-white
+                                    "
+                                >
+                                    Déconnexion
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    @endguest
+
+                </div>
+
+            </div>
 
         </nav>
 

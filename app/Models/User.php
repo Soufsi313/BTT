@@ -14,15 +14,13 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | CHAMPS AUTORISÉS À L'ENREGISTREMENT
+    | CHAMPS MODIFIABLES
     |--------------------------------------------------------------------------
     |
-    | Ces informations peuvent être enregistrées depuis
-    | les formulaires prévus par l'application.
+    | Le rôle est volontairement absent.
     |
-    | Le rôle n'est volontairement pas présent.
-    | Un utilisateur ne peut donc jamais choisir lui-même
-    | de devenir administrateur.
+    | Cela empêche qu'un utilisateur puisse tenter de devenir lui-même
+    | administrateur en envoyant une valeur "role" depuis un formulaire.
     |
     */
     protected $fillable = [
@@ -55,12 +53,6 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-
-            /*
-            |--------------------------------------------------------------------------
-            | HASHAGE AUTOMATIQUE DU MOT DE PASSE
-            |--------------------------------------------------------------------------
-            */
             'password' => 'hashed',
         ];
     }
@@ -68,8 +60,28 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | VÉRIFIER SI L'UTILISATEUR EST ADMIN
+    | SUPER ADMIN
     |--------------------------------------------------------------------------
+    |
+    | Le Super Admin possède les droits les plus élevés de la plateforme.
+    |
+    */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMINISTRATEUR
+    |--------------------------------------------------------------------------
+    |
+    | Cette méthode retourne true uniquement pour un administrateur normal.
+    |
+    | Le Super Admin est volontairement distingué afin que nous puissions
+    | appliquer des règles différentes entre les deux niveaux.
+    |
     */
     public function isAdmin(): bool
     {
@@ -79,7 +91,21 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | VÉRIFIER SI L'UTILISATEUR EST ADHÉRENT
+    | ACCÈS À L'ADMINISTRATION
+    |--------------------------------------------------------------------------
+    |
+    | Un Admin OU un Super Admin peut entrer dans l'espace administration.
+    |
+    */
+    public function canAccessAdmin(): bool
+    {
+        return $this->isAdmin() || $this->isSuperAdmin();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADHÉRENT
     |--------------------------------------------------------------------------
     */
     public function isAdherent(): bool
@@ -90,7 +116,7 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | VÉRIFIER SI L'UTILISATEUR EST UN HOMME
+    | CATÉGORIE HOMME
     |--------------------------------------------------------------------------
     */
     public function isHomme(): bool
@@ -101,11 +127,53 @@ class User extends Authenticatable
 
     /*
     |--------------------------------------------------------------------------
-    | VÉRIFIER SI L'UTILISATEUR EST UNE FEMME
+    | CATÉGORIE FEMME
     |--------------------------------------------------------------------------
     */
     public function isFemme(): bool
     {
         return $this->genre === 'femme';
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GESTION D'UNE CATÉGORIE
+    |--------------------------------------------------------------------------
+    |
+    | Le Super Admin peut gérer toutes les catégories.
+    |
+    | Un Admin normal peut uniquement gérer les contenus correspondant
+    | à sa propre catégorie.
+    |
+    | Exemple :
+    |
+    | Admin homme + contenu homme = autorisé.
+    | Admin homme + contenu femme = refusé.
+    | Super Admin + contenu femme = autorisé.
+    |
+    */
+    public function canManageGender(string $gender): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return $this->isAdmin()
+            && $this->genre === $gender;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GESTION DES RÔLES
+    |--------------------------------------------------------------------------
+    |
+    | Seul le Super Admin peut nommer ou rétrograder un administrateur.
+    |
+    */
+    public function canManageRoles(): bool
+    {
+        return $this->isSuperAdmin();
     }
 }

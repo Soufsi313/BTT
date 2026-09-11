@@ -222,12 +222,6 @@ Route::put(
 |--------------------------------------------------------------------------
 | CALENDRIER PRIVÉ DES ENTRAÎNEMENTS
 |--------------------------------------------------------------------------
-|
-| Cette page est réservée aux utilisateurs connectés.
-|
-| Le contrôleur filtrera les entraînements selon la catégorie
-| homme ou femme de l'adhérent.
-|
 */
 Route::get(
     '/mon-compte/calendrier',
@@ -262,12 +256,36 @@ Route::delete(
 |--------------------------------------------------------------------------
 | CONFIRMATION DE SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
-|
-| Cette page n'est pas protégée par le middleware auth car l'utilisateur
-| vient d'être déconnecté après la suppression de son compte.
-|
 */
 Route::get(
     '/compte-supprime',
     [AuthController::class, 'accountDeleted']
 )->name('account.deleted');
+
+
+/*
+|--------------------------------------------------------------------------
+| ESPACE ADMINISTRATION
+|--------------------------------------------------------------------------
+|
+| Cette route est protégée par deux niveaux :
+|
+| 1. "auth"
+|    L'utilisateur doit être connecté.
+|
+| 2. "admin"
+|    L'utilisateur doit posséder le rôle :
+|    - admin
+|    - super_admin
+|
+*/
+Route::get('/admin', function () {
+
+    return view('admin.dashboard');
+
+})
+    ->middleware([
+        'auth',
+        'admin',
+    ])
+    ->name('admin.dashboard');

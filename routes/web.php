@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Routes Web de Brussels Top Team
+| ROUTES WEB - BRUSSELS TOP TEAM
 |--------------------------------------------------------------------------
 */
 
@@ -138,3 +138,23 @@ Route::post(
 )
     ->middleware('auth')
     ->name('logout');
+
+
+/*
+|--------------------------------------------------------------------------
+| ESPACE ADHÉRENT
+|--------------------------------------------------------------------------
+|
+| Cette page est protégée par le middleware "auth".
+|
+| Cela signifie qu'un visiteur non connecté ne peut pas accéder
+| directement à l'espace adhérent.
+|
+*/
+Route::get('/mon-compte', function () {
+
+    return view('member.dashboard');
+
+})
+    ->middleware('auth')
+    ->name('member.dashboard');

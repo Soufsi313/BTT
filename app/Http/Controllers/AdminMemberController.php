@@ -12,22 +12,16 @@ class AdminMemberController extends Controller
     | LISTE DES ADHÉRENTS
     |--------------------------------------------------------------------------
     |
-    | Cette page permet aux administrateurs de rechercher et trier les
-    | adhérents.
-    |
-    | Règles :
-    |
     | Super Admin :
-    | - voit tous les adhérents ;
-    | - peut afficher les hommes ;
-    | - peut afficher les femmes ;
-    | - peut voir les comptes actifs et supprimés ;
-    | - peut effectuer une recherche mixte.
+    | - voit les hommes et les femmes ;
+    | - peut utiliser une recherche mixte ;
+    | - voit les comptes actifs et supprimés ;
+    | - peut réactiver un compte supprimé ;
+    | - peut promouvoir un adhérent actif en Admin.
     |
-    | Admin :
-    | - voit uniquement les adhérents de sa propre catégorie ;
-    | - un Admin Homme ne peut voir que les hommes ;
-    | - une Admin Femme ne peut voir que les femmes.
+    | Admin normal :
+    | - voit uniquement les adhérents correspondant à son propre genre ;
+    | - ne peut pas modifier les rôles.
     |
     */
     public function index(Request $request)
@@ -71,6 +65,11 @@ class AdminMemberController extends Controller
 
         if ($admin->isSuperAdmin()) {
 
+            /*
+            |--------------------------------------------------------------------------
+            | SUPER ADMIN
+            |--------------------------------------------------------------------------
+            */
             if (! in_array(
                 $gender,
                 ['all', 'homme', 'femme'],
@@ -86,7 +85,7 @@ class AdminMemberController extends Controller
             | ADMIN NORMAL
             |--------------------------------------------------------------------------
             |
-            | Son genre est imposé côté serveur.
+            | Le genre de l'Admin est imposé côté serveur.
             |
             */
             $gender = $admin->genre;
@@ -98,10 +97,7 @@ class AdminMemberController extends Controller
         | REQUÊTE DES ADHÉRENTS
         |--------------------------------------------------------------------------
         |
-        | withTrashed() permet d'inclure les comptes supprimés avec
-        | SoftDeletes.
-        |
-        | On affiche uniquement les comptes ayant le rôle "adherent".
+        | withTrashed() permet d'afficher également les comptes supprimés.
         |
         */
         $members = User::withTrashed()
@@ -110,7 +106,7 @@ class AdminMemberController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | APPLICATION DU FILTRE DE GENRE
+        | FILTRE DE GENRE
         |--------------------------------------------------------------------------
         */
         if ($gender !== 'all') {
@@ -120,7 +116,7 @@ class AdminMemberController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | APPLICATION DE LA RECHERCHE
+        | RECHERCHE
         |--------------------------------------------------------------------------
         */
         if ($search !== '') {
@@ -191,30 +187,20 @@ class AdminMemberController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | RÉACTIVER UN ADHÉRENT SUPPRIMÉ
+    | RÉACTIVER UN ADHÉRENT
     |--------------------------------------------------------------------------
     |
-    | Cette action est réservée au Super Admin.
-    |
-    | restore() remet simplement deleted_at à NULL.
+    | Seul le Super Admin peut effectuer cette action.
     |
     */
     public function restore(Request $request, int $id)
     {
         /*
         |--------------------------------------------------------------------------
-        | UTILISATEUR CONNECTÉ
+        | SUPER ADMIN UNIQUEMENT
         |--------------------------------------------------------------------------
         */
-        $admin = $request->user();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | PROTECTION SUPER ADMIN
-        |--------------------------------------------------------------------------
-        */
-        if (! $admin->isSuperAdmin()) {
+        if (! $request->user()->isSuperAdmin()) {
             abort(
                 403,
                 'Seul le Super Admin peut réactiver un adhérent.'
@@ -226,10 +212,6 @@ class AdminMemberController extends Controller
         |--------------------------------------------------------------------------
         | RECHERCHE DU COMPTE SUPPRIMÉ
         |--------------------------------------------------------------------------
-        |
-        | onlyTrashed() garantit que cette action ne concerne que les
-        | comptes réellement supprimés.
-        |
         */
         $member = User::onlyTrashed()
             ->where('role', 'adherent')
@@ -246,7 +228,7 @@ class AdminMemberController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | RETOUR À LA LISTE
+        | RETOUR
         |--------------------------------------------------------------------------
         */
         return redirect()
@@ -254,6 +236,326 @@ class AdminMemberController extends Controller
             ->with(
                 'success',
                 'Le compte de l’adhérent a été réactivé.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROMOUVOIR UN ADHÉRENT EN ADMIN
+    |--------------------------------------------------------------------------
+    |
+    | Cette action est strictement réservée au Super Admin.
+    |
+    | Le genre du compte n'est pas modifié.
+    |
+    */
+    public function promoteToAdmin(
+        Request $request,
+        int $id
+    ) {
+        /*
+        |--------------------------------------------------------------------------
+        | PROTECTION SUPER ADMIN
+        |--------------------------------------------------------------------------
+        */
+        if (! $request->user()->isSuperAdmin()) {
+            abort(
+                403,
+                'Seul le Super Admin peut nommer un administrateur.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RECHERCHE DE L'ADHÉRENT
+        |--------------------------------------------------------------------------
+        |
+        | Seul un adhérent actif peut devenir administrateur.
+        |
+        */
+        $member = User::query()
+            ->where('role', 'adherent')
+            ->findOrFail($id);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PROMOTION
+        |--------------------------------------------------------------------------
+        */
+        $member->role = 'admin';
+
+        $member->save();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETOUR
+        |--------------------------------------------------------------------------
+        */
+        return redirect()
+            ->route('admin.members.index')
+            ->with(
+                'success',
+                $member->prenom
+                . ' '
+                . $member->nom
+                . ' est maintenant administrateur.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LISTE DES ADMINISTRATEURS
+    |--------------------------------------------------------------------------
+    |
+    | Cette page est strictement réservée au Super Admin.
+    |
+    | Elle affiche :
+    |
+    | - le Super Admin ;
+    | - les Admins Hommes ;
+    | - les Admins Femmes.
+    |
+    | Le Super Admin peut :
+    |
+    | - effectuer une recherche ;
+    | - filtrer par genre ;
+    | - trier alphabétiquement ;
+    | - rétrograder un Admin en adhérent.
+    |
+    */
+    public function administrators(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | PROTECTION SUPER ADMIN
+        |--------------------------------------------------------------------------
+        */
+        if (! $request->user()->isSuperAdmin()) {
+            abort(
+                403,
+                'Seul le Super Admin peut gérer les administrateurs.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RECHERCHE MANUELLE
+        |--------------------------------------------------------------------------
+        */
+        $search = trim(
+            (string) $request->query('search', '')
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI ALPHABÉTIQUE
+        |--------------------------------------------------------------------------
+        */
+        $sort = $request->query('sort', 'asc');
+
+        if (! in_array($sort, ['asc', 'desc'], true)) {
+            $sort = 'asc';
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTRE DE GENRE
+        |--------------------------------------------------------------------------
+        */
+        $gender = $request->query('genre', 'all');
+
+        if (! in_array(
+            $gender,
+            ['all', 'homme', 'femme'],
+            true
+        )) {
+            $gender = 'all';
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REQUÊTE DES ADMINISTRATEURS
+        |--------------------------------------------------------------------------
+        |
+        | Nous recherchons :
+        |
+        | - les comptes "admin" ;
+        | - le compte "super_admin".
+        |
+        */
+        $administrators = User::query()
+            ->whereIn(
+                'role',
+                [
+                    'admin',
+                    'super_admin',
+                ]
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILTRE DE GENRE
+        |--------------------------------------------------------------------------
+        */
+        if ($gender !== 'all') {
+            $administrators->where(
+                'genre',
+                $gender
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RECHERCHE
+        |--------------------------------------------------------------------------
+        */
+        if ($search !== '') {
+
+            $administrators->where(
+                function ($query) use ($search) {
+
+                    $query
+                        ->where(
+                            'nom',
+                            'like',
+                            '%' . $search . '%'
+                        )
+                        ->orWhere(
+                            'prenom',
+                            'like',
+                            '%' . $search . '%'
+                        )
+                        ->orWhere(
+                            'pseudo',
+                            'like',
+                            '%' . $search . '%'
+                        )
+                        ->orWhere(
+                            'email',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                }
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI
+        |--------------------------------------------------------------------------
+        */
+        $administrators
+            ->orderBy('nom', $sort)
+            ->orderBy('prenom', $sort);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATION
+        |--------------------------------------------------------------------------
+        */
+        $administrators = $administrators
+            ->paginate(20)
+            ->withQueryString();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | AFFICHAGE
+        |--------------------------------------------------------------------------
+        */
+        return view(
+            'admin.administrators.index',
+            [
+                'administrators' => $administrators,
+                'search' => $search,
+                'sort' => $sort,
+                'gender' => $gender,
+            ]
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RÉTROGRADER UN ADMIN EN ADHÉRENT
+    |--------------------------------------------------------------------------
+    |
+    | Seul le Super Admin peut effectuer cette opération.
+    |
+    | Un compte Super Admin ne peut jamais être rétrogradé par cette route.
+    |
+    */
+    public function demoteAdmin(
+        Request $request,
+        int $id
+    ) {
+        /*
+        |--------------------------------------------------------------------------
+        | PROTECTION SUPER ADMIN
+        |--------------------------------------------------------------------------
+        */
+        if (! $request->user()->isSuperAdmin()) {
+            abort(
+                403,
+                'Seul le Super Admin peut rétrograder un administrateur.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RECHERCHE DE L'ADMIN
+        |--------------------------------------------------------------------------
+        |
+        | Le filtre role = admin est volontaire.
+        |
+        | Cela empêche automatiquement de rétrograder :
+        |
+        | - un adhérent ;
+        | - le Super Admin.
+        |
+        */
+        $administrator = User::query()
+            ->where('role', 'admin')
+            ->findOrFail($id);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉTROGRADATION
+        |--------------------------------------------------------------------------
+        */
+        $administrator->role = 'adherent';
+
+        $administrator->save();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETOUR
+        |--------------------------------------------------------------------------
+        */
+        return redirect()
+            ->route('admin.administrators.index')
+            ->with(
+                'success',
+                $administrator->prenom
+                . ' '
+                . $administrator->nom
+                . ' est redevenu adhérent.'
             );
     }
 }

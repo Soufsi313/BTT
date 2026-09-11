@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
 
-@section('title', 'Gestion des adhérents - BTT Admin')
+@section('title', 'Administrateurs - BTT Admin')
 
 
 @section(
     'meta_description',
-    'Gestion des adhérents de Brussels Top Team.'
+    'Gestion des administrateurs de Brussels Top Team.'
 )
 
 
 @section('content')
 
     <!-- =========================================================
-         PAGE DE GESTION DES ADHÉRENTS
+         GESTION DES ADMINISTRATEURS
          ========================================================= -->
     <section class="min-h-screen bg-white text-zinc-900">
 
@@ -62,7 +62,7 @@
                             sm:text-4xl
                         "
                     >
-                        Adhérents
+                        Administrateurs
                     </h1>
 
                     <p
@@ -74,34 +74,74 @@
                             text-zinc-500
                         "
                     >
-                        Recherchez, consultez et gérez les adhérents
-                        Brussels Top Team.
+                        Consultez et gérez les comptes ayant accès
+                        à l'administration Brussels Top Team.
                     </p>
 
                 </div>
 
 
-                <a
-                    href="{{ route('admin.dashboard') }}"
+                <div
                     class="
-                        inline-flex
-                        items-center
-                        justify-center
-                        rounded-md
-                        border
-                        border-zinc-300
-                        px-4
-                        py-3
-                        text-sm
-                        font-bold
-                        text-zinc-700
-                        transition
-                        hover:border-zinc-900
-                        hover:text-zinc-900
+                        flex
+                        flex-col
+                        gap-3
+                        sm:flex-row
                     "
                 >
-                    ← Tableau de bord
-                </a>
+
+                    <!-- =========================================
+                         ADHÉRENTS
+                         ========================================= -->
+                    <a
+                        href="{{ route('admin.members.index') }}"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            rounded-md
+                            border
+                            border-zinc-300
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-zinc-700
+                            transition
+                            hover:border-red-600
+                            hover:text-red-600
+                        "
+                    >
+                        Adhérents
+                    </a>
+
+
+                    <!-- =========================================
+                         TABLEAU DE BORD
+                         ========================================= -->
+                    <a
+                        href="{{ route('admin.dashboard') }}"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            rounded-md
+                            border
+                            border-zinc-300
+                            px-4
+                            py-3
+                            text-sm
+                            font-bold
+                            text-zinc-700
+                            transition
+                            hover:border-zinc-900
+                            hover:text-zinc-900
+                        "
+                    >
+                        ← Tableau de bord
+                    </a>
+
+                </div>
 
             </div>
 
@@ -121,68 +161,39 @@
                         py-4
                     "
                 >
+
                     <p class="text-sm font-bold text-green-800">
                         {{ session('success') }}
                     </p>
+
                 </div>
 
             @endif
 
 
             <!-- =================================================
-                 INFORMATIONS SUR LES DROITS
+                 INFORMATION SUPER ADMIN
                  ================================================= -->
-            <div class="mt-8">
+            <div
+                class="
+                    mt-8
+                    border-l-4
+                    border-red-600
+                    bg-red-50
+                    px-5
+                    py-4
+                "
+            >
 
-                @if (auth()->user()->isSuperAdmin())
+                <p class="text-sm font-bold text-zinc-900">
+                    Gestion réservée au Super Admin
+                </p>
 
-                    <div
-                        class="
-                            border-l-4
-                            border-red-600
-                            bg-red-50
-                            px-5
-                            py-4
-                        "
-                    >
-
-                        <p class="text-sm font-bold text-zinc-900">
-                            Mode Super Admin
-                        </p>
-
-                        <p class="mt-1 text-sm text-zinc-600">
-                            Vous pouvez consulter les adhérents Hommes et
-                            Femmes, réactiver les comptes supprimés et nommer
-                            de nouveaux administrateurs.
-                        </p>
-
-                    </div>
-
-                @else
-
-                    <div
-                        class="
-                            border-l-4
-                            border-zinc-900
-                            bg-zinc-100
-                            px-5
-                            py-4
-                        "
-                    >
-
-                        <p class="text-sm font-bold text-zinc-900">
-                            Catégorie autorisée :
-                            {{ ucfirst(auth()->user()->genre) }}
-                        </p>
-
-                        <p class="mt-1 text-sm text-zinc-600">
-                            Votre compte administrateur peut uniquement
-                            consulter les adhérents de cette catégorie.
-                        </p>
-
-                    </div>
-
-                @endif
+                <p class="mt-1 text-sm leading-6 text-zinc-600">
+                    Vous pouvez consulter les administrateurs Hommes et
+                    Femmes et rétrograder un Admin en adhérent.
+                    Le compte Super Admin est protégé.
+                </p>
 
             </div>
 
@@ -191,8 +202,7 @@
                  RECHERCHE ET FILTRES
                  ================================================= -->
             <form
-                id="members-filter-form"
-                action="{{ route('admin.members.index') }}"
+                action="{{ route('admin.administrators.index') }}"
                 method="GET"
                 class="
                     mt-8
@@ -235,7 +245,7 @@
                                 text-zinc-600
                             "
                         >
-                            Rechercher un adhérent
+                            Rechercher
                         </label>
 
                         <input
@@ -268,7 +278,7 @@
 
 
                     <!-- =========================================
-                         TRI AUTOMATIQUE
+                         TRI ALPHABÉTIQUE
                          ========================================= -->
                     <div>
 
@@ -303,7 +313,10 @@
                                 text-sm
                                 text-zinc-900
                                 outline-none
+                                transition
                                 focus:border-red-600
+                                focus:ring-2
+                                focus:ring-red-600/10
                             "
                         >
 
@@ -327,79 +340,78 @@
 
 
                     <!-- =========================================
-                         GENRE - SUPER ADMIN
+                         GENRE
                          ========================================= -->
-                    @if (auth()->user()->isSuperAdmin())
+                    <div>
 
-                        <div>
+                        <label
+                            for="genre"
+                            class="
+                                block
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-wider
+                                text-zinc-600
+                            "
+                        >
+                            Genre
+                        </label>
 
-                            <label
-                                for="genre"
-                                class="
-                                    block
-                                    text-xs
-                                    font-black
-                                    uppercase
-                                    tracking-wider
-                                    text-zinc-600
-                                "
+                        <select
+                            id="genre"
+                            name="genre"
+                            onchange="this.form.submit()"
+                            class="
+                                mt-2
+                                w-full
+                                cursor-pointer
+                                rounded-md
+                                border
+                                border-zinc-300
+                                bg-white
+                                px-4
+                                py-3
+                                text-sm
+                                text-zinc-900
+                                outline-none
+                                transition
+                                focus:border-red-600
+                                focus:ring-2
+                                focus:ring-red-600/10
+                            "
+                        >
+
+                            <option
+                                value="all"
+                                @selected($gender === 'all')
                             >
-                                Genre
-                            </label>
+                                Tous
+                            </option>
 
-                            <select
-                                id="genre"
-                                name="genre"
-                                onchange="this.form.submit()"
-                                class="
-                                    mt-2
-                                    w-full
-                                    cursor-pointer
-                                    rounded-md
-                                    border
-                                    border-zinc-300
-                                    bg-white
-                                    px-4
-                                    py-3
-                                    text-sm
-                                    text-zinc-900
-                                    outline-none
-                                    focus:border-red-600
-                                "
+                            <option
+                                value="homme"
+                                @selected($gender === 'homme')
                             >
+                                Hommes
+                            </option>
 
-                                <option
-                                    value="all"
-                                    @selected($gender === 'all')
-                                >
-                                    Tous
-                                </option>
+                            <option
+                                value="femme"
+                                @selected($gender === 'femme')
+                            >
+                                Femmes
+                            </option>
 
-                                <option
-                                    value="homme"
-                                    @selected($gender === 'homme')
-                                >
-                                    Hommes
-                                </option>
+                        </select>
 
-                                <option
-                                    value="femme"
-                                    @selected($gender === 'femme')
-                                >
-                                    Femmes
-                                </option>
-
-                            </select>
-
-                        </div>
-
-                    @endif
+                    </div>
 
                 </div>
 
 
                 <!-- =============================================
-                     ACTIONS DE RECHERCHE
+                     BOUTONS
                      ============================================= -->
                 <div
                     class="
@@ -435,7 +447,7 @@
 
 
                     <a
-                        href="{{ route('admin.members.index') }}"
+                        href="{{ route('admin.administrators.index') }}"
                         class="
                             inline-flex
                             items-center
@@ -465,7 +477,7 @@
 
 
             <!-- =================================================
-                 LISTE
+                 LISTE DES ADMINISTRATEURS
                  ================================================= -->
             <section class="mt-10">
 
@@ -489,16 +501,17 @@
                             text-zinc-900
                         "
                     >
-                        Liste des adhérents
+                        Équipe administrative
                     </h2>
+
 
                     <p class="text-sm font-bold text-zinc-500">
 
-                        {{ $members->total() }}
+                        {{ $administrators->total() }}
 
-                        {{ $members->total() > 1
-                            ? 'adhérents trouvés'
-                            : 'adhérent trouvé'
+                        {{ $administrators->total() > 1
+                            ? 'comptes administrateurs'
+                            : 'compte administrateur'
                         }}
 
                     </p>
@@ -506,6 +519,9 @@
                 </div>
 
 
+                <!-- =============================================
+                     TABLEAU
+                     ============================================= -->
                 <div
                     class="
                         mt-5
@@ -521,37 +537,95 @@
 
                             <tr>
 
-                                <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-zinc-500">
+                                <th
+                                    class="
+                                        px-5
+                                        py-4
+                                        text-left
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
                                     Nom
                                 </th>
 
-                                <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-zinc-500">
+                                <th
+                                    class="
+                                        px-5
+                                        py-4
+                                        text-left
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
                                     Pseudo
                                 </th>
 
-                                <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-zinc-500">
+                                <th
+                                    class="
+                                        px-5
+                                        py-4
+                                        text-left
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
                                     Email
                                 </th>
 
-                                <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-zinc-500">
+                                <th
+                                    class="
+                                        px-5
+                                        py-4
+                                        text-left
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
                                     Genre
                                 </th>
 
-                                <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-zinc-500">
-                                    Statut
+                                <th
+                                    class="
+                                        px-5
+                                        py-4
+                                        text-left
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Rôle
                                 </th>
 
-                                <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-zinc-500">
-                                    Inscription
+                                <th
+                                    class="
+                                        px-5
+                                        py-4
+                                        text-right
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Action
                                 </th>
-
-                                @if (auth()->user()->isSuperAdmin())
-
-                                    <th class="px-5 py-4 text-right text-xs font-black uppercase tracking-wider text-zinc-500">
-                                        Actions
-                                    </th>
-
-                                @endif
 
                             </tr>
 
@@ -560,7 +634,7 @@
 
                         <tbody class="divide-y divide-zinc-200">
 
-                            @forelse ($members as $member)
+                            @forelse ($administrators as $administrator)
 
                                 <tr class="transition hover:bg-zinc-50">
 
@@ -568,15 +642,23 @@
                                     <!-- =========================
                                          IDENTITÉ
                                          ========================= -->
-                                    <td class="whitespace-nowrap px-5 py-4">
+                                    <td
+                                        class="
+                                            whitespace-nowrap
+                                            px-5
+                                            py-4
+                                        "
+                                    >
 
                                         <p class="text-sm font-bold text-zinc-900">
-                                            {{ $member->nom }}
-                                            {{ $member->prenom }}
+
+                                            {{ $administrator->nom }}
+                                            {{ $administrator->prenom }}
+
                                         </p>
 
                                         <p class="mt-1 text-xs text-zinc-400">
-                                            ID #{{ $member->id }}
+                                            ID #{{ $administrator->id }}
                                         </p>
 
                                     </td>
@@ -585,23 +667,46 @@
                                     <!-- =========================
                                          PSEUDO
                                          ========================= -->
-                                    <td class="whitespace-nowrap px-5 py-4 text-sm font-semibold text-zinc-700">
-                                        {{ $member->pseudo }}
+                                    <td
+                                        class="
+                                            whitespace-nowrap
+                                            px-5
+                                            py-4
+                                            text-sm
+                                            font-semibold
+                                            text-zinc-700
+                                        "
+                                    >
+                                        {{ $administrator->pseudo }}
                                     </td>
 
 
                                     <!-- =========================
                                          EMAIL
                                          ========================= -->
-                                    <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-600">
-                                        {{ $member->email }}
+                                    <td
+                                        class="
+                                            whitespace-nowrap
+                                            px-5
+                                            py-4
+                                            text-sm
+                                            text-zinc-600
+                                        "
+                                    >
+                                        {{ $administrator->email }}
                                     </td>
 
 
                                     <!-- =========================
                                          GENRE
                                          ========================= -->
-                                    <td class="whitespace-nowrap px-5 py-4">
+                                    <td
+                                        class="
+                                            whitespace-nowrap
+                                            px-5
+                                            py-4
+                                        "
+                                    >
 
                                         <span
                                             class="
@@ -617,18 +722,24 @@
                                                 text-zinc-700
                                             "
                                         >
-                                            {{ ucfirst($member->genre) }}
+                                            {{ ucfirst($administrator->genre) }}
                                         </span>
 
                                     </td>
 
 
                                     <!-- =========================
-                                         STATUT
+                                         RÔLE
                                          ========================= -->
-                                    <td class="whitespace-nowrap px-5 py-4">
+                                    <td
+                                        class="
+                                            whitespace-nowrap
+                                            px-5
+                                            py-4
+                                        "
+                                    >
 
-                                        @if ($member->trashed())
+                                        @if ($administrator->isSuperAdmin())
 
                                             <span
                                                 class="
@@ -644,7 +755,7 @@
                                                     text-red-700
                                                 "
                                             >
-                                                Supprimé
+                                                Super Admin
                                             </span>
 
                                         @else
@@ -653,17 +764,17 @@
                                                 class="
                                                     inline-flex
                                                     rounded-full
-                                                    bg-green-100
+                                                    bg-zinc-900
                                                     px-3
                                                     py-1
                                                     text-xs
                                                     font-black
                                                     uppercase
                                                     tracking-wider
-                                                    text-green-700
+                                                    text-white
                                                 "
                                             >
-                                                Actif
+                                                Admin
                                             </span>
 
                                         @endif
@@ -672,108 +783,80 @@
 
 
                                     <!-- =========================
-                                         DATE D'INSCRIPTION
+                                         ACTION
                                          ========================= -->
-                                    <td class="whitespace-nowrap px-5 py-4 text-sm text-zinc-500">
+                                    <td
+                                        class="
+                                            whitespace-nowrap
+                                            px-5
+                                            py-4
+                                            text-right
+                                        "
+                                    >
 
-                                        {{ $member->created_at->format('d/m/Y') }}
+                                        @if ($administrator->isAdmin())
 
-                                    </td>
+                                            <form
+                                                action="{{ route(
+                                                    'admin.administrators.demote',
+                                                    $administrator->id
+                                                ) }}"
+                                                method="POST"
+                                                onsubmit="
+                                                    return confirm(
+                                                        'Confirmer la rétrogradation de cet administrateur en adhérent ?'
+                                                    );
+                                                "
+                                            >
 
+                                                @csrf
+                                                @method('PATCH')
 
-                                    <!-- =========================
-                                         ACTIONS SUPER ADMIN
-                                         ========================= -->
-                                    @if (auth()->user()->isSuperAdmin())
-
-                                        <td class="whitespace-nowrap px-5 py-4 text-right">
-
-
-                                            <!-- =================
-                                                 COMPTE SUPPRIMÉ
-                                                 ================= -->
-                                            @if ($member->trashed())
-
-                                                <form
-                                                    action="{{ route(
-                                                        'admin.members.restore',
-                                                        $member->id
-                                                    ) }}"
-                                                    method="POST"
-                                                >
-
-                                                    @csrf
-                                                    @method('PATCH')
-
-                                                    <button
-                                                        type="submit"
-                                                        class="
-                                                            rounded-md
-                                                            bg-green-600
-                                                            px-4
-                                                            py-2
-                                                            text-xs
-                                                            font-black
-                                                            uppercase
-                                                            tracking-wider
-                                                            text-white
-                                                            transition
-                                                            hover:bg-green-700
-                                                        "
-                                                    >
-                                                        Réactiver
-                                                    </button>
-
-                                                </form>
-
-
-                                            <!-- =================
-                                                 COMPTE ACTIF
-                                                 ================= -->
-                                            @else
-
-                                                <form
-                                                    action="{{ route(
-                                                        'admin.members.promote',
-                                                        $member->id
-                                                    ) }}"
-                                                    method="POST"
-                                                    onsubmit="
-                                                        return confirm(
-                                                            'Confirmer la nomination de cet adhérent comme administrateur ?'
-                                                        );
+                                                <button
+                                                    type="submit"
+                                                    class="
+                                                        rounded-md
+                                                        border
+                                                        border-red-600
+                                                        bg-white
+                                                        px-4
+                                                        py-2
+                                                        text-xs
+                                                        font-black
+                                                        uppercase
+                                                        tracking-wider
+                                                        text-red-600
+                                                        transition
+                                                        hover:bg-red-600
+                                                        hover:text-white
                                                     "
                                                 >
+                                                    Rétrograder
+                                                </button>
 
-                                                    @csrf
-                                                    @method('PATCH')
+                                            </form>
 
-                                                    <button
-                                                        type="submit"
-                                                        class="
-                                                            rounded-md
-                                                            bg-zinc-900
-                                                            px-4
-                                                            py-2
-                                                            text-xs
-                                                            font-black
-                                                            uppercase
-                                                            tracking-wider
-                                                            text-white
-                                                            transition
-                                                            hover:bg-red-600
-                                                        "
-                                                    >
-                                                        Nommer Admin
-                                                    </button>
+                                        @else
 
-                                                </form>
+                                            <!-- =================
+                                                 SUPER ADMIN
+                                                 AUCUNE ACTION
+                                                 ================= -->
+                                            <span
+                                                class="
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wider
+                                                    text-zinc-400
+                                                "
+                                            >
+                                                Protégé
+                                            </span>
 
-                                            @endif
+                                        @endif
 
-                                        </td>
-
-                                    @endif
+                                    </td>
 
                                 </tr>
 
@@ -783,7 +866,7 @@
                                 <tr>
 
                                     <td
-                                        colspan="{{ auth()->user()->isSuperAdmin() ? 7 : 6 }}"
+                                        colspan="6"
                                         class="
                                             px-5
                                             py-14
@@ -792,7 +875,7 @@
                                     >
 
                                         <p class="text-sm font-bold text-zinc-700">
-                                            Aucun adhérent trouvé.
+                                            Aucun administrateur trouvé.
                                         </p>
 
                                     </td>
@@ -811,10 +894,10 @@
                 <!-- =============================================
                      PAGINATION
                      ============================================= -->
-                @if ($members->hasPages())
+                @if ($administrators->hasPages())
 
                     <div class="mt-6">
-                        {{ $members->links() }}
+                        {{ $administrators->links() }}
                     </div>
 
                 @endif

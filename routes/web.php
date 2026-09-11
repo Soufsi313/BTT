@@ -303,15 +303,49 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | RÉACTIVATION D'UN ADHÉRENT
+        | RÉACTIVER UN ADHÉRENT
         |--------------------------------------------------------------------------
-        |
-        | La sécurité Super Admin est également vérifiée dans le contrôleur.
-        |
         */
         Route::patch(
             '/adherents/{id}/reactiver',
             [AdminMemberController::class, 'restore']
         )->name('members.restore');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PROMOUVOIR UN ADHÉRENT
+        |--------------------------------------------------------------------------
+        */
+        Route::patch(
+            '/adherents/{id}/promouvoir-admin',
+            [AdminMemberController::class, 'promoteToAdmin']
+        )->name('members.promote');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTE DES ADMINISTRATEURS
+        |--------------------------------------------------------------------------
+        |
+        | La vérification Super Admin est également effectuée dans
+        | le contrôleur.
+        |
+        */
+        Route::get(
+            '/administrateurs',
+            [AdminMemberController::class, 'administrators']
+        )->name('administrators.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉTROGRADER UN ADMINISTRATEUR
+        |--------------------------------------------------------------------------
+        */
+        Route::patch(
+            '/administrateurs/{id}/retrograder',
+            [AdminMemberController::class, 'demoteAdmin']
+        )->name('administrators.demote');
 
     });

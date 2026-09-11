@@ -84,6 +84,10 @@
 
                     <div class="space-y-1">
 
+
+                        <!-- =========================================
+                             TABLEAU DE BORD
+                             ========================================= -->
                         <a
                             href="{{ route('admin.dashboard') }}"
                             class="
@@ -102,21 +106,32 @@
                         </a>
 
 
-                        <span
+                        <!-- =========================================
+                             GESTION DES ADHÉRENTS
+                             ========================================= -->
+                        <a
+                            href="{{ route('admin.members.index') }}"
                             class="
-                                block
+                                flex
+                                items-center
                                 rounded-md
                                 px-4
                                 py-3
                                 text-sm
                                 font-bold
-                                text-zinc-500
+                                text-zinc-600
+                                transition
+                                hover:bg-zinc-200
+                                hover:text-red-600
                             "
                         >
                             Adhérents
-                        </span>
+                        </a>
 
 
+                        <!-- =========================================
+                             CALENDRIER
+                             ========================================= -->
                         <span
                             class="
                                 block
@@ -132,6 +147,9 @@
                         </span>
 
 
+                        <!-- =========================================
+                             ARTICLES
+                             ========================================= -->
                         <span
                             class="
                                 block
@@ -147,6 +165,9 @@
                         </span>
 
 
+                        <!-- =========================================
+                             PRODUITS
+                             ========================================= -->
                         <span
                             class="
                                 block
@@ -162,6 +183,9 @@
                         </span>
 
 
+                        <!-- =========================================
+                             MESSAGES
+                             ========================================= -->
                         <span
                             class="
                                 block
@@ -177,21 +201,30 @@
                         </span>
 
 
+                        <!-- =========================================
+                             ADMINISTRATEURS
+                             SUPER ADMIN UNIQUEMENT
+                             ========================================= -->
                         @if (auth()->user()->isSuperAdmin())
 
-                            <span
+                            <a
+                                href="{{ route('admin.administrators.index') }}"
                                 class="
-                                    block
+                                    flex
+                                    items-center
                                     rounded-md
                                     px-4
                                     py-3
                                     text-sm
                                     font-bold
-                                    text-zinc-500
+                                    text-zinc-600
+                                    transition
+                                    hover:bg-zinc-200
+                                    hover:text-red-600
                                 "
                             >
                                 Administrateurs
-                            </span>
+                            </a>
 
                         @endif
 

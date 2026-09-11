@@ -86,7 +86,7 @@
 
             <!-- Contact -->
             <a
-                href="#"
+                href="{{ route('contact') }}"
                 class="text-sm font-semibold uppercase transition hover:text-red-500"
             >
                 Contact
@@ -276,7 +276,7 @@
 
             <!-- Contact -->
             <a
-                href="#"
+                href="{{ route('contact') }}"
                 class="
                     py-4
                     text-sm font-semibold uppercase
@@ -287,7 +287,9 @@
             </a>
 
 
-            <!-- Bouton inscription mobile -->
+            <!-- =================================================
+                 BOUTON INSCRIPTION MOBILE
+                 ================================================= -->
             <a
                 href="#"
                 class="

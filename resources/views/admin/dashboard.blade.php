@@ -12,20 +12,8 @@
 
 @section('content')
 
-
     <!-- =========================================================
          ESPACE ADMINISTRATION
-         =========================================================
-         Cette page constitue le tableau de bord principal
-         de l'administration Brussels Top Team.
-
-         L'espace administration utilise volontairement une
-         identité visuelle différente du site public :
-
-         - fond blanc
-         - navigation claire
-         - accents rouges
-         - accès rapide aux principales fonctionnalités
          ========================================================= -->
     <section class="min-h-screen bg-white text-zinc-900">
 
@@ -33,7 +21,7 @@
 
 
             <!-- =================================================
-                 BARRE LATÉRALE ADMINISTRATION
+                 BARRE LATÉRALE
                  ================================================= -->
             <aside
                 class="
@@ -48,9 +36,8 @@
                 "
             >
 
-
                 <!-- =============================================
-                     IDENTITÉ DE L'ADMINISTRATEUR
+                     IDENTITÉ ADMIN
                      ============================================= -->
                 <div class="border-b border-zinc-200 px-6 py-6">
 
@@ -66,11 +53,9 @@
                         BTT Admin
                     </p>
 
-
                     <p class="mt-2 text-sm font-bold text-zinc-900">
                         {{ auth()->user()->pseudo }}
                     </p>
-
 
                     <p
                         class="
@@ -82,34 +67,27 @@
                             text-zinc-500
                         "
                     >
-
                         @if (auth()->user()->isSuperAdmin())
-
                             Super Admin
-
                         @else
-
                             Admin
-
                         @endif
-
                     </p>
 
                 </div>
 
 
-
                 <!-- =============================================
-                     NAVIGATION ADMINISTRATION
+                     NAVIGATION ADMIN
                      ============================================= -->
                 <nav class="flex-1 px-4 py-6">
 
                     <div class="space-y-1">
 
 
-                        <!-- =====================================
+                        <!-- =========================================
                              TABLEAU DE BORD
-                             ===================================== -->
+                             ========================================= -->
                         <a
                             href="{{ route('admin.dashboard') }}"
                             class="
@@ -128,10 +106,9 @@
                         </a>
 
 
-
-                        <!-- =====================================
+                        <!-- =========================================
                              GESTION DES ADHÉRENTS
-                             ===================================== -->
+                             ========================================= -->
                         <a
                             href="{{ route('admin.members.index') }}"
                             class="
@@ -152,10 +129,9 @@
                         </a>
 
 
-
-                        <!-- =====================================
+                        <!-- =========================================
                              GESTION DU CALENDRIER
-                             ===================================== -->
+                             ========================================= -->
                         <a
                             href="{{ route('admin.courses.index') }}"
                             class="
@@ -176,13 +152,10 @@
                         </a>
 
 
-
-                        <!-- =====================================
+                        <!-- =========================================
                              ARTICLES
-                             =====================================
-                             Cette fonctionnalité sera développée
-                             lorsque nous créerons le système Blog.
-                             ===================================== -->
+                             Fonctionnalité à venir.
+                             ========================================= -->
                         <span
                             class="
                                 block
@@ -191,19 +164,17 @@
                                 py-3
                                 text-sm
                                 font-bold
-                                text-zinc-400
+                                text-zinc-500
                             "
                         >
                             Articles
                         </span>
 
 
-
-                        <!-- =====================================
+                        <!-- =========================================
                              PRODUITS
-                             =====================================
-                             La boutique sera développée plus tard.
-                             ===================================== -->
+                             Fonctionnalité à venir.
+                             ========================================= -->
                         <span
                             class="
                                 block
@@ -212,45 +183,45 @@
                                 py-3
                                 text-sm
                                 font-bold
-                                text-zinc-400
+                                text-zinc-500
                             "
                         >
                             Produits
                         </span>
 
 
-
-                        <!-- =====================================
+                        <!-- =========================================
                              MESSAGES
-                             =====================================
-                             La structure de la messagerie existe
-                             maintenant dans la base de données.
+                             =========================================
+                             La messagerie est maintenant fonctionnelle.
 
-                             La boîte de réception administrateur
-                             sera notre prochaine étape.
-                             ===================================== -->
-                        <span
+                             Ce lien permet d'accéder directement à la
+                             boîte de réception de l'administration.
+                             ========================================= -->
+                        <a
+                            href="{{ route('admin.messages.index') }}"
                             class="
-                                block
+                                flex
+                                items-center
                                 rounded-md
                                 px-4
                                 py-3
                                 text-sm
                                 font-bold
-                                text-zinc-400
+                                text-zinc-600
+                                transition
+                                hover:bg-zinc-200
+                                hover:text-red-600
                             "
                         >
                             Messages
-                        </span>
+                        </a>
 
 
-
-                        <!-- =====================================
-                             GESTION DES ADMINISTRATEURS
-                             =====================================
-                             Cette section est volontairement
-                             réservée au Super Admin.
-                             ===================================== -->
+                        <!-- =========================================
+                             ADMINISTRATEURS
+                             SUPER ADMIN UNIQUEMENT
+                             ========================================= -->
                         @if (auth()->user()->isSuperAdmin())
 
                             <a
@@ -279,9 +250,8 @@
                 </nav>
 
 
-
                 <!-- =============================================
-                     RETOUR À L'ESPACE MEMBRE
+                     RETOUR AU SITE
                      ============================================= -->
                 <div class="border-t border-zinc-200 p-4">
 
@@ -308,11 +278,10 @@
             </aside>
 
 
-
             <!-- =================================================
                  CONTENU PRINCIPAL
                  ================================================= -->
-            <div class="min-w-0 flex-1">
+            <div class="flex-1">
 
 
                 <!-- =============================================
@@ -321,23 +290,16 @@
                 <header
                     class="
                         flex
-                        flex-col
-                        gap-4
+                        items-center
+                        justify-between
                         border-b
                         border-zinc-200
                         px-6
                         py-5
-                        sm:flex-row
-                        sm:items-center
-                        sm:justify-between
                         lg:px-10
                     "
                 >
 
-
-                    <!-- =========================================
-                         TITRE DE LA PAGE
-                         ========================================= -->
                     <div>
 
                         <p
@@ -351,7 +313,6 @@
                         >
                             Administration
                         </p>
-
 
                         <h1
                             class="
@@ -369,17 +330,15 @@
                     </div>
 
 
-
                     <!-- =========================================
-                         UTILISATEUR CONNECTÉ
+                         ADMINISTRATEUR CONNECTÉ
                          ========================================= -->
-                    <div class="sm:text-right">
+                    <div class="text-right">
 
                         <p class="text-sm font-bold text-zinc-900">
                             {{ auth()->user()->prenom }}
                             {{ auth()->user()->nom }}
                         </p>
-
 
                         <p
                             class="
@@ -391,17 +350,11 @@
                                 text-zinc-500
                             "
                         >
-
                             @if (auth()->user()->isSuperAdmin())
-
                                 Super Admin
-
                             @else
-
                                 Admin
-
                             @endif
-
                         </p>
 
                     </div>
@@ -409,9 +362,8 @@
                 </header>
 
 
-
                 <!-- =============================================
-                     CONTENU DU TABLEAU DE BORD
+                     CONTENU DU DASHBOARD
                      ============================================= -->
                 <main class="px-6 py-8 lg:px-10 lg:py-10">
 
@@ -443,132 +395,15 @@
                                 text-zinc-500
                             "
                         >
-                            Gérez rapidement les principales sections
-                            du site Brussels Top Team depuis votre espace
-                            d'administration.
+                            Gérez rapidement les principales sections du site
+                            Brussels Top Team depuis cet espace.
                         </p>
 
                     </section>
 
 
-
-                    <!-- =========================================
-                         ACCÈS RAPIDES MOBILE
-                         =========================================
-                         La sidebar étant masquée sur petit écran,
-                         nous conservons ici les accès essentiels.
-                         ========================================= -->
-                    <section class="mt-8 lg:hidden">
-
-                        <div class="flex flex-wrap gap-3">
-
-                            <a
-                                href="{{ route('admin.members.index') }}"
-                                class="
-                                    inline-flex
-                                    items-center
-                                    justify-center
-                                    rounded-md
-                                    border
-                                    border-zinc-300
-                                    px-4
-                                    py-2.5
-                                    text-sm
-                                    font-bold
-                                    text-zinc-700
-                                    transition
-                                    hover:border-red-600
-                                    hover:text-red-600
-                                "
-                            >
-                                Adhérents
-                            </a>
-
-
-                            <a
-                                href="{{ route('admin.courses.index') }}"
-                                class="
-                                    inline-flex
-                                    items-center
-                                    justify-center
-                                    rounded-md
-                                    border
-                                    border-zinc-300
-                                    px-4
-                                    py-2.5
-                                    text-sm
-                                    font-bold
-                                    text-zinc-700
-                                    transition
-                                    hover:border-red-600
-                                    hover:text-red-600
-                                "
-                            >
-                                Calendrier
-                            </a>
-
-
-                            @if (auth()->user()->isSuperAdmin())
-
-                                <a
-                                    href="{{ route('admin.administrators.index') }}"
-                                    class="
-                                        inline-flex
-                                        items-center
-                                        justify-center
-                                        rounded-md
-                                        border
-                                        border-zinc-300
-                                        px-4
-                                        py-2.5
-                                        text-sm
-                                        font-bold
-                                        text-zinc-700
-                                        transition
-                                        hover:border-red-600
-                                        hover:text-red-600
-                                    "
-                                >
-                                    Administrateurs
-                                </a>
-
-                            @endif
-
-
-                            <a
-                                href="{{ route('member.dashboard') }}"
-                                class="
-                                    inline-flex
-                                    items-center
-                                    justify-center
-                                    rounded-md
-                                    border
-                                    border-zinc-300
-                                    px-4
-                                    py-2.5
-                                    text-sm
-                                    font-bold
-                                    text-zinc-700
-                                    transition
-                                    hover:border-red-600
-                                    hover:text-red-600
-                                "
-                            >
-                                Retour au site
-                            </a>
-
-                        </div>
-
-                    </section>
-
-
-
                     <!-- =========================================
                          STATISTIQUES
-                         =========================================
-                         Les compteurs dynamiques seront ajoutés
-                         progressivement lorsque le dashboard sera
-                         relié à ses données.
                          ========================================= -->
                     <section class="mt-10">
 
@@ -606,7 +441,6 @@
                                     Adhérents
                                 </p>
 
-
                                 <p
                                     class="
                                         mt-3
@@ -619,7 +453,6 @@
                                 </p>
 
                             </div>
-
 
 
                             <!-- =====================================
@@ -646,7 +479,6 @@
                                     Cours
                                 </p>
 
-
                                 <p
                                     class="
                                         mt-3
@@ -659,7 +491,6 @@
                                 </p>
 
                             </div>
-
 
 
                             <!-- =====================================
@@ -686,7 +517,6 @@
                                     Articles
                                 </p>
 
-
                                 <p
                                     class="
                                         mt-3
@@ -701,9 +531,13 @@
                             </div>
 
 
-
                             <!-- =====================================
                                  STATISTIQUE MESSAGES
+                                 =====================================
+                                 Le compteur dynamique sera ajouté plus
+                                 tard au contrôleur du dashboard.
+
+                                 Pour le moment nous conservons le tiret.
                                  ===================================== -->
                             <div
                                 class="
@@ -726,7 +560,6 @@
                                     Messages
                                 </p>
 
-
                                 <p
                                     class="
                                         mt-3
@@ -743,7 +576,6 @@
                         </div>
 
                     </section>
-
 
 
                     <!-- =========================================
@@ -777,7 +609,6 @@
                         </h2>
 
 
-
                         <div
                             class="
                                 mt-6
@@ -792,11 +623,13 @@
                             <!-- =====================================
                                  AJOUTER UN COURS
                                  =====================================
-                                 Le calendrier étant désormais
-                                 fonctionnel, ce bouton est actif.
+                                 Cette zone reste inchangée pour l'instant.
+                                 Le calendrier dispose déjà de sa propre
+                                 section dans la navigation admin.
                                  ===================================== -->
-                            <a
-                                href="{{ route('admin.courses.create') }}"
+                            <button
+                                type="button"
+                                disabled
                                 class="
                                     border
                                     border-zinc-200
@@ -804,9 +637,7 @@
                                     px-5
                                     py-5
                                     text-left
-                                    transition
-                                    hover:border-red-600
-                                    hover:bg-white
+                                    opacity-60
                                 "
                             >
 
@@ -821,21 +652,99 @@
                                     Ajouter un cours
                                 </p>
 
-
-                                <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                    Ajoutez rapidement un nouvel entraînement
-                                    au calendrier Brussels Top Team.
+                                <p class="mt-2 text-sm text-zinc-500">
+                                    Gestion du calendrier prochainement.
                                 </p>
+
+                            </button>
+
+
+                            <!-- =====================================
+                                 CONSULTER LES MESSAGES
+                                 =====================================
+                                 La messagerie étant maintenant fonctionnelle,
+                                 cette action devient directement accessible
+                                 depuis le dashboard.
+                                 ===================================== -->
+                            <a
+                                href="{{ route('admin.messages.index') }}"
+                                class="
+                                    group
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    px-5
+                                    py-5
+                                    text-left
+                                    transition
+                                    hover:border-red-600
+                                    hover:bg-red-50
+                                "
+                            >
+
+                                <div
+                                    class="
+                                        flex
+                                        items-start
+                                        justify-between
+                                        gap-4
+                                    "
+                                >
+
+                                    <div>
+
+                                        <p
+                                            class="
+                                                text-sm
+                                                font-black
+                                                uppercase
+                                                text-zinc-900
+                                                transition
+                                                group-hover:text-red-600
+                                            "
+                                        >
+                                            Consulter les messages
+                                        </p>
+
+                                        <p
+                                            class="
+                                                mt-2
+                                                text-sm
+                                                leading-6
+                                                text-zinc-500
+                                            "
+                                        >
+                                            Consultez les demandes reçues et
+                                            répondez aux visiteurs et adhérents.
+                                        </p>
+
+                                    </div>
+
+
+                                    <span
+                                        class="
+                                            text-lg
+                                            font-black
+                                            text-red-600
+                                            transition-transform
+                                            group-hover:translate-x-1
+                                        "
+                                    >
+                                        →
+                                    </span>
+
+                                </div>
 
                             </a>
 
 
-
                             <!-- =====================================
-                                 GÉRER LES ADHÉRENTS
+                                 PUBLIER UN ARTICLE
+                                 Fonctionnalité prochainement.
                                  ===================================== -->
-                            <a
-                                href="{{ route('admin.members.index') }}"
+                            <button
+                                type="button"
+                                disabled
                                 class="
                                     border
                                     border-zinc-200
@@ -843,81 +752,6 @@
                                     px-5
                                     py-5
                                     text-left
-                                    transition
-                                    hover:border-red-600
-                                    hover:bg-white
-                                "
-                            >
-
-                                <p
-                                    class="
-                                        text-sm
-                                        font-black
-                                        uppercase
-                                        text-zinc-900
-                                    "
-                                >
-                                    Gérer les adhérents
-                                </p>
-
-
-                                <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                    Consultez et gérez les comptes adhérents
-                                    accessibles à votre niveau d'administration.
-                                </p>
-
-                            </a>
-
-
-
-                            <!-- =====================================
-                                 MESSAGERIE
-                                 =====================================
-                                 La réception des messages sera
-                                 activée lors de notre prochaine étape.
-                                 ===================================== -->
-                            <div
-                                class="
-                                    border
-                                    border-zinc-200
-                                    bg-zinc-50
-                                    px-5
-                                    py-5
-                                    opacity-60
-                                "
-                            >
-
-                                <p
-                                    class="
-                                        text-sm
-                                        font-black
-                                        uppercase
-                                        text-zinc-900
-                                    "
-                                >
-                                    Consulter les messages
-                                </p>
-
-
-                                <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                    La boîte de réception de l'administration
-                                    sera disponible prochainement.
-                                </p>
-
-                            </div>
-
-
-
-                            <!-- =====================================
-                                 PUBLIER UN ARTICLE
-                                 ===================================== -->
-                            <div
-                                class="
-                                    border
-                                    border-zinc-200
-                                    bg-zinc-50
-                                    px-5
-                                    py-5
                                     opacity-60
                                 "
                             >
@@ -933,26 +767,27 @@
                                     Publier un article
                                 </p>
 
-
-                                <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                    La gestion du blog sera développée
-                                    dans une prochaine étape.
+                                <p class="mt-2 text-sm text-zinc-500">
+                                    Gestion du blog prochainement.
                                 </p>
 
-                            </div>
-
+                            </button>
 
 
                             <!-- =====================================
                                  AJOUTER UN PRODUIT
+                                 Fonctionnalité prochainement.
                                  ===================================== -->
-                            <div
+                            <button
+                                type="button"
+                                disabled
                                 class="
                                     border
                                     border-zinc-200
                                     bg-zinc-50
                                     px-5
                                     py-5
+                                    text-left
                                     opacity-60
                                 "
                             >
@@ -968,58 +803,11 @@
                                     Ajouter un produit
                                 </p>
 
-
-                                <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                    La gestion de la boutique sera développée
-                                    ultérieurement.
+                                <p class="mt-2 text-sm text-zinc-500">
+                                    Gestion de la boutique prochainement.
                                 </p>
 
-                            </div>
-
-
-
-                            <!-- =====================================
-                                 GÉRER LES ADMINISTRATEURS
-                                 =====================================
-                                 Uniquement visible pour le Super Admin.
-                                 ===================================== -->
-                            @if (auth()->user()->isSuperAdmin())
-
-                                <a
-                                    href="{{ route('admin.administrators.index') }}"
-                                    class="
-                                        border
-                                        border-zinc-200
-                                        bg-zinc-50
-                                        px-5
-                                        py-5
-                                        text-left
-                                        transition
-                                        hover:border-red-600
-                                        hover:bg-white
-                                    "
-                                >
-
-                                    <p
-                                        class="
-                                            text-sm
-                                            font-black
-                                            uppercase
-                                            text-zinc-900
-                                        "
-                                    >
-                                        Gérer les administrateurs
-                                    </p>
-
-
-                                    <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                        Gérez les comptes disposant des droits
-                                        d'administration Brussels Top Team.
-                                    </p>
-
-                                </a>
-
-                            @endif
+                            </button>
 
                         </div>
 
@@ -1032,6 +820,5 @@
         </div>
 
     </section>
-
 
 @endsection

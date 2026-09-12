@@ -6,29 +6,14 @@
 
 @section(
     'meta_description',
-    'Boîte de réception de l’administration Brussels Top Team.'
+    'Gestion des conversations reçues dans l’administration Brussels Top Team.'
 )
 
 
 @section('content')
 
-
     <!-- =========================================================
          MESSAGERIE ADMINISTRATION
-         =========================================================
-
-         Cette page affiche toutes les conversations reçues par BTT.
-
-         Une conversation peut provenir :
-
-         - d'un visiteur non connecté ;
-         - d'un adhérent connecté.
-
-         L'état de lecture est représenté clairement :
-
-         - Nouveau : au moins un message entrant non lu ;
-         - Lu      : tous les messages entrants ont été consultés.
-
          ========================================================= -->
     <section class="min-h-screen bg-white text-zinc-900">
 
@@ -51,7 +36,6 @@
                 "
             >
 
-
                 <!-- =============================================
                      IDENTITÉ ADMIN
                      ============================================= -->
@@ -69,11 +53,9 @@
                         BTT Admin
                     </p>
 
-
                     <p class="mt-2 text-sm font-bold text-zinc-900">
                         {{ auth()->user()->pseudo }}
                     </p>
-
 
                     <p
                         class="
@@ -85,21 +67,14 @@
                             text-zinc-500
                         "
                     >
-
                         @if (auth()->user()->isSuperAdmin())
-
                             Super Admin
-
                         @else
-
                             Admin
-
                         @endif
-
                     </p>
 
                 </div>
-
 
 
                 <!-- =============================================
@@ -131,7 +106,6 @@
                         </a>
 
 
-
                         <!-- ADHÉRENTS -->
                         <a
                             href="{{ route('admin.members.index') }}"
@@ -151,7 +125,6 @@
                         >
                             Adhérents
                         </a>
-
 
 
                         <!-- CALENDRIER -->
@@ -175,7 +148,6 @@
                         </a>
 
 
-
                         <!-- ARTICLES -->
                         <span
                             class="
@@ -190,7 +162,6 @@
                         >
                             Articles
                         </span>
-
 
 
                         <!-- PRODUITS -->
@@ -209,11 +180,7 @@
                         </span>
 
 
-
-                        <!-- =====================================
-                             MESSAGES
-                             Page actuellement active.
-                             ===================================== -->
+                        <!-- MESSAGES -->
                         <a
                             href="{{ route('admin.messages.index') }}"
                             class="
@@ -230,7 +197,6 @@
                         >
                             Messages
                         </a>
-
 
 
                         <!-- ADMINISTRATEURS -->
@@ -262,7 +228,6 @@
                 </nav>
 
 
-
                 <!-- =============================================
                      RETOUR AU SITE
                      ============================================= -->
@@ -289,7 +254,6 @@
                 </div>
 
             </aside>
-
 
 
             <!-- =================================================
@@ -331,7 +295,6 @@
                             Administration
                         </p>
 
-
                         <h1
                             class="
                                 mt-1
@@ -348,14 +311,13 @@
                     </div>
 
 
-
+                    <!-- ADMIN CONNECTÉ -->
                     <div class="sm:text-right">
 
                         <p class="text-sm font-bold text-zinc-900">
                             {{ auth()->user()->prenom }}
                             {{ auth()->user()->nom }}
                         </p>
-
 
                         <p
                             class="
@@ -367,23 +329,16 @@
                                 text-zinc-500
                             "
                         >
-
                             @if (auth()->user()->isSuperAdmin())
-
                                 Super Admin
-
                             @else
-
                                 Admin
-
                             @endif
-
                         </p>
 
                     </div>
 
                 </header>
-
 
 
                 <!-- =============================================
@@ -393,114 +348,106 @@
 
 
                     <!-- =========================================
-                         TITRE DE LA BOÎTE DE RÉCEPTION
+                         EN-TÊTE
                          ========================================= -->
-                    <section>
+                    <section
+                        class="
+                            flex
+                            flex-col
+                            gap-5
+                            border-b
+                            border-zinc-200
+                            pb-8
+                            lg:flex-row
+                            lg:items-end
+                            lg:justify-between
+                        "
+                    >
 
-                        <h2
-                            class="
-                                text-3xl
-                                font-black
-                                uppercase
-                                tracking-tight
-                                text-zinc-900
-                            "
-                        >
-                            Boîte de réception
-                        </h2>
+                        <div>
 
-
-                        <p
-                            class="
-                                mt-3
-                                max-w-3xl
-                                text-sm
-                                leading-6
-                                text-zinc-500
-                            "
-                        >
-                            Consultez les demandes envoyées par les visiteurs
-                            et les adhérents Brussels Top Team.
-                        </p>
-
-                    </section>
-
-
-
-                    <!-- =========================================
-                         NAVIGATION MOBILE
-                         ========================================= -->
-                    <section class="mt-8 lg:hidden">
-
-                        <div class="flex flex-wrap gap-3">
-
-                            <a
-                                href="{{ route('admin.dashboard') }}"
+                            <p
                                 class="
-                                    rounded-md
-                                    border
-                                    border-zinc-300
-                                    px-4
-                                    py-2.5
-                                    text-sm
-                                    font-bold
-                                    text-zinc-700
+                                    text-xs
+                                    font-black
+                                    uppercase
+                                    tracking-[0.3em]
+                                    text-red-600
                                 "
                             >
-                                Dashboard
-                            </a>
+                                Messagerie
+                            </p>
 
-
-                            <a
-                                href="{{ route('admin.members.index') }}"
+                            <h2
                                 class="
-                                    rounded-md
-                                    border
-                                    border-zinc-300
-                                    px-4
-                                    py-2.5
-                                    text-sm
-                                    font-bold
-                                    text-zinc-700
+                                    mt-2
+                                    text-3xl
+                                    font-black
+                                    uppercase
+                                    tracking-tight
+                                    text-zinc-900
                                 "
                             >
-                                Adhérents
-                            </a>
+                                Boîte de réception
+                            </h2>
 
-
-                            <a
-                                href="{{ route('admin.courses.index') }}"
+                            <p
                                 class="
-                                    rounded-md
-                                    border
-                                    border-zinc-300
-                                    px-4
-                                    py-2.5
+                                    mt-3
+                                    max-w-2xl
                                     text-sm
-                                    font-bold
-                                    text-zinc-700
+                                    leading-6
+                                    text-zinc-500
                                 "
                             >
-                                Calendrier
-                            </a>
+                                Cliquez directement sur les titres du tableau
+                                pour modifier l'ordre d'affichage.
+                            </p>
+
+                        </div>
+
+
+                        <!-- NOMBRE DE CONVERSATIONS -->
+                        <div class="border-l-2 border-red-600 pl-4">
+
+                            <p
+                                class="
+                                    text-xs
+                                    font-bold
+                                    uppercase
+                                    tracking-wider
+                                    text-zinc-400
+                                "
+                            >
+                                Conversations
+                            </p>
+
+                            <p
+                                class="
+                                    mt-1
+                                    text-2xl
+                                    font-black
+                                    text-zinc-900
+                                "
+                            >
+                                {{ $conversations->total() }}
+                            </p>
 
                         </div>
 
                     </section>
 
 
-
                     <!-- =========================================
-                         LISTE DES CONVERSATIONS
+                         TABLEAU
                          ========================================= -->
-                    <section class="mt-10">
-
+                    <section class="mt-8">
 
                         @if ($conversations->count() > 0)
 
 
                             <!-- =====================================
-                                 TABLEAU DESKTOP
+                                 VERSION ORDINATEUR
                                  ===================================== -->
                             <div
                                 class="
@@ -508,376 +455,651 @@
                                     overflow-hidden
                                     border
                                     border-zinc-200
-                                    md:block
+                                    lg:block
                                 "
                             >
 
-                                <table class="w-full">
+                                <div class="overflow-x-auto">
 
-                                    <thead class="bg-zinc-50">
+                                    <table class="w-full">
 
-                                        <tr class="border-b border-zinc-200 text-left">
+                                        <thead class="bg-zinc-100">
 
-                                            <th
-                                                class="
-                                                    px-5
-                                                    py-4
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-zinc-500
-                                                "
-                                            >
-                                                Expéditeur
-                                            </th>
-
-
-                                            <th
-                                                class="
-                                                    px-5
-                                                    py-4
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-zinc-500
-                                                "
-                                            >
-                                                Sujet
-                                            </th>
-
-
-                                            <th
-                                                class="
-                                                    px-5
-                                                    py-4
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-zinc-500
-                                                "
-                                            >
-                                                Type
-                                            </th>
-
-
-                                            <th
-                                                class="
-                                                    px-5
-                                                    py-4
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-zinc-500
-                                                "
-                                            >
-                                                Lecture
-                                            </th>
-
-
-                                            <th
-                                                class="
-                                                    px-5
-                                                    py-4
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-zinc-500
-                                                "
-                                            >
-                                                Date
-                                            </th>
-
-
-                                            <th
-                                                class="
-                                                    px-5
-                                                    py-4
-                                                    text-right
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-zinc-500
-                                                "
-                                            >
-                                                Action
-                                            </th>
-
-                                        </tr>
-
-                                    </thead>
-
-
-
-                                    <tbody class="divide-y divide-zinc-200">
-
-
-                                        @foreach ($conversations as $conversation)
-
-                                            <tr
-                                                class="
-                                                    transition
-                                                    hover:bg-zinc-50
-                                                "
-                                            >
+                                            <tr class="border-b border-zinc-200">
 
 
                                                 <!-- =====================
                                                      EXPÉDITEUR
                                                      ===================== -->
-                                                <td class="px-5 py-5">
+                                                <th class="p-0 text-left">
 
-                                                    <p class="text-sm font-black text-zinc-900">
-                                                        {{ $conversation->name }}
-                                                    </p>
+                                                    <a
+                                                        href="{{ route(
+                                                            'admin.messages.index',
+                                                            [
+                                                                'sort' => 'name',
+                                                                'direction' => (
+                                                                    $sort === 'name'
+                                                                    && $direction === 'asc'
+                                                                )
+                                                                    ? 'desc'
+                                                                    : 'asc'
+                                                            ]
+                                                        ) }}"
+                                                        class="
+                                                            group
+                                                            flex
+                                                            items-center
+                                                            gap-2
+                                                            px-5
+                                                            py-4
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            transition
+                                                            hover:bg-zinc-200
+                                                            hover:text-red-600
+                                                            {{ $sort === 'name'
+                                                                ? 'text-red-600'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        Expéditeur
 
+                                                        <span>
+                                                            @if ($sort === 'name')
+                                                                {{ $direction === 'asc' ? '↑' : '↓' }}
+                                                            @else
+                                                                ↕
+                                                            @endif
+                                                        </span>
+                                                    </a>
 
-                                                    <p class="mt-1 text-xs text-zinc-500">
-                                                        {{ $conversation->email }}
-                                                    </p>
-
-                                                </td>
-
+                                                </th>
 
 
                                                 <!-- =====================
                                                      SUJET
                                                      ===================== -->
-                                                <td class="px-5 py-5">
+                                                <th class="p-0 text-left">
 
-                                                    <p class="text-sm font-bold text-zinc-700">
+                                                    <a
+                                                        href="{{ route(
+                                                            'admin.messages.index',
+                                                            [
+                                                                'sort' => 'subject',
+                                                                'direction' => (
+                                                                    $sort === 'subject'
+                                                                    && $direction === 'asc'
+                                                                )
+                                                                    ? 'desc'
+                                                                    : 'asc'
+                                                            ]
+                                                        ) }}"
+                                                        class="
+                                                            flex
+                                                            items-center
+                                                            gap-2
+                                                            px-5
+                                                            py-4
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            transition
+                                                            hover:bg-zinc-200
+                                                            hover:text-red-600
+                                                            {{ $sort === 'subject'
+                                                                ? 'text-red-600'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        Sujet
 
-                                                        @switch($conversation->subject)
+                                                        <span>
+                                                            @if ($sort === 'subject')
+                                                                {{ $direction === 'asc' ? '↑' : '↓' }}
+                                                            @else
+                                                                ↕
+                                                            @endif
+                                                        </span>
+                                                    </a>
 
-                                                            @case('abonnement')
-                                                                Abonnements / Affiliation
-                                                                @break
-
-                                                            @case('entrainements')
-                                                                Nos entraînements
-                                                                @break
-
-                                                            @case('compte')
-                                                                Inscription / Compte
-                                                                @break
-
-                                                            @default
-                                                                Autre demande
-
-                                                        @endswitch
-
-                                                    </p>
-
-                                                </td>
-
+                                                </th>
 
 
                                                 <!-- =====================
                                                      TYPE
                                                      ===================== -->
-                                                <td class="px-5 py-5">
+                                                <th class="p-0 text-left">
 
-                                                    @if ($conversation->user_id)
+                                                    <a
+                                                        href="{{ route(
+                                                            'admin.messages.index',
+                                                            [
+                                                                'sort' => 'type',
+                                                                'direction' => (
+                                                                    $sort === 'type'
+                                                                    && $direction === 'asc'
+                                                                )
+                                                                    ? 'desc'
+                                                                    : 'asc'
+                                                            ]
+                                                        ) }}"
+                                                        class="
+                                                            flex
+                                                            items-center
+                                                            gap-2
+                                                            px-5
+                                                            py-4
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            transition
+                                                            hover:bg-zinc-200
+                                                            hover:text-red-600
+                                                            {{ $sort === 'type'
+                                                                ? 'text-red-600'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        Type
 
-                                                        <span
+                                                        <span>
+                                                            @if ($sort === 'type')
+                                                                {{ $direction === 'asc' ? '↑' : '↓' }}
+                                                            @else
+                                                                ↕
+                                                            @endif
+                                                        </span>
+                                                    </a>
+
+                                                </th>
+
+
+                                                <!-- =====================
+                                                     STATUT
+                                                     ===================== -->
+                                                <th class="p-0 text-left">
+
+                                                    <a
+                                                        href="{{ route(
+                                                            'admin.messages.index',
+                                                            [
+                                                                'sort' => 'status',
+                                                                'direction' => (
+                                                                    $sort === 'status'
+                                                                    && $direction === 'asc'
+                                                                )
+                                                                    ? 'desc'
+                                                                    : 'asc'
+                                                            ]
+                                                        ) }}"
+                                                        class="
+                                                            flex
+                                                            items-center
+                                                            gap-2
+                                                            px-5
+                                                            py-4
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            transition
+                                                            hover:bg-zinc-200
+                                                            hover:text-red-600
+                                                            {{ $sort === 'status'
+                                                                ? 'text-red-600'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        Statut
+
+                                                        <span>
+                                                            @if ($sort === 'status')
+                                                                {{ $direction === 'asc' ? '↑' : '↓' }}
+                                                            @else
+                                                                ↕
+                                                            @endif
+                                                        </span>
+                                                    </a>
+
+                                                </th>
+
+
+                                                <!-- =====================
+                                                     LECTURE
+                                                     ===================== -->
+                                                <th class="p-0 text-left">
+
+                                                    <a
+                                                        href="{{ route(
+                                                            'admin.messages.index',
+                                                            [
+                                                                'sort' => 'read',
+                                                                'direction' => (
+                                                                    $sort === 'read'
+                                                                    && $direction === 'desc'
+                                                                )
+                                                                    ? 'asc'
+                                                                    : 'desc'
+                                                            ]
+                                                        ) }}"
+                                                        class="
+                                                            flex
+                                                            items-center
+                                                            gap-2
+                                                            px-5
+                                                            py-4
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            transition
+                                                            hover:bg-zinc-200
+                                                            hover:text-red-600
+                                                            {{ $sort === 'read'
+                                                                ? 'text-red-600'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        Lecture
+
+                                                        <span>
+                                                            @if ($sort === 'read')
+                                                                {{ $direction === 'asc' ? '↑' : '↓' }}
+                                                            @else
+                                                                ↕
+                                                            @endif
+                                                        </span>
+                                                    </a>
+
+                                                </th>
+
+
+                                                <!-- =====================
+                                                     DERNIÈRE ACTIVITÉ
+                                                     ===================== -->
+                                                <th class="p-0 text-left">
+
+                                                    <a
+                                                        href="{{ route(
+                                                            'admin.messages.index',
+                                                            [
+                                                                'sort' => 'updated_at',
+                                                                'direction' => (
+                                                                    $sort === 'updated_at'
+                                                                    && $direction === 'desc'
+                                                                )
+                                                                    ? 'asc'
+                                                                    : 'desc'
+                                                            ]
+                                                        ) }}"
+                                                        class="
+                                                            flex
+                                                            items-center
+                                                            gap-2
+                                                            px-5
+                                                            py-4
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            transition
+                                                            hover:bg-zinc-200
+                                                            hover:text-red-600
+                                                            {{ $sort === 'updated_at'
+                                                                ? 'text-red-600'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        Dernière activité
+
+                                                        <span>
+                                                            @if ($sort === 'updated_at')
+                                                                {{ $direction === 'asc' ? '↑' : '↓' }}
+                                                            @else
+                                                                ↕
+                                                            @endif
+                                                        </span>
+                                                    </a>
+
+                                                </th>
+
+
+                                                <!-- ACTION -->
+                                                <th
+                                                    class="
+                                                        px-5
+                                                        py-4
+                                                        text-right
+                                                        text-xs
+                                                        font-black
+                                                        uppercase
+                                                        tracking-wider
+                                                        text-zinc-500
+                                                    "
+                                                >
+                                                    Action
+                                                </th>
+
+                                            </tr>
+
+                                        </thead>
+
+
+                                        <tbody class="divide-y divide-zinc-200">
+
+                                            @foreach ($conversations as $conversation)
+
+                                                <tr
+                                                    class="
+                                                        bg-white
+                                                        transition
+                                                        hover:bg-zinc-50
+                                                    "
+                                                >
+
+
+                                                    <!-- EXPÉDITEUR -->
+                                                    <td class="px-5 py-5">
+
+                                                        <p class="font-black text-zinc-900">
+                                                            {{ $conversation->name }}
+                                                        </p>
+
+                                                        <p
+                                                            class="
+                                                                mt-1
+                                                                max-w-xs
+                                                                truncate
+                                                                text-xs
+                                                                text-zinc-500
+                                                            "
+                                                        >
+                                                            {{ $conversation->email }}
+                                                        </p>
+
+                                                    </td>
+
+
+                                                    <!-- SUJET -->
+                                                    <td class="px-5 py-5">
+
+                                                        <p
+                                                            class="
+                                                                text-sm
+                                                                font-bold
+                                                                text-zinc-700
+                                                            "
+                                                        >
+                                                            @switch($conversation->subject)
+
+                                                                @case('abonnement')
+                                                                    Abonnements / Affiliation
+                                                                    @break
+
+                                                                @case('entrainements')
+                                                                    Nos entraînements
+                                                                    @break
+
+                                                                @case('compte')
+                                                                    Inscription / Compte
+                                                                    @break
+
+                                                                @default
+                                                                    Autre demande
+
+                                                            @endswitch
+                                                        </p>
+
+                                                    </td>
+
+
+                                                    <!-- TYPE -->
+                                                    <td class="px-5 py-5">
+
+                                                        @if ($conversation->user_id)
+
+                                                            <span
+                                                                class="
+                                                                    inline-flex
+                                                                    rounded-full
+                                                                    bg-zinc-900
+                                                                    px-3
+                                                                    py-1.5
+                                                                    text-[10px]
+                                                                    font-black
+                                                                    uppercase
+                                                                    tracking-wider
+                                                                    text-white
+                                                                "
+                                                            >
+                                                                Adhérent
+                                                            </span>
+
+                                                        @else
+
+                                                            <span
+                                                                class="
+                                                                    inline-flex
+                                                                    rounded-full
+                                                                    border
+                                                                    border-zinc-300
+                                                                    bg-white
+                                                                    px-3
+                                                                    py-1.5
+                                                                    text-[10px]
+                                                                    font-black
+                                                                    uppercase
+                                                                    tracking-wider
+                                                                    text-zinc-600
+                                                                "
+                                                            >
+                                                                Visiteur
+                                                            </span>
+
+                                                        @endif
+
+                                                    </td>
+
+
+                                                    <!-- STATUT -->
+                                                    <td class="px-5 py-5">
+
+                                                        @if ($conversation->status === 'open')
+
+                                                            <span
+                                                                class="
+                                                                    inline-flex
+                                                                    items-center
+                                                                    gap-2
+                                                                    text-xs
+                                                                    font-black
+                                                                    uppercase
+                                                                    text-green-700
+                                                                "
+                                                            >
+                                                                <span
+                                                                    class="
+                                                                        h-2
+                                                                        w-2
+                                                                        rounded-full
+                                                                        bg-green-600
+                                                                    "
+                                                                ></span>
+
+                                                                Ouverte
+                                                            </span>
+
+                                                        @else
+
+                                                            <span
+                                                                class="
+                                                                    inline-flex
+                                                                    items-center
+                                                                    gap-2
+                                                                    text-xs
+                                                                    font-black
+                                                                    uppercase
+                                                                    text-zinc-500
+                                                                "
+                                                            >
+                                                                <span
+                                                                    class="
+                                                                        h-2
+                                                                        w-2
+                                                                        rounded-full
+                                                                        bg-zinc-400
+                                                                    "
+                                                                ></span>
+
+                                                                Fermée
+                                                            </span>
+
+                                                        @endif
+
+                                                    </td>
+
+
+                                                    <!-- LECTURE -->
+                                                    <td class="px-5 py-5">
+
+                                                        @if ($conversation->unread_messages_count > 0)
+
+                                                            <span
+                                                                class="
+                                                                    inline-flex
+                                                                    items-center
+                                                                    gap-2
+                                                                    rounded-full
+                                                                    bg-red-100
+                                                                    px-3
+                                                                    py-1.5
+                                                                    text-[10px]
+                                                                    font-black
+                                                                    uppercase
+                                                                    tracking-wider
+                                                                    text-red-700
+                                                                "
+                                                            >
+                                                                <span
+                                                                    class="
+                                                                        h-2
+                                                                        w-2
+                                                                        rounded-full
+                                                                        bg-red-600
+                                                                    "
+                                                                ></span>
+
+                                                                Nouveau
+                                                            </span>
+
+                                                        @else
+
+                                                            <span
+                                                                class="
+                                                                    inline-flex
+                                                                    items-center
+                                                                    gap-2
+                                                                    rounded-full
+                                                                    bg-zinc-100
+                                                                    px-3
+                                                                    py-1.5
+                                                                    text-[10px]
+                                                                    font-black
+                                                                    uppercase
+                                                                    tracking-wider
+                                                                    text-zinc-500
+                                                                "
+                                                            >
+                                                                <span
+                                                                    class="
+                                                                        h-2
+                                                                        w-2
+                                                                        rounded-full
+                                                                        bg-zinc-400
+                                                                    "
+                                                                ></span>
+
+                                                                Lu
+                                                            </span>
+
+                                                        @endif
+
+                                                    </td>
+
+
+                                                    <!-- DERNIÈRE ACTIVITÉ -->
+                                                    <td
+                                                        class="
+                                                            whitespace-nowrap
+                                                            px-5
+                                                            py-5
+                                                            text-sm
+                                                            font-bold
+                                                            text-zinc-500
+                                                        "
+                                                    >
+                                                        {{ $conversation->updated_at->format('d/m/Y H:i') }}
+                                                    </td>
+
+
+                                                    <!-- ACTION -->
+                                                    <td class="px-5 py-5 text-right">
+
+                                                        <a
+                                                            href="{{ route(
+                                                                'admin.messages.show',
+                                                                $conversation
+                                                            ) }}"
                                                             class="
                                                                 inline-flex
-                                                                rounded-full
+                                                                items-center
+                                                                justify-center
+                                                                rounded-md
                                                                 bg-zinc-900
-                                                                px-3
-                                                                py-1.5
+                                                                px-4
+                                                                py-2.5
                                                                 text-xs
                                                                 font-black
                                                                 uppercase
                                                                 tracking-wider
                                                                 text-white
+                                                                transition
+                                                                hover:bg-red-600
                                                             "
                                                         >
-                                                            Adhérent
-                                                        </span>
+                                                            Ouvrir
+                                                        </a>
 
-                                                    @else
+                                                    </td>
 
-                                                        <span
-                                                            class="
-                                                                inline-flex
-                                                                rounded-full
-                                                                bg-zinc-100
-                                                                px-3
-                                                                py-1.5
-                                                                text-xs
-                                                                font-black
-                                                                uppercase
-                                                                tracking-wider
-                                                                text-zinc-600
-                                                            "
-                                                        >
-                                                            Visiteur
-                                                        </span>
+                                                </tr>
 
-                                                    @endif
+                                            @endforeach
 
-                                                </td>
+                                        </tbody>
 
+                                    </table>
 
-
-                                                <!-- =====================
-                                                     ÉTAT DE LECTURE
-                                                     ===================== -->
-                                                <td class="px-5 py-5">
-
-
-                                                    @if ($conversation->unread_messages_count > 0)
-
-                                                        <!-- =================
-                                                             MESSAGE NON LU
-                                                             ================= -->
-                                                        <span
-                                                            class="
-                                                                inline-flex
-                                                                items-center
-                                                                gap-2
-                                                                rounded-full
-                                                                bg-red-100
-                                                                px-3
-                                                                py-1.5
-                                                                text-xs
-                                                                font-black
-                                                                uppercase
-                                                                tracking-wider
-                                                                text-red-700
-                                                            "
-                                                        >
-
-                                                            <span
-                                                                class="
-                                                                    h-2
-                                                                    w-2
-                                                                    rounded-full
-                                                                    bg-red-600
-                                                                "
-                                                            ></span>
-
-                                                            Nouveau
-
-                                                        </span>
-
-                                                    @else
-
-                                                        <!-- =================
-                                                             MESSAGE LU
-                                                             =================
-                                                             Si tous les
-                                                             messages entrants
-                                                             ont is_read = 1,
-                                                             ce badge apparaît.
-                                                             ================= -->
-                                                        <span
-                                                            class="
-                                                                inline-flex
-                                                                items-center
-                                                                gap-2
-                                                                rounded-full
-                                                                bg-zinc-200
-                                                                px-3
-                                                                py-1.5
-                                                                text-xs
-                                                                font-black
-                                                                uppercase
-                                                                tracking-wider
-                                                                text-zinc-700
-                                                            "
-                                                        >
-
-                                                            <span
-                                                                class="
-                                                                    h-2
-                                                                    w-2
-                                                                    rounded-full
-                                                                    bg-zinc-500
-                                                                "
-                                                            ></span>
-
-                                                            Lu
-
-                                                        </span>
-
-                                                    @endif
-
-                                                </td>
-
-
-
-                                                <!-- =====================
-                                                     DATE
-                                                     ===================== -->
-                                                <td
-                                                    class="
-                                                        px-5
-                                                        py-5
-                                                        text-sm
-                                                        text-zinc-500
-                                                    "
-                                                >
-                                                    {{ $conversation->created_at->format('d/m/Y H:i') }}
-                                                </td>
-
-
-
-                                                <!-- =====================
-                                                     OUVRIR
-                                                     ===================== -->
-                                                <td class="px-5 py-5 text-right">
-
-                                                    <a
-                                                        href="{{ route(
-                                                            'admin.messages.show',
-                                                            $conversation
-                                                        ) }}"
-                                                        class="
-                                                            inline-flex
-                                                            items-center
-                                                            justify-center
-                                                            rounded-md
-                                                            bg-red-600
-                                                            px-4
-                                                            py-2.5
-                                                            text-xs
-                                                            font-black
-                                                            uppercase
-                                                            tracking-wider
-                                                            text-white
-                                                            transition
-                                                            hover:bg-red-700
-                                                        "
-                                                    >
-                                                        Ouvrir
-                                                    </a>
-
-                                                </td>
-
-                                            </tr>
-
-                                        @endforeach
-
-                                    </tbody>
-
-                                </table>
+                                </div>
 
                             </div>
 
 
-
                             <!-- =====================================
-                                 AFFICHAGE MOBILE
+                                 VERSION MOBILE
                                  ===================================== -->
-                            <div class="space-y-4 md:hidden">
-
+                            <div class="space-y-4 lg:hidden">
 
                                 @foreach ($conversations as $conversation)
 
@@ -890,10 +1112,6 @@
                                         "
                                     >
 
-
-                                        <!-- =========================
-                                             NOM + ÉTAT
-                                             ========================= -->
                                         <div
                                             class="
                                                 flex
@@ -903,17 +1121,22 @@
                                             "
                                         >
 
-                                            <div>
+                                            <div class="min-w-0">
 
-                                                <p class="text-sm font-black text-zinc-900">
+                                                <p
+                                                    class="
+                                                        truncate
+                                                        font-black
+                                                        text-zinc-900
+                                                    "
+                                                >
                                                     {{ $conversation->name }}
                                                 </p>
-
 
                                                 <p
                                                     class="
                                                         mt-1
-                                                        break-all
+                                                        truncate
                                                         text-xs
                                                         text-zinc-500
                                                     "
@@ -924,18 +1147,12 @@
                                             </div>
 
 
-
-                                            <!-- =====================
-                                                 ÉTAT MOBILE
-                                                 ===================== -->
+                                            <!-- LECTURE -->
                                             @if ($conversation->unread_messages_count > 0)
 
                                                 <span
                                                     class="
-                                                        inline-flex
                                                         shrink-0
-                                                        items-center
-                                                        gap-2
                                                         rounded-full
                                                         bg-red-100
                                                         px-3
@@ -943,55 +1160,28 @@
                                                         text-[10px]
                                                         font-black
                                                         uppercase
-                                                        tracking-wider
                                                         text-red-700
                                                     "
                                                 >
-
-                                                    <span
-                                                        class="
-                                                            h-2
-                                                            w-2
-                                                            rounded-full
-                                                            bg-red-600
-                                                        "
-                                                    ></span>
-
                                                     Nouveau
-
                                                 </span>
 
                                             @else
 
                                                 <span
                                                     class="
-                                                        inline-flex
                                                         shrink-0
-                                                        items-center
-                                                        gap-2
                                                         rounded-full
-                                                        bg-zinc-200
+                                                        bg-zinc-100
                                                         px-3
                                                         py-1.5
                                                         text-[10px]
                                                         font-black
                                                         uppercase
-                                                        tracking-wider
-                                                        text-zinc-700
+                                                        text-zinc-500
                                                     "
                                                 >
-
-                                                    <span
-                                                        class="
-                                                            h-2
-                                                            w-2
-                                                            rounded-full
-                                                            bg-zinc-500
-                                                        "
-                                                    ></span>
-
                                                     Lu
-
                                                 </span>
 
                                             @endif
@@ -999,12 +1189,17 @@
                                         </div>
 
 
-
-                                        <!-- =========================
-                                             INFORMATIONS
-                                             ========================= -->
-                                        <div class="mt-5 space-y-4">
-
+                                        <div
+                                            class="
+                                                mt-5
+                                                grid
+                                                grid-cols-2
+                                                gap-4
+                                                border-y
+                                                border-zinc-200
+                                                py-4
+                                            "
+                                        >
 
                                             <!-- SUJET -->
                                             <div>
@@ -1021,9 +1216,14 @@
                                                     Sujet
                                                 </p>
 
-
-                                                <p class="mt-1 text-sm font-bold text-zinc-700">
-
+                                                <p
+                                                    class="
+                                                        mt-1
+                                                        text-sm
+                                                        font-bold
+                                                        text-zinc-700
+                                                    "
+                                                >
                                                     @switch($conversation->subject)
 
                                                         @case('abonnement')
@@ -1042,11 +1242,9 @@
                                                             Autre demande
 
                                                     @endswitch
-
                                                 </p>
 
                                             </div>
-
 
 
                                             <!-- TYPE -->
@@ -1061,26 +1259,61 @@
                                                         text-zinc-400
                                                     "
                                                 >
-                                                    Expéditeur
+                                                    Type
                                                 </p>
 
-
-                                                <p class="mt-1 text-sm font-bold text-zinc-700">
-
+                                                <p
+                                                    class="
+                                                        mt-1
+                                                        text-sm
+                                                        font-bold
+                                                        text-zinc-700
+                                                    "
+                                                >
                                                     @if ($conversation->user_id)
-
                                                         Adhérent
+                                                    @else
+                                                        Visiteur
+                                                    @endif
+                                                </p>
+
+                                            </div>
+
+
+                                            <!-- STATUT -->
+                                            <div>
+
+                                                <p
+                                                    class="
+                                                        text-[10px]
+                                                        font-black
+                                                        uppercase
+                                                        tracking-wider
+                                                        text-zinc-400
+                                                    "
+                                                >
+                                                    Statut
+                                                </p>
+
+                                                <p class="mt-1 text-sm font-bold">
+
+                                                    @if ($conversation->status === 'open')
+
+                                                        <span class="text-green-700">
+                                                            Ouverte
+                                                        </span>
 
                                                     @else
 
-                                                        Visiteur
+                                                        <span class="text-zinc-500">
+                                                            Fermée
+                                                        </span>
 
                                                     @endif
 
                                                 </p>
 
                                             </div>
-
 
 
                                             <!-- DATE -->
@@ -1095,12 +1328,18 @@
                                                         text-zinc-400
                                                     "
                                                 >
-                                                    Reçu le
+                                                    Dernière activité
                                                 </p>
 
-
-                                                <p class="mt-1 text-sm text-zinc-600">
-                                                    {{ $conversation->created_at->format('d/m/Y H:i') }}
+                                                <p
+                                                    class="
+                                                        mt-1
+                                                        text-sm
+                                                        font-bold
+                                                        text-zinc-700
+                                                    "
+                                                >
+                                                    {{ $conversation->updated_at->format('d/m/Y H:i') }}
                                                 </p>
 
                                             </div>
@@ -1108,43 +1347,42 @@
                                         </div>
 
 
+                                        <!-- ACTION -->
+                                        <div class="mt-5">
 
-                                        <!-- =========================
-                                             OUVRIR
-                                             ========================= -->
-                                        <a
-                                            href="{{ route(
-                                                'admin.messages.show',
-                                                $conversation
-                                            ) }}"
-                                            class="
-                                                mt-5
-                                                inline-flex
-                                                w-full
-                                                items-center
-                                                justify-center
-                                                rounded-md
-                                                bg-red-600
-                                                px-4
-                                                py-3
-                                                text-xs
-                                                font-black
-                                                uppercase
-                                                tracking-wider
-                                                text-white
-                                                transition
-                                                hover:bg-red-700
-                                            "
-                                        >
-                                            Ouvrir la conversation
-                                        </a>
+                                            <a
+                                                href="{{ route(
+                                                    'admin.messages.show',
+                                                    $conversation
+                                                ) }}"
+                                                class="
+                                                    inline-flex
+                                                    w-full
+                                                    items-center
+                                                    justify-center
+                                                    rounded-md
+                                                    bg-zinc-900
+                                                    px-5
+                                                    py-3
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wider
+                                                    text-white
+                                                    transition
+                                                    hover:bg-red-600
+                                                "
+                                            >
+                                                Ouvrir la conversation
+                                            </a>
+
+                                        </div>
 
                                     </article>
 
                                 @endforeach
 
                             </div>
-
 
 
                             <!-- =====================================
@@ -1161,9 +1399,8 @@
 
                         @else
 
-
                             <!-- =====================================
-                                 AUCUN MESSAGE
+                                 AUCUNE CONVERSATION
                                  ===================================== -->
                             <div
                                 class="
@@ -1171,23 +1408,34 @@
                                     border-zinc-200
                                     bg-zinc-50
                                     px-6
-                                    py-12
+                                    py-14
                                     text-center
                                 "
                             >
 
                                 <p
                                     class="
-                                        text-sm
+                                        text-xs
                                         font-black
                                         uppercase
-                                        tracking-wider
+                                        tracking-[0.2em]
+                                        text-red-600
+                                    "
+                                >
+                                    Messagerie BTT
+                                </p>
+
+                                <h3
+                                    class="
+                                        mt-3
+                                        text-2xl
+                                        font-black
+                                        uppercase
                                         text-zinc-900
                                     "
                                 >
                                     Aucun message
-                                </p>
-
+                                </h3>
 
                                 <p
                                     class="
@@ -1199,9 +1447,7 @@
                                         text-zinc-500
                                     "
                                 >
-                                    Les messages envoyés depuis le formulaire
-                                    de contact ou depuis l'espace adhérent
-                                    apparaîtront ici.
+                                    Aucune conversation n'a encore été reçue.
                                 </p>
 
                             </div>
@@ -1217,6 +1463,5 @@
         </div>
 
     </section>
-
 
 @endsection

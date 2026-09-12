@@ -6,7 +6,7 @@
 
 @section(
     'meta_description',
-    'Lecture d’une conversation dans l’administration Brussels Top Team.'
+    'Lecture et gestion d’une conversation dans l’administration Brussels Top Team.'
 )
 
 
@@ -16,15 +16,15 @@
     <!-- =========================================================
          CONVERSATION ADMINISTRATION
          =========================================================
-         Cette page permet à un administrateur de consulter
-         l'intégralité d'une conversation.
 
-         Pour le moment :
-         - lecture de la conversation ;
-         - identification de l'expéditeur ;
-         - affichage de tous les messages.
+         Cette page permet à un administrateur :
 
-         La réponse de l'administration sera ajoutée ensuite.
+         - de consulter les informations de la conversation ;
+         - de lire l'historique complet des messages ;
+         - de répondre à l'expéditeur ;
+         - de fermer une conversation terminée ;
+         - de rouvrir une conversation si nécessaire.
+
          ========================================================= -->
     <section class="min-h-screen bg-white text-zinc-900">
 
@@ -106,9 +106,7 @@
                     <div class="space-y-1">
 
 
-                        <!-- =====================================
-                             TABLEAU DE BORD
-                             ===================================== -->
+                        <!-- TABLEAU DE BORD -->
                         <a
                             href="{{ route('admin.dashboard') }}"
                             class="
@@ -130,9 +128,7 @@
 
 
 
-                        <!-- =====================================
-                             ADHÉRENTS
-                             ===================================== -->
+                        <!-- ADHÉRENTS -->
                         <a
                             href="{{ route('admin.members.index') }}"
                             class="
@@ -154,9 +150,7 @@
 
 
 
-                        <!-- =====================================
-                             CALENDRIER
-                             ===================================== -->
+                        <!-- CALENDRIER -->
                         <a
                             href="{{ route('admin.courses.index') }}"
                             class="
@@ -178,9 +172,7 @@
 
 
 
-                        <!-- =====================================
-                             ARTICLES
-                             ===================================== -->
+                        <!-- ARTICLES -->
                         <span
                             class="
                                 block
@@ -197,9 +189,7 @@
 
 
 
-                        <!-- =====================================
-                             PRODUITS
-                             ===================================== -->
+                        <!-- PRODUITS -->
                         <span
                             class="
                                 block
@@ -216,9 +206,7 @@
 
 
 
-                        <!-- =====================================
-                             MESSAGES
-                             ===================================== -->
+                        <!-- MESSAGES -->
                         <a
                             href="{{ route('admin.messages.index') }}"
                             class="
@@ -238,9 +226,7 @@
 
 
 
-                        <!-- =====================================
-                             ADMINISTRATEURS
-                             ===================================== -->
+                        <!-- ADMINISTRATEURS -->
                         @if (auth()->user()->isSuperAdmin())
 
                             <a
@@ -324,7 +310,6 @@
                     "
                 >
 
-
                     <div>
 
                         <p
@@ -357,6 +342,7 @@
 
 
 
+                    <!-- ADMIN CONNECTÉ -->
                     <div class="sm:text-right">
 
                         <p class="text-sm font-bold text-zinc-900">
@@ -401,22 +387,183 @@
 
 
                     <!-- =========================================
-                         RETOUR À LA BOÎTE DE RÉCEPTION
+                         RETOUR + ACTION SUR LA CONVERSATION
                          ========================================= -->
-                    <a
-                        href="{{ route('admin.messages.index') }}"
+                    <div
                         class="
-                            inline-flex
-                            items-center
-                            text-sm
-                            font-bold
-                            text-zinc-500
-                            transition
-                            hover:text-red-600
+                            flex
+                            flex-col
+                            gap-4
+                            sm:flex-row
+                            sm:items-center
+                            sm:justify-between
                         "
                     >
-                        ← Retour aux messages
-                    </a>
+
+                        <a
+                            href="{{ route('admin.messages.index') }}"
+                            class="
+                                inline-flex
+                                items-center
+                                text-sm
+                                font-bold
+                                text-zinc-500
+                                transition
+                                hover:text-red-600
+                            "
+                        >
+                            ← Retour aux messages
+                        </a>
+
+
+
+                        <!-- =====================================
+                             FERMER / ROUVRIR
+                             ===================================== -->
+                        <div>
+
+
+                            @if ($conversation->status === 'open')
+
+                                <!-- =============================
+                                     FERMER LA CONVERSATION
+                                     ============================= -->
+                                <form
+                                    action="{{ route(
+                                        'admin.messages.close',
+                                        $conversation
+                                    ) }}"
+                                    method="POST"
+                                >
+
+                                    @csrf
+                                    @method('PATCH')
+
+
+                                    <button
+                                        type="submit"
+                                        class="
+                                            inline-flex
+                                            items-center
+                                            justify-center
+                                            rounded-md
+                                            border
+                                            border-zinc-300
+                                            bg-white
+                                            px-4
+                                            py-2.5
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-zinc-700
+                                            transition
+                                            hover:border-zinc-900
+                                            hover:bg-zinc-900
+                                            hover:text-white
+                                        "
+                                    >
+                                        Fermer la conversation
+                                    </button>
+
+                                </form>
+
+                            @else
+
+                                <!-- =============================
+                                     ROUVRIR LA CONVERSATION
+                                     ============================= -->
+                                <form
+                                    action="{{ route(
+                                        'admin.messages.reopen',
+                                        $conversation
+                                    ) }}"
+                                    method="POST"
+                                >
+
+                                    @csrf
+                                    @method('PATCH')
+
+
+                                    <button
+                                        type="submit"
+                                        class="
+                                            inline-flex
+                                            items-center
+                                            justify-center
+                                            rounded-md
+                                            bg-red-600
+                                            px-4
+                                            py-2.5
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-white
+                                            transition
+                                            hover:bg-red-700
+                                        "
+                                    >
+                                        Rouvrir la conversation
+                                    </button>
+
+                                </form>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================================
+                         MESSAGE DE CONFIRMATION
+                         ========================================= -->
+                    @if (session('success'))
+
+                        <div
+                            class="
+                                mt-6
+                                border
+                                border-green-200
+                                bg-green-50
+                                px-5
+                                py-4
+                                text-sm
+                                font-bold
+                                text-green-800
+                            "
+                        >
+                            {{ session('success') }}
+                        </div>
+
+                    @endif
+
+
+
+                    <!-- =========================================
+                         MESSAGE D'ERREUR
+                         ========================================= -->
+                    @if (session('error'))
+
+                        <div
+                            class="
+                                mt-6
+                                border
+                                border-red-200
+                                bg-red-50
+                                px-5
+                                py-4
+                                text-sm
+                                font-bold
+                                text-red-700
+                            "
+                        >
+                            {{ session('error') }}
+                        </div>
+
+                    @endif
 
 
 
@@ -452,6 +599,7 @@
                                 "
                             >
 
+                                <!-- EXPÉDITEUR -->
                                 <div>
 
                                     <p
@@ -494,9 +642,7 @@
 
 
 
-                                <!-- =============================
-                                     TYPE D'EXPÉDITEUR
-                                     ============================= -->
+                                <!-- TYPE D'EXPÉDITEUR -->
                                 <div>
 
                                     @if ($conversation->user_id)
@@ -629,35 +775,75 @@
                                 </p>
 
 
-                                <p class="mt-2">
+                                <div class="mt-2">
 
                                     @if ($conversation->status === 'open')
 
                                         <span
                                             class="
-                                                text-sm
+                                                inline-flex
+                                                items-center
+                                                gap-2
+                                                rounded-full
+                                                bg-green-100
+                                                px-3
+                                                py-1.5
+                                                text-xs
                                                 font-black
+                                                uppercase
+                                                tracking-wider
                                                 text-green-700
                                             "
                                         >
+
+                                            <span
+                                                class="
+                                                    h-2
+                                                    w-2
+                                                    rounded-full
+                                                    bg-green-600
+                                                "
+                                            ></span>
+
                                             Ouverte
+
                                         </span>
 
                                     @else
 
                                         <span
                                             class="
-                                                text-sm
+                                                inline-flex
+                                                items-center
+                                                gap-2
+                                                rounded-full
+                                                bg-zinc-200
+                                                px-3
+                                                py-1.5
+                                                text-xs
                                                 font-black
-                                                text-zinc-500
+                                                uppercase
+                                                tracking-wider
+                                                text-zinc-600
                                             "
                                         >
+
+                                            <span
+                                                class="
+                                                    h-2
+                                                    w-2
+                                                    rounded-full
+                                                    bg-zinc-500
+                                                "
+                                            ></span>
+
                                             Fermée
+
                                         </span>
 
                                     @endif
 
-                                </p>
+                                </div>
 
                             </div>
 
@@ -728,14 +914,20 @@
 
 
                             <p class="text-xs font-bold text-zinc-400">
+
                                 {{ $conversation->messages->count() }}
+
                                 message{{ $conversation->messages->count() > 1 ? 's' : '' }}
+
                             </p>
 
                         </div>
 
 
 
+                        <!-- =====================================
+                             LISTE DES MESSAGES
+                             ===================================== -->
                         <div class="mt-6 space-y-5">
 
 
@@ -743,7 +935,7 @@
 
 
                                 <!-- =================================
-                                     MESSAGE DE L'ADMINISTRATION
+                                     MESSAGE ADMINISTRATION
                                      ================================= -->
                                 @if ($message->sender_type === 'admin')
 
@@ -771,17 +963,41 @@
                                             "
                                         >
 
-                                            <p
-                                                class="
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-red-500
-                                                "
-                                            >
-                                                Administration BTT
-                                            </p>
+                                            <div>
+
+                                                <p
+                                                    class="
+                                                        text-xs
+                                                        font-black
+                                                        uppercase
+                                                        tracking-wider
+                                                        text-red-500
+                                                    "
+                                                >
+                                                    Administration BTT
+                                                </p>
+
+
+                                                @if ($message->user)
+
+                                                    <p
+                                                        class="
+                                                            mt-1
+                                                            text-xs
+                                                            text-zinc-400
+                                                        "
+                                                    >
+                                                        {{ $message->user->prenom }}
+                                                        {{ $message->user->nom }}
+
+                                                        @if ($message->user->pseudo)
+                                                            — {{ $message->user->pseudo }}
+                                                        @endif
+                                                    </p>
+
+                                                @endif
+
+                                            </div>
 
 
                                             <p class="text-xs text-zinc-400">
@@ -800,16 +1016,14 @@
                                                 leading-7
                                                 text-zinc-100
                                             "
-                                        >
-                                            {{ $message->body }}
-                                        </p>
+                                        >{{ $message->body }}</p>
 
                                     </article>
 
 
 
                                 <!-- =================================
-                                     MESSAGE ADHÉRENT / VISITEUR
+                                     MESSAGE VISITEUR / ADHÉRENT
                                      ================================= -->
                                 @else
 
@@ -835,27 +1049,54 @@
                                             "
                                         >
 
-                                            <p
-                                                class="
-                                                    text-xs
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-zinc-700
-                                                "
-                                            >
+                                            <div>
 
-                                                @if ($message->sender_type === 'member')
+                                                <p
+                                                    class="
+                                                        text-xs
+                                                        font-black
+                                                        uppercase
+                                                        tracking-wider
+                                                        text-zinc-700
+                                                    "
+                                                >
 
-                                                    Adhérent
+                                                    @if ($message->sender_type === 'member')
 
-                                                @else
+                                                        Adhérent
 
-                                                    Visiteur
+                                                    @else
+
+                                                        Visiteur
+
+                                                    @endif
+
+                                                </p>
+
+
+                                                @if (
+                                                    $message->sender_type === 'member'
+                                                    && $message->user
+                                                )
+
+                                                    <p
+                                                        class="
+                                                            mt-1
+                                                            text-xs
+                                                            text-zinc-400
+                                                        "
+                                                    >
+                                                        {{ $message->user->prenom }}
+                                                        {{ $message->user->nom }}
+
+                                                        @if ($message->user->pseudo)
+                                                            — {{ $message->user->pseudo }}
+                                                        @endif
+                                                    </p>
 
                                                 @endif
 
-                                            </p>
+                                            </div>
 
 
                                             <p class="text-xs text-zinc-400">
@@ -874,9 +1115,7 @@
                                                 leading-7
                                                 text-zinc-700
                                             "
-                                        >
-                                            {{ $message->body }}
-                                        </p>
+                                        >{{ $message->body }}</p>
 
                                     </article>
 
@@ -892,14 +1131,7 @@
 
 
                     <!-- =========================================
-                         FUTURE ZONE DE RÉPONSE
-                         =========================================
-                         On n'active pas encore l'envoi.
-
-                         Nous allons d'abord vérifier que :
-                         - le message est correctement lu ;
-                         - le passage Nouveau -> Lu fonctionne ;
-                         - l'historique s'affiche correctement.
+                         ZONE DE RÉPONSE
                          ========================================= -->
                     <section
                         class="
@@ -910,45 +1142,279 @@
                         "
                     >
 
-                        <div
-                            class="
-                                border
-                                border-dashed
-                                border-zinc-300
-                                bg-zinc-50
-                                px-6
-                                py-6
-                            "
-                        >
 
-                            <p
+                        <!-- =====================================
+                             CONVERSATION OUVERTE
+                             ===================================== -->
+                        @if ($conversation->status === 'open')
+
+                            <div class="max-w-3xl">
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-[0.2em]
+                                        text-red-600
+                                    "
+                                >
+                                    Administration BTT
+                                </p>
+
+
+                                <h2
+                                    class="
+                                        mt-2
+                                        text-2xl
+                                        font-black
+                                        uppercase
+                                        tracking-tight
+                                        text-zinc-900
+                                    "
+                                >
+                                    Répondre
+                                </h2>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-sm
+                                        leading-6
+                                        text-zinc-500
+                                    "
+                                >
+                                    Votre réponse sera enregistrée dans
+                                    l'historique de cette conversation.
+                                </p>
+
+
+
+                                <!-- =============================
+                                     FORMULAIRE DE RÉPONSE
+                                     ============================= -->
+                                <form
+                                    action="{{ route(
+                                        'admin.messages.reply',
+                                        $conversation
+                                    ) }}"
+                                    method="POST"
+                                    class="mt-6"
+                                >
+
+                                    @csrf
+
+
+                                    <!-- =========================
+                                         CHAMP RÉPONSE
+                                         ========================= -->
+                                    <div>
+
+                                        <label
+                                            for="reply"
+                                            class="
+                                                block
+                                                text-sm
+                                                font-black
+                                                text-zinc-900
+                                            "
+                                        >
+                                            Votre réponse
+                                        </label>
+
+
+                                        <textarea
+                                            id="reply"
+                                            name="reply"
+                                            rows="7"
+                                            minlength="2"
+                                            maxlength="5000"
+                                            required
+                                            placeholder="Écrivez votre réponse..."
+                                            class="
+                                                mt-3
+                                                block
+                                                w-full
+                                                resize-y
+                                                rounded-md
+                                                border
+                                                border-zinc-300
+                                                bg-white
+                                                px-4
+                                                py-3
+                                                text-sm
+                                                leading-6
+                                                text-zinc-900
+                                                outline-none
+                                                transition
+                                                placeholder:text-zinc-400
+                                                focus:border-red-600
+                                                focus:ring-2
+                                                focus:ring-red-600/20
+                                            "
+                                        >{{ old('reply') }}</textarea>
+
+
+
+                                        <!-- ERREUR DE VALIDATION -->
+                                        @error('reply')
+
+                                            <p
+                                                class="
+                                                    mt-2
+                                                    text-sm
+                                                    font-bold
+                                                    text-red-600
+                                                "
+                                            >
+                                                {{ $message }}
+                                            </p>
+
+                                        @enderror
+
+
+                                        <p
+                                            class="
+                                                mt-2
+                                                text-xs
+                                                text-zinc-400
+                                            "
+                                        >
+                                            Maximum : 5 000 caractères.
+                                        </p>
+
+                                    </div>
+
+
+
+                                    <!-- =========================
+                                         ENVOI
+                                         ========================= -->
+                                    <div
+                                        class="
+                                            mt-5
+                                            flex
+                                            flex-col
+                                            gap-3
+                                            sm:flex-row
+                                            sm:items-center
+                                        "
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="
+                                                inline-flex
+                                                items-center
+                                                justify-center
+                                                rounded-md
+                                                bg-red-600
+                                                px-6
+                                                py-3
+                                                text-sm
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-white
+                                                transition
+                                                hover:bg-red-700
+                                                focus:outline-none
+                                                focus:ring-2
+                                                focus:ring-red-600
+                                                focus:ring-offset-2
+                                            "
+                                        >
+                                            Envoyer la réponse
+                                        </button>
+
+
+                                        <p class="text-xs text-zinc-400">
+                                            Aucun e-mail n'est encore envoyé à cette étape.
+                                        </p>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+
+
+                        <!-- =====================================
+                             CONVERSATION FERMÉE
+                             ===================================== -->
+                        @else
+
+                            <div
                                 class="
-                                    text-xs
-                                    font-black
-                                    uppercase
-                                    tracking-[0.2em]
-                                    text-zinc-500
+                                    max-w-3xl
+                                    border
+                                    border-zinc-200
+                                    bg-zinc-50
+                                    px-6
+                                    py-6
                                 "
                             >
-                                Réponse administration
-                            </p>
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-[0.2em]
+                                        text-zinc-500
+                                    "
+                                >
+                                    Conversation fermée
+                                </p>
 
 
-                            <p
-                                class="
-                                    mt-3
-                                    max-w-2xl
-                                    text-sm
-                                    leading-6
-                                    text-zinc-500
-                                "
-                            >
-                                La fonction de réponse sera activée à la
-                                prochaine étape, après validation de la lecture
-                                des conversations.
-                            </p>
+                                <h2
+                                    class="
+                                        mt-2
+                                        text-xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    Cette demande est terminée.
+                                </h2>
 
-                        </div>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-sm
+                                        leading-6
+                                        text-zinc-500
+                                    "
+                                >
+                                    Il n'est plus possible d'envoyer une
+                                    nouvelle réponse tant que la conversation
+                                    reste fermée.
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-2
+                                        text-sm
+                                        leading-6
+                                        text-zinc-500
+                                    "
+                                >
+                                    Utilisez le bouton
+                                    <strong class="text-zinc-700">
+                                        Rouvrir la conversation
+                                    </strong>
+                                    en haut de cette page si vous devez
+                                    reprendre cet échange.
+                                </p>
+
+                            </div>
+
+                        @endif
 
                     </section>
 

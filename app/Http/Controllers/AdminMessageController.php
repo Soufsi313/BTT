@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Conversation;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class AdminMessageController extends Controller
 {
@@ -12,56 +14,107 @@ class AdminMessageController extends Controller
     | BOÎTE DE RÉCEPTION ADMINISTRATION
     |--------------------------------------------------------------------------
     |
-    | Cette méthode récupère les conversations envoyées :
+    | Cette méthode affiche toutes les conversations reçues par BTT.
     |
-    | - par les visiteurs du site ;
-    | - par les adhérents connectés.
+    | Le tableau peut être trié directement en cliquant sur ses colonnes :
     |
-    | Toutes les conversations sont visibles par les administrateurs.
-    |
-    | Nous affichons également le nombre de messages non lus provenant
-    | d'un visiteur ou d'un adhérent.
+    | - Expéditeur
+    | - Sujet
+    | - Type
+    | - Statut
+    | - Lecture
+    | - Dernière activité
     |
     */
-    public function index(): View
+    public function index(Request $request): View
     {
         /*
         |--------------------------------------------------------------------------
-        | RÉCUPÉRATION DES CONVERSATIONS
+        | COLONNE DE TRI
         |--------------------------------------------------------------------------
         |
-        | with('user')
-        |
-        | Permet de récupérer l'adhérent lié à la conversation lorsqu'il
-        | s'agit d'un utilisateur connecté.
-        |
-        | Pour un visiteur, user_id est null.
-        |
-        |
-        | withCount(...)
-        |
-        | Nous calculons le nombre de messages non lus envoyés par :
-        |
-        | - visitor
-        | - member
-        |
-        | Les futurs messages envoyés par un administrateur ne doivent pas
-        | être considérés comme des messages entrants non lus.
-        |
-        |
-        | latest()
-        |
-        | Les conversations les plus récentes apparaissent en premier.
-        |
-        |
-        | paginate(20)
-        |
-        | Nous limitons l'affichage à 20 conversations par page afin de
-        | garder l'administration rapide même lorsque beaucoup de messages
-        | seront enregistrés.
+        | Par défaut, les conversations sont classées selon leur dernière
+        | activité.
         |
         */
-        $conversations = Conversation::query()
+        $sort = (string) $request->query(
+            'sort',
+            'updated_at'
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DIRECTION DU TRI
+        |--------------------------------------------------------------------------
+        |
+        | desc = décroissant
+        | asc  = croissant
+        |
+        | Pour les dates :
+        |
+        | desc = plus récent vers plus ancien
+        | asc  = plus ancien vers plus récent
+        |
+        */
+        $direction = strtolower(
+            (string) $request->query(
+                'direction',
+                'desc'
+            )
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COLONNES AUTORISÉES
+        |--------------------------------------------------------------------------
+        |
+        | Cette vérification empêche qu'une colonne arbitraire soit injectée
+        | directement dans la requête SQL depuis l'URL.
+        |
+        */
+        $allowedSorts = [
+            'name',
+            'subject',
+            'type',
+            'status',
+            'read',
+            'updated_at',
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SÉCURISATION DU TRI
+        |--------------------------------------------------------------------------
+        */
+        if (! in_array($sort, $allowedSorts, true)) {
+            $sort = 'updated_at';
+        }
+
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REQUÊTE PRINCIPALE
+        |--------------------------------------------------------------------------
+        |
+        | Nous récupérons :
+        |
+        | - les conversations ;
+        | - l'utilisateur associé lorsqu'il existe ;
+        | - le nombre de messages entrants non lus.
+        |
+        | Seuls les messages de type "visitor" ou "member" sont considérés
+        | comme nouveaux pour l'administration.
+        |
+        */
+        $query = Conversation::query()
             ->with('user')
             ->withCount([
                 'messages as unread_messages_count' => function ($query) {
@@ -75,20 +128,143 @@ class AdminMessageController extends Controller
                             ]
                         );
                 },
-            ])
-            ->latest()
-            ->paginate(20);
+            ]);
 
 
         /*
         |--------------------------------------------------------------------------
-        | AFFICHAGE DE LA BOÎTE DE RÉCEPTION
+        | TRI : EXPÉDITEUR
+        |--------------------------------------------------------------------------
+        */
+        if ($sort === 'name') {
+            $query->orderBy(
+                'name',
+                $direction
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI : SUJET
+        |--------------------------------------------------------------------------
+        */
+        elseif ($sort === 'subject') {
+            $query->orderBy(
+                'subject',
+                $direction
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI : TYPE
+        |--------------------------------------------------------------------------
+        |
+        | user_id NULL     = Visiteur
+        | user_id non NULL = Adhérent
+        |
+        */
+        elseif ($sort === 'type') {
+            $query->orderByRaw(
+                "
+                CASE
+                    WHEN user_id IS NULL THEN 0
+                    ELSE 1
+                END {$direction}
+                "
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI : STATUT
+        |--------------------------------------------------------------------------
+        */
+        elseif ($sort === 'status') {
+            $query->orderBy(
+                'status',
+                $direction
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI : LECTURE
+        |--------------------------------------------------------------------------
+        |
+        | Nous utilisons ici le compteur calculé :
+        |
+        | unread_messages_count
+        |
+        | Une valeur supérieure à 0 signifie qu'il existe au moins un
+        | nouveau message pour l'administration.
+        |
+        */
+        elseif ($sort === 'read') {
+            $query->orderBy(
+                'unread_messages_count',
+                $direction
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI : DERNIÈRE ACTIVITÉ
+        |--------------------------------------------------------------------------
+        */
+        else {
+            $query->orderBy(
+                'updated_at',
+                $direction
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI SECONDAIRE
+        |--------------------------------------------------------------------------
+        |
+        | Lorsque plusieurs lignes ont exactement la même valeur pour la
+        | colonne principale, l'ID évite un ordre imprévisible.
+        |
+        */
+        $query->orderBy(
+            'id',
+            'desc'
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATION
+        |--------------------------------------------------------------------------
+        |
+        | withQueryString() conserve le tri sélectionné lorsque l'on passe
+        | à une autre page.
+        |
+        */
+        $conversations = $query
+            ->paginate(20)
+            ->withQueryString();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | AFFICHAGE
         |--------------------------------------------------------------------------
         */
         return view(
             'admin.messages.index',
             [
                 'conversations' => $conversations,
+                'sort' => $sort,
+                'direction' => $direction,
             ]
         );
     }
@@ -98,30 +274,14 @@ class AdminMessageController extends Controller
     |--------------------------------------------------------------------------
     | AFFICHER UNE CONVERSATION
     |--------------------------------------------------------------------------
-    |
-    | Cette méthode affiche l'intégralité d'une conversation :
-    |
-    | - premier message du visiteur ou de l'adhérent ;
-    | - futures réponses de l'administration ;
-    | - futurs messages supplémentaires.
-    |
     */
-    public function show(Conversation $conversation): View
-    {
+    public function show(
+        Conversation $conversation
+    ): View {
         /*
         |--------------------------------------------------------------------------
-        | CHARGEMENT DES INFORMATIONS
+        | CHARGEMENT DE L'HISTORIQUE
         |--------------------------------------------------------------------------
-        |
-        | Nous récupérons :
-        |
-        | - l'utilisateur lié à la conversation s'il existe ;
-        | - tous les messages ;
-        | - l'utilisateur lié à chaque message lorsqu'il existe.
-        |
-        | Les messages sont classés du plus ancien au plus récent afin de
-        | conserver l'ordre naturel d'une conversation.
-        |
         */
         $conversation->load([
             'user',
@@ -138,18 +298,6 @@ class AdminMessageController extends Controller
         |--------------------------------------------------------------------------
         | MARQUER LES MESSAGES ENTRANTS COMME LUS
         |--------------------------------------------------------------------------
-        |
-        | Lorsqu'un administrateur ouvre la conversation, les messages
-        | provenant d'un visiteur ou d'un adhérent passent à "lus".
-        |
-        | Pour le moment, is_read représente donc :
-        |
-        | "lu par l'administration"
-        |
-        | et non :
-        |
-        | "lu individuellement par chaque administrateur".
-        |
         */
         $conversation
             ->messages()
@@ -168,7 +316,7 @@ class AdminMessageController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | AFFICHAGE DE LA CONVERSATION
+        | AFFICHAGE
         |--------------------------------------------------------------------------
         */
         return view(
@@ -176,6 +324,182 @@ class AdminMessageController extends Controller
             [
                 'conversation' => $conversation,
             ]
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RÉPONDRE À UNE CONVERSATION
+    |--------------------------------------------------------------------------
+    */
+    public function reply(
+        Request $request,
+        Conversation $conversation
+    ): RedirectResponse {
+        /*
+        |--------------------------------------------------------------------------
+        | CONVERSATION FERMÉE
+        |--------------------------------------------------------------------------
+        */
+        if ($conversation->isClosed()) {
+            return back()->with(
+                'error',
+                'Cette conversation est fermée. Vous devez la rouvrir avant de pouvoir répondre.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        */
+        $validated = $request->validate(
+            [
+                'reply' => [
+                    'required',
+                    'string',
+                    'min:2',
+                    'max:5000',
+                ],
+            ],
+            [
+                'reply.required' => 'Veuillez écrire une réponse.',
+                'reply.string' => 'La réponse indiquée n’est pas valide.',
+                'reply.min' => 'Votre réponse doit contenir au moins 2 caractères.',
+                'reply.max' => 'Votre réponse ne peut pas dépasser 5000 caractères.',
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADMINISTRATEUR CONNECTÉ
+        |--------------------------------------------------------------------------
+        */
+        $admin = $request->user();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ENREGISTREMENT DE LA RÉPONSE
+        |--------------------------------------------------------------------------
+        */
+        $conversation->messages()->create([
+            'user_id' => $admin->id,
+            'sender_type' => 'admin',
+            'body' => $validated['reply'],
+            'is_read' => false,
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACTUALISATION DE LA CONVERSATION
+        |--------------------------------------------------------------------------
+        |
+        | Une nouvelle réponse fait remonter la conversation dans le tri
+        | par dernière activité.
+        |
+        */
+        $conversation->touch();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONFIRMATION
+        |--------------------------------------------------------------------------
+        */
+        return back()->with(
+            'success',
+            'Votre réponse a bien été enregistrée.'
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FERMER UNE CONVERSATION
+    |--------------------------------------------------------------------------
+    */
+    public function close(
+        Conversation $conversation
+    ): RedirectResponse {
+        /*
+        |--------------------------------------------------------------------------
+        | DÉJÀ FERMÉE
+        |--------------------------------------------------------------------------
+        */
+        if ($conversation->isClosed()) {
+            return back()->with(
+                'error',
+                'Cette conversation est déjà fermée.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MISE À JOUR
+        |--------------------------------------------------------------------------
+        */
+        $conversation->update([
+            'status' => 'closed',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONFIRMATION
+        |--------------------------------------------------------------------------
+        */
+        return back()->with(
+            'success',
+            'La conversation a bien été fermée.'
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ROUVRIR UNE CONVERSATION
+    |--------------------------------------------------------------------------
+    */
+    public function reopen(
+        Conversation $conversation
+    ): RedirectResponse {
+        /*
+        |--------------------------------------------------------------------------
+        | DÉJÀ OUVERTE
+        |--------------------------------------------------------------------------
+        */
+        if ($conversation->isOpen()) {
+            return back()->with(
+                'error',
+                'Cette conversation est déjà ouverte.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MISE À JOUR
+        |--------------------------------------------------------------------------
+        */
+        $conversation->update([
+            'status' => 'open',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONFIRMATION
+        |--------------------------------------------------------------------------
+        */
+        return back()->with(
+            'success',
+            'La conversation a bien été rouverte.'
         );
     }
 }

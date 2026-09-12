@@ -87,7 +87,7 @@ Route::get('/abonnements', function () {
 | CONTACT
 |--------------------------------------------------------------------------
 |
-| La page Contact est accessible aussi bien :
+| La page Contact est accessible :
 |
 | - aux visiteurs non connectés ;
 | - aux adhérents connectés.
@@ -115,9 +115,6 @@ Route::post(
 |--------------------------------------------------------------------------
 |
 | Ces routes sont protégées par le middleware "guest".
-|
-| Un utilisateur déjà connecté ne doit normalement pas accéder
-| aux pages de connexion ou d'inscription.
 |
 */
 
@@ -170,9 +167,6 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 | DÉCONNEXION
 |--------------------------------------------------------------------------
-|
-| Seul un utilisateur connecté peut utiliser cette route.
-|
 */
 
 Route::post(
@@ -298,10 +292,6 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 | CONFIRMATION APRÈS SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
-|
-| Cette page reste accessible après la déconnexion automatique
-| provoquée par la suppression du compte.
-|
 */
 
 Route::get('/compte-supprime', function () {
@@ -320,13 +310,8 @@ Route::get('/compte-supprime', function () {
 | - auth  : l'utilisateur doit être connecté ;
 | - admin : l'utilisateur doit être Admin ou Super Admin.
 |
-| Toutes les URL commencent par :
-|
-| /admin
-|
-| Tous les noms de routes commencent par :
-|
-| admin.
+| Toutes les URL commencent par /admin.
+| Tous les noms de routes commencent par admin.
 |
 */
 
@@ -367,12 +352,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | RÉACTIVER UN ADHÉRENT
         |--------------------------------------------------------------------------
-        |
-        | Cette fonctionnalité utilise SoftDeletes.
-        |
-        | La protection Super Admin est également appliquée
-        | directement dans le contrôleur.
-        |
         */
 
         Route::patch(
@@ -385,9 +364,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | PROMOUVOIR UN ADHÉRENT ADMIN
         |--------------------------------------------------------------------------
-        |
-        | Seul le Super Admin peut effectuer cette opération.
-        |
         */
 
         Route::patch(
@@ -413,10 +389,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | RÉTROGRADER UN ADMINISTRATEUR
         |--------------------------------------------------------------------------
-        |
-        | Permet au Super Admin de transformer un Admin
-        | en simple adhérent.
-        |
         */
 
         Route::patch(
@@ -431,13 +403,12 @@ Route::middleware([
         | MESSAGERIE ADMINISTRATION
         |--------------------------------------------------------------------------
         |
-        | La messagerie permet aux administrateurs de consulter les
-        | conversations envoyées :
+        | Tous les administrateurs utilisent la même boîte de réception.
         |
-        | - par les visiteurs du site ;
-        | - par les adhérents connectés.
+        | Les conversations peuvent provenir :
         |
-        | Tous les administrateurs consultent la même boîte de réception.
+        | - d'un visiteur ;
+        | - d'un adhérent connecté.
         |
         */
 
@@ -447,9 +418,7 @@ Route::middleware([
         | LISTE DES CONVERSATIONS
         |--------------------------------------------------------------------------
         |
-        | Exemple :
-        |
-        | /admin/messages
+        | GET /admin/messages
         |
         */
 
@@ -461,15 +430,10 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | DÉTAIL D'UNE CONVERSATION
+        | AFFICHER UNE CONVERSATION
         |--------------------------------------------------------------------------
         |
-        | Exemple :
-        |
-        | /admin/messages/12
-        |
-        | Laravel récupère automatiquement la conversation grâce
-        | au Route Model Binding.
+        | GET /admin/messages/1
         |
         */
 
@@ -477,6 +441,70 @@ Route::middleware([
             '/messages/{conversation}',
             [AdminMessageController::class, 'show']
         )->name('messages.show');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉPONDRE À UNE CONVERSATION
+        |--------------------------------------------------------------------------
+        |
+        | POST /admin/messages/1/repondre
+        |
+        | La réponse est enregistrée dans la table "messages" avec :
+        |
+        | sender_type = admin
+        |
+        */
+
+        Route::post(
+            '/messages/{conversation}/repondre',
+            [AdminMessageController::class, 'reply']
+        )->name('messages.reply');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FERMER UNE CONVERSATION
+        |--------------------------------------------------------------------------
+        |
+        | PATCH /admin/messages/1/fermer
+        |
+        | Cette action ne supprime absolument rien.
+        |
+        | Elle modifie uniquement le champ :
+        |
+        | status = closed
+        |
+        | L'intégralité de l'historique reste conservée.
+        |
+        */
+
+        Route::patch(
+            '/messages/{conversation}/fermer',
+            [AdminMessageController::class, 'close']
+        )->name('messages.close');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROUVRIR UNE CONVERSATION
+        |--------------------------------------------------------------------------
+        |
+        | PATCH /admin/messages/1/rouvrir
+        |
+        | Cette action permet de reprendre une conversation précédemment
+        | fermée.
+        |
+        | Elle modifie :
+        |
+        | status = open
+        |
+        */
+
+        Route::patch(
+            '/messages/{conversation}/rouvrir',
+            [AdminMessageController::class, 'reopen']
+        )->name('messages.reopen');
 
 
 
@@ -521,11 +549,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | RÉACTIVER UN COURS SUPPRIMÉ
         |--------------------------------------------------------------------------
-        |
-        | Cette action est protégée également dans le contrôleur.
-        |
-        | Seul le Super Admin peut restaurer un cours supprimé.
-        |
         */
 
         Route::patch(

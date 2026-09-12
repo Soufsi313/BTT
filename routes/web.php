@@ -6,28 +6,31 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MemberCourseController;
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
-| ROUTES WEB - BRUSSELS TOP TEAM
+| PAGES PUBLIQUES
 |--------------------------------------------------------------------------
 */
 
 
 /*
 |--------------------------------------------------------------------------
-| PAGE D'ACCUEIL
+| ACCUEIL
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 
 /*
 |--------------------------------------------------------------------------
-| PAGE DISCIPLINES
+| DISCIPLINES
 |--------------------------------------------------------------------------
 */
+
 Route::get('/disciplines', function () {
     return view('disciplines');
 })->name('disciplines');
@@ -35,9 +38,10 @@ Route::get('/disciplines', function () {
 
 /*
 |--------------------------------------------------------------------------
-| PAGE COACHS
+| COACHS
 |--------------------------------------------------------------------------
 */
+
 Route::get('/coachs', function () {
     return view('coachs');
 })->name('coachs');
@@ -45,9 +49,10 @@ Route::get('/coachs', function () {
 
 /*
 |--------------------------------------------------------------------------
-| PAGE BLOG
+| BLOG
 |--------------------------------------------------------------------------
 */
+
 Route::get('/blog', function () {
     return view('blog');
 })->name('blog');
@@ -55,9 +60,10 @@ Route::get('/blog', function () {
 
 /*
 |--------------------------------------------------------------------------
-| PAGE HUMANITAIRE
+| HUMANITAIRE
 |--------------------------------------------------------------------------
 */
+
 Route::get('/humanitaire', function () {
     return view('humanitaire');
 })->name('humanitaire');
@@ -65,9 +71,10 @@ Route::get('/humanitaire', function () {
 
 /*
 |--------------------------------------------------------------------------
-| PAGE ABONNEMENTS
+| ABONNEMENTS
 |--------------------------------------------------------------------------
 */
+
 Route::get('/abonnements', function () {
     return view('abonnements');
 })->name('abonnements');
@@ -75,59 +82,64 @@ Route::get('/abonnements', function () {
 
 /*
 |--------------------------------------------------------------------------
-| PAGE CONTACT
+| CONTACT
 |--------------------------------------------------------------------------
 */
+
 Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
 
-/*
-|--------------------------------------------------------------------------
-| INSCRIPTION
-|--------------------------------------------------------------------------
-*/
-Route::get(
-    '/inscription',
-    [AuthController::class, 'showRegister']
-)->name('register');
-
-
-Route::post(
-    '/inscription',
-    [AuthController::class, 'register']
-)->name('register.store');
-
 
 /*
 |--------------------------------------------------------------------------
-| CONFIRMATION D'INSCRIPTION
+| VISITEURS NON CONNECTÉS
 |--------------------------------------------------------------------------
 */
-Route::get(
-    '/inscription/confirmation',
-    [AuthController::class, 'registerSuccess']
-)
-    ->middleware('auth')
-    ->name('register.success');
+
+Route::middleware('guest')->group(function () {
 
 
-/*
-|--------------------------------------------------------------------------
-| CONNEXION
-|--------------------------------------------------------------------------
-*/
-Route::get(
-    '/connexion',
-    [AuthController::class, 'showLogin']
-)->name('login');
+    /*
+    |--------------------------------------------------------------------------
+    | INSCRIPTION
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/inscription', function () {
+        return view('register');
+    })->name('register');
 
 
-Route::post(
-    '/connexion',
-    [AuthController::class, 'login']
-)->name('login.store');
+    Route::post(
+        '/inscription',
+        [AuthController::class, 'register']
+    )->name('register.store');
+
+
+    Route::get('/inscription-reussie', function () {
+        return view('register-success');
+    })->name('register.success');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONNEXION
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/connexion', function () {
+        return view('login');
+    })->name('login');
+
+
+    Route::post(
+        '/connexion',
+        [AuthController::class, 'login']
+    )->name('login.store');
+
+});
 
 
 /*
@@ -135,6 +147,7 @@ Route::post(
 | DÉCONNEXION
 |--------------------------------------------------------------------------
 */
+
 Route::post(
     '/deconnexion',
     [AuthController::class, 'logout']
@@ -143,133 +156,131 @@ Route::post(
     ->name('logout');
 
 
+
 /*
 |--------------------------------------------------------------------------
 | ESPACE ADHÉRENT
 |--------------------------------------------------------------------------
 */
-Route::get('/mon-compte', function () {
 
-    return view('member.dashboard');
-
-})
-    ->middleware('auth')
-    ->name('member.dashboard');
+Route::middleware('auth')
+    ->prefix('membre')
+    ->name('member.')
+    ->group(function () {
 
 
-/*
-|--------------------------------------------------------------------------
-| PROFIL ADHÉRENT
-|--------------------------------------------------------------------------
-*/
-Route::get(
-    '/mon-compte/profil',
-    [AuthController::class, 'showProfile']
-)
-    ->middleware('auth')
-    ->name('member.profile');
+        /*
+        |--------------------------------------------------------------------------
+        | TABLEAU DE BORD
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/', function () {
+            return view('member.dashboard');
+        })->name('dashboard');
 
 
-Route::put(
-    '/mon-compte/profil',
-    [AuthController::class, 'updateProfile']
-)
-    ->middleware('auth')
-    ->name('member.profile.update');
+        /*
+        |--------------------------------------------------------------------------
+        | CALENDRIER
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/calendrier',
+            [MemberCourseController::class, 'index']
+        )->name('courses');
 
 
-/*
-|--------------------------------------------------------------------------
-| MODIFICATION DE L'ADRESSE EMAIL
-|--------------------------------------------------------------------------
-*/
-Route::get(
-    '/mon-compte/email',
-    [AuthController::class, 'showEmail']
-)
-    ->middleware('auth')
-    ->name('member.email');
+        /*
+        |--------------------------------------------------------------------------
+        | PROFIL
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/profil', function () {
+            return view('member.profile');
+        })->name('profile');
 
 
-Route::put(
-    '/mon-compte/email',
-    [AuthController::class, 'updateEmail']
-)
-    ->middleware('auth')
-    ->name('member.email.update');
+        Route::patch(
+            '/profil',
+            [AuthController::class, 'updateProfile']
+        )->name('profile.update');
 
 
-/*
-|--------------------------------------------------------------------------
-| MODIFICATION DU MOT DE PASSE
-|--------------------------------------------------------------------------
-*/
-Route::get(
-    '/mon-compte/mot-de-passe',
-    [AuthController::class, 'showPassword']
-)
-    ->middleware('auth')
-    ->name('member.password');
+        /*
+        |--------------------------------------------------------------------------
+        | EMAIL
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/email', function () {
+            return view('member.email');
+        })->name('email');
 
 
-Route::put(
-    '/mon-compte/mot-de-passe',
-    [AuthController::class, 'updatePassword']
-)
-    ->middleware('auth')
-    ->name('member.password.update');
+        Route::patch(
+            '/email',
+            [AuthController::class, 'updateEmail']
+        )->name('email.update');
 
 
-/*
-|--------------------------------------------------------------------------
-| CALENDRIER PRIVÉ DES ENTRAÎNEMENTS
-|--------------------------------------------------------------------------
-*/
-Route::get(
-    '/mon-compte/calendrier',
-    [MemberCourseController::class, 'index']
-)
-    ->middleware('auth')
-    ->name('member.courses');
+        /*
+        |--------------------------------------------------------------------------
+        | MOT DE PASSE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/mot-de-passe', function () {
+            return view('member.password');
+        })->name('password');
 
 
-/*
-|--------------------------------------------------------------------------
-| SUPPRESSION DU COMPTE
-|--------------------------------------------------------------------------
-*/
-Route::get(
-    '/mon-compte/supprimer',
-    [AuthController::class, 'showDeleteAccount']
-)
-    ->middleware('auth')
-    ->name('member.delete-account');
+        Route::patch(
+            '/mot-de-passe',
+            [AuthController::class, 'updatePassword']
+        )->name('password.update');
 
 
-Route::delete(
-    '/mon-compte/supprimer',
-    [AuthController::class, 'deleteAccount']
-)
-    ->middleware('auth')
-    ->name('member.delete-account.destroy');
+        /*
+        |--------------------------------------------------------------------------
+        | SUPPRESSION DU COMPTE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/supprimer-mon-compte', function () {
+            return view('member.delete-account');
+        })->name('delete-account');
+
+
+        Route::delete(
+            '/supprimer-mon-compte',
+            [AuthController::class, 'deleteAccount']
+        )->name('delete-account.destroy');
+
+    });
+
 
 
 /*
 |--------------------------------------------------------------------------
-| CONFIRMATION DE SUPPRESSION DU COMPTE
+| CONFIRMATION APRÈS SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
 */
-Route::get(
-    '/compte-supprime',
-    [AuthController::class, 'accountDeleted']
-)->name('account.deleted');
+
+Route::get('/compte-supprime', function () {
+    return view('member.account-deleted');
+})->name('member.account-deleted');
+
 
 
 /*
 |--------------------------------------------------------------------------
-| ADMINISTRATION
+| ESPACE ADMINISTRATION
 |--------------------------------------------------------------------------
 */
+
 Route::middleware([
     'auth',
     'admin',
@@ -281,90 +292,73 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | TABLEAU DE BORD
+        | TABLEAU DE BORD ADMIN
         |--------------------------------------------------------------------------
         */
+
         Route::get('/', function () {
-
             return view('admin.dashboard');
-
         })->name('dashboard');
+
 
 
         /*
         |--------------------------------------------------------------------------
-        | LISTE DES ADHÉRENTS
+        | GESTION DES ADHÉRENTS
         |--------------------------------------------------------------------------
         */
+
         Route::get(
             '/adherents',
             [AdminMemberController::class, 'index']
         )->name('members.index');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | RÉACTIVER UN ADHÉRENT
-        |--------------------------------------------------------------------------
-        */
         Route::patch(
             '/adherents/{id}/reactiver',
             [AdminMemberController::class, 'restore']
         )->name('members.restore');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | PROMOUVOIR UN ADHÉRENT
-        |--------------------------------------------------------------------------
-        */
         Route::patch(
             '/adherents/{id}/promouvoir-admin',
             [AdminMemberController::class, 'promoteToAdmin']
         )->name('members.promote');
 
 
+
         /*
         |--------------------------------------------------------------------------
-        | LISTE DES ADMINISTRATEURS
+        | GESTION DES ADMINISTRATEURS
         |--------------------------------------------------------------------------
-        |
-        | La vérification Super Admin est également effectuée dans
-        | le contrôleur.
-        |
         */
+
         Route::get(
             '/administrateurs',
             [AdminMemberController::class, 'administrators']
         )->name('administrators.index');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | RÉTROGRADER UN ADMINISTRATEUR
-        |--------------------------------------------------------------------------
-        */
         Route::patch(
             '/administrateurs/{id}/retrograder',
             [AdminMemberController::class, 'demoteAdmin']
         )->name('administrators.demote');
 
 
+
         /*
         |--------------------------------------------------------------------------
-        | CALENDRIER - LISTE DES COURS
+        | CALENDRIER ADMIN
         |--------------------------------------------------------------------------
-        |
-        | Affiche les cours que l'administrateur est autorisé à consulter.
-        |
-        | Super Admin :
-        | - Homme
-        | - Femme
-        |
-        | Admin normal :
-        | - uniquement sa propre catégorie
-        |
         */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTE DES COURS
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             '/calendrier',
             [AdminCourseController::class, 'index']
@@ -373,34 +367,69 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | CALENDRIER - FORMULAIRE D'AJOUT D'UN COURS
+        | AJOUTER UN COURS
         |--------------------------------------------------------------------------
-        |
-        | Cette route affichera le formulaire permettant de créer
-        | un nouvel entraînement.
-        |
         */
+
         Route::get(
             '/calendrier/ajouter',
             [AdminCourseController::class, 'create']
         )->name('courses.create');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | CALENDRIER - ENREGISTRER UN NOUVEAU COURS
-        |--------------------------------------------------------------------------
-        |
-        | Cette route recevra les informations envoyées par le
-        | formulaire d'ajout.
-        |
-        | La sécurité concernant la catégorie Homme / Femme sera
-        | contrôlée côté serveur dans AdminCourseController.
-        |
-        */
         Route::post(
             '/calendrier',
             [AdminCourseController::class, 'store']
         )->name('courses.store');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉACTIVER UN COURS SUPPRIMÉ
+        |--------------------------------------------------------------------------
+        |
+        | Cette action est protégée également dans le contrôleur.
+        | Seul le Super Admin pourra restaurer un cours supprimé.
+        |
+        */
+
+        Route::patch(
+            '/calendrier/{id}/reactiver',
+            [AdminCourseController::class, 'restore']
+        )->name('courses.restore');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MODIFIER UN COURS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/calendrier/{course}/modifier',
+            [AdminCourseController::class, 'edit']
+        )->name('courses.edit');
+
+
+        Route::patch(
+            '/calendrier/{course}',
+            [AdminCourseController::class, 'update']
+        )->name('courses.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUPPRIMER UN COURS
+        |--------------------------------------------------------------------------
+        |
+        | Grâce à SoftDeletes, cette suppression renseigne deleted_at
+        | au lieu d'effacer définitivement la ligne.
+        |
+        */
+
+        Route::delete(
+            '/calendrier/{course}',
+            [AdminCourseController::class, 'destroy']
+        )->name('courses.destroy');
 
     });

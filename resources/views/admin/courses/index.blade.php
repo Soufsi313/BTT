@@ -1,7 +1,10 @@
 @extends('layouts.app')
 
 
-@section('title', 'Calendrier des entraînements - BTT Admin')
+@section(
+    'title',
+    'Calendrier des entraînements - BTT Admin'
+)
 
 
 @section(
@@ -66,26 +69,14 @@
                     </h1>
 
 
-                    <p
-                        class="
-                            mt-3
-                            max-w-2xl
-                            text-sm
-                            leading-6
-                            text-zinc-500
-                        "
-                    >
-                        Gérez tous les entraînements qui apparaîtront
-                        dans le calendrier privé des adhérents
-                        Brussels Top Team.
+                    <p class="mt-3 max-w-2xl text-sm leading-6 text-zinc-500">
+                        Gérez les entraînements visibles dans le calendrier privé
+                        des adhérents Brussels Top Team.
                     </p>
 
                 </div>
 
 
-                <!-- =============================================
-                     ACTIONS PRINCIPALES
-                     ============================================= -->
                 <div class="flex flex-wrap gap-3">
 
                     <a
@@ -163,7 +154,7 @@
 
 
             <!-- =================================================
-                 INFORMATIONS SUR LES DROITS
+                 DROITS
                  ================================================= -->
             <div class="mt-8">
 
@@ -180,10 +171,9 @@
                             text-red-800
                         "
                     >
-                        Vous êtes
-                        <strong>Super Admin</strong> :
-                        vous pouvez consulter, ajouter, modifier et supprimer
-                        les cours Homme et Femme.
+                        Vous êtes <strong>Super Admin</strong> :
+                        vous pouvez gérer les cours Homme et Femme et
+                        réactiver les cours supprimés.
                     </div>
 
                 @else
@@ -227,12 +217,26 @@
                 "
             >
 
+                <!-- Conservation du tri actuel -->
+                <input
+                    type="hidden"
+                    name="sort_by"
+                    value="{{ $sortBy }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="direction"
+                    value="{{ $direction }}"
+                >
+
+
                 <div
                     class="
                         grid
                         gap-4
                         md:grid-cols-2
-                        xl:grid-cols-5
+                        xl:grid-cols-4
                     "
                 >
 
@@ -240,7 +244,7 @@
                     <!-- =========================================
                          RECHERCHE
                          ========================================= -->
-                    <div class="xl:col-span-2">
+                    <div>
 
                         <label
                             for="search"
@@ -275,7 +279,6 @@
                                 text-sm
                                 text-zinc-900
                                 outline-none
-                                transition
                                 focus:border-red-600
                                 focus:ring-1
                                 focus:ring-red-600
@@ -320,15 +323,13 @@
                                 py-3
                                 text-sm
                                 text-zinc-900
-                                outline-none
-                                transition
-                                focus:border-red-600
-                                focus:ring-1
-                                focus:ring-red-600
                             "
                         >
 
-                            <option value="all">
+                            <option
+                                value="all"
+                                @selected($discipline === 'all')
+                            >
                                 Toutes
                             </option>
 
@@ -386,11 +387,6 @@
                                 py-3
                                 text-sm
                                 text-zinc-900
-                                outline-none
-                                transition
-                                focus:border-red-600
-                                focus:ring-1
-                                focus:ring-red-600
                             "
                         >
 
@@ -415,92 +411,27 @@
                                 Inactifs
                             </option>
 
-                        </select>
-
-                    </div>
-
-
-                    <!-- =========================================
-                         TRI PAR DATE
-                         ========================================= -->
-                    <div>
-
-                        <label
-                            for="sort"
-                            class="
-                                mb-2
-                                block
-                                text-xs
-                                font-black
-                                uppercase
-                                tracking-wider
-                                text-zinc-600
-                            "
-                        >
-                            Date
-                        </label>
-
-
-                        <select
-                            id="sort"
-                            name="sort"
-                            onchange="this.form.submit()"
-                            class="
-                                w-full
-                                rounded-md
-                                border
-                                border-zinc-300
-                                bg-white
-                                px-4
-                                py-3
-                                text-sm
-                                text-zinc-900
-                                outline-none
-                                transition
-                                focus:border-red-600
-                                focus:ring-1
-                                focus:ring-red-600
-                            "
-                        >
-
                             <option
-                                value="asc"
-                                @selected($sort === 'asc')
+                                value="completed"
+                                @selected($status === 'completed')
                             >
-                                Plus proches
+                                Terminés
                             </option>
 
                             <option
-                                value="desc"
-                                @selected($sort === 'desc')
+                                value="deleted"
+                                @selected($status === 'deleted')
                             >
-                                Plus éloignés
+                                Supprimés
                             </option>
 
                         </select>
 
                     </div>
-
-                </div>
-
-
-                <!-- =================================================
-                     DEUXIÈME LIGNE DES FILTRES
-                     ================================================= -->
-                <div
-                    class="
-                        mt-4
-                        grid
-                        gap-4
-                        md:grid-cols-2
-                        lg:grid-cols-4
-                    "
-                >
 
 
                     <!-- =========================================
                          CATÉGORIE
-                         SUPER ADMIN UNIQUEMENT
                          ========================================= -->
                     @if (auth()->user()->isSuperAdmin())
 
@@ -536,11 +467,6 @@
                                     py-3
                                     text-sm
                                     text-zinc-900
-                                    outline-none
-                                    transition
-                                    focus:border-red-600
-                                    focus:ring-1
-                                    focus:ring-red-600
                                 "
                             >
 
@@ -571,62 +497,55 @@
 
                     @endif
 
+                </div>
 
-                    <!-- =========================================
-                         BOUTONS
-                         ========================================= -->
-                    <div
+
+                <!-- =================================================
+                     BOUTONS
+                     ================================================= -->
+                <div class="mt-4 flex flex-wrap gap-3">
+
+                    <button
+                        type="submit"
                         class="
-                            flex
-                            items-end
-                            gap-3
-                            md:col-span-2
+                            inline-flex
+                            items-center
+                            justify-center
+                            rounded-md
+                            bg-zinc-900
+                            px-5
+                            py-3
+                            text-sm
+                            font-bold
+                            text-white
+                            transition
+                            hover:bg-red-600
                         "
                     >
-
-                        <button
-                            type="submit"
-                            class="
-                                inline-flex
-                                items-center
-                                justify-center
-                                rounded-md
-                                bg-zinc-900
-                                px-5
-                                py-3
-                                text-sm
-                                font-bold
-                                text-white
-                                transition
-                                hover:bg-red-600
-                            "
-                        >
-                            Rechercher
-                        </button>
+                        Rechercher
+                    </button>
 
 
-                        <a
-                            href="{{ route('admin.courses.index') }}"
-                            class="
-                                inline-flex
-                                items-center
-                                justify-center
-                                rounded-md
-                                border
-                                border-zinc-300
-                                px-5
-                                py-3
-                                text-sm
-                                font-bold
-                                text-zinc-700
-                                transition
-                                hover:bg-white
-                            "
-                        >
-                            Réinitialiser
-                        </a>
-
-                    </div>
+                    <a
+                        href="{{ route('admin.courses.index') }}"
+                        class="
+                            inline-flex
+                            items-center
+                            justify-center
+                            rounded-md
+                            border
+                            border-zinc-300
+                            px-5
+                            py-3
+                            text-sm
+                            font-bold
+                            text-zinc-700
+                            transition
+                            hover:bg-white
+                        "
+                    >
+                        Réinitialiser
+                    </a>
 
                 </div>
 
@@ -634,121 +553,19 @@
 
 
             <!-- =================================================
-                 RÉSUMÉ DES FILTRES
+                 AIDE AU TRI
                  ================================================= -->
-            <div
-                class="
-                    mt-6
-                    flex
-                    flex-wrap
-                    items-center
-                    gap-2
-                    text-xs
-                    font-bold
-                    uppercase
-                    tracking-wider
-                    text-zinc-500
-                "
-            >
-
-                <span>
-                    Filtres :
-                </span>
-
-
-                @if ($discipline !== 'all')
-
-                    <span
-                        class="
-                            rounded-full
-                            bg-zinc-100
-                            px-3
-                            py-1
-                            text-zinc-700
-                        "
-                    >
-                        {{ $discipline }}
-                    </span>
-
-                @endif
-
-
-                @if (
-                    auth()->user()->isSuperAdmin()
-                    && $gender !== 'all'
-                )
-
-                    <span
-                        class="
-                            rounded-full
-                            bg-zinc-100
-                            px-3
-                            py-1
-                            text-zinc-700
-                        "
-                    >
-                        {{ $gender === 'homme' ? 'Homme' : 'Femme' }}
-                    </span>
-
-                @endif
-
-
-                @if ($status !== 'all')
-
-                    <span
-                        class="
-                            rounded-full
-                            bg-zinc-100
-                            px-3
-                            py-1
-                            text-zinc-700
-                        "
-                    >
-                        {{ $status === 'active' ? 'Actifs' : 'Inactifs' }}
-                    </span>
-
-                @endif
-
-
-                @if (
-                    $search !== ''
-                    || $discipline !== 'all'
-                    || $status !== 'all'
-                    || (
-                        auth()->user()->isSuperAdmin()
-                        && $gender !== 'all'
-                    )
-                )
-
-                    <a
-                        href="{{ route('admin.courses.index') }}"
-                        class="
-                            ml-2
-                            text-red-600
-                            transition
-                            hover:text-red-700
-                        "
-                    >
-                        Effacer les filtres
-                    </a>
-
-                @else
-
-                    <span class="normal-case tracking-normal text-zinc-400">
-                        Aucun filtre actif
-                    </span>
-
-                @endif
-
-            </div>
+            <p class="mt-5 text-xs font-bold text-zinc-500">
+                Cliquez sur un titre du tableau pour trier rapidement les résultats.
+            </p>
 
 
             <!-- =================================================
-                 TABLEAU DES COURS
+                 TABLEAU
                  ================================================= -->
             <div
                 class="
-                    mt-6
+                    mt-3
                     overflow-x-auto
                     rounded-lg
                     border
@@ -762,86 +579,290 @@
 
                         <tr>
 
-                            <th
-                                class="
-                                    px-5
-                                    py-4
-                                    text-left
-                                    text-xs
-                                    font-black
-                                    uppercase
-                                    tracking-wider
-                                    text-zinc-600
-                                "
-                            >
-                                Entraînement
+
+                            <!-- =================================
+                                 ENTRAÎNEMENT
+                                 ================================= -->
+                            <th class="px-5 py-4 text-left">
+
+                                <a
+                                    href="{{ route(
+                                        'admin.courses.index',
+                                        array_merge(
+                                            request()->query(),
+                                            [
+                                                'sort_by' => 'title',
+                                                'direction' =>
+                                                    $sortBy === 'title'
+                                                    && $direction === 'asc'
+                                                        ? 'desc'
+                                                        : 'asc',
+                                                'page' => null,
+                                            ]
+                                        )
+                                    ) }}"
+                                    class="
+                                        group
+                                        inline-flex
+                                        items-center
+                                        gap-2
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-600
+                                        transition
+                                        hover:text-red-600
+                                    "
+                                >
+                                    Entraînement
+
+                                    @if ($sortBy === 'title')
+
+                                        <span class="text-red-600">
+                                            {{ $direction === 'asc' ? '↑' : '↓' }}
+                                        </span>
+
+                                    @else
+
+                                        <span class="text-zinc-300 group-hover:text-red-400">
+                                            ↕
+                                        </span>
+
+                                    @endif
+
+                                </a>
+
                             </th>
 
 
-                            <th
-                                class="
-                                    px-5
-                                    py-4
-                                    text-left
-                                    text-xs
-                                    font-black
-                                    uppercase
-                                    tracking-wider
-                                    text-zinc-600
-                                "
-                            >
-                                Date
+                            <!-- =================================
+                                 DATE
+                                 ================================= -->
+                            <th class="px-5 py-4 text-left">
+
+                                <a
+                                    href="{{ route(
+                                        'admin.courses.index',
+                                        array_merge(
+                                            request()->query(),
+                                            [
+                                                'sort_by' => 'date',
+                                                'direction' =>
+                                                    $sortBy === 'date'
+                                                    && $direction === 'desc'
+                                                        ? 'asc'
+                                                        : 'desc',
+                                                'page' => null,
+                                            ]
+                                        )
+                                    ) }}"
+                                    class="
+                                        group
+                                        inline-flex
+                                        items-center
+                                        gap-2
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-600
+                                        transition
+                                        hover:text-red-600
+                                    "
+                                >
+                                    Date
+
+                                    @if ($sortBy === 'date')
+
+                                        <span class="text-red-600">
+                                            {{ $direction === 'asc' ? '↑' : '↓' }}
+                                        </span>
+
+                                    @else
+
+                                        <span class="text-zinc-300 group-hover:text-red-400">
+                                            ↕
+                                        </span>
+
+                                    @endif
+
+                                </a>
+
                             </th>
 
 
-                            <th
-                                class="
-                                    px-5
-                                    py-4
-                                    text-left
-                                    text-xs
-                                    font-black
-                                    uppercase
-                                    tracking-wider
-                                    text-zinc-600
-                                "
-                            >
-                                Horaire
+                            <!-- =================================
+                                 HORAIRE
+                                 ================================= -->
+                            <th class="px-5 py-4 text-left">
+
+                                <a
+                                    href="{{ route(
+                                        'admin.courses.index',
+                                        array_merge(
+                                            request()->query(),
+                                            [
+                                                'sort_by' => 'time',
+                                                'direction' =>
+                                                    $sortBy === 'time'
+                                                    && $direction === 'desc'
+                                                        ? 'asc'
+                                                        : 'desc',
+                                                'page' => null,
+                                            ]
+                                        )
+                                    ) }}"
+                                    class="
+                                        group
+                                        inline-flex
+                                        items-center
+                                        gap-2
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-600
+                                        transition
+                                        hover:text-red-600
+                                    "
+                                >
+                                    Horaire
+
+                                    @if ($sortBy === 'time')
+
+                                        <span class="text-red-600">
+                                            {{ $direction === 'asc' ? '↑' : '↓' }}
+                                        </span>
+
+                                    @else
+
+                                        <span class="text-zinc-300 group-hover:text-red-400">
+                                            ↕
+                                        </span>
+
+                                    @endif
+
+                                </a>
+
                             </th>
 
 
-                            <th
-                                class="
-                                    px-5
-                                    py-4
-                                    text-left
-                                    text-xs
-                                    font-black
-                                    uppercase
-                                    tracking-wider
-                                    text-zinc-600
-                                "
-                            >
-                                Catégorie
+                            <!-- =================================
+                                 CATÉGORIE
+                                 ================================= -->
+                            <th class="px-5 py-4 text-left">
+
+                                <a
+                                    href="{{ route(
+                                        'admin.courses.index',
+                                        array_merge(
+                                            request()->query(),
+                                            [
+                                                'sort_by' => 'category',
+                                                'direction' =>
+                                                    $sortBy === 'category'
+                                                    && $direction === 'asc'
+                                                        ? 'desc'
+                                                        : 'asc',
+                                                'page' => null,
+                                            ]
+                                        )
+                                    ) }}"
+                                    class="
+                                        group
+                                        inline-flex
+                                        items-center
+                                        gap-2
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-600
+                                        transition
+                                        hover:text-red-600
+                                    "
+                                >
+                                    Catégorie
+
+                                    @if ($sortBy === 'category')
+
+                                        <span class="text-red-600">
+                                            {{ $direction === 'asc' ? '↑' : '↓' }}
+                                        </span>
+
+                                    @else
+
+                                        <span class="text-zinc-300 group-hover:text-red-400">
+                                            ↕
+                                        </span>
+
+                                    @endif
+
+                                </a>
+
                             </th>
 
 
-                            <th
-                                class="
-                                    px-5
-                                    py-4
-                                    text-left
-                                    text-xs
-                                    font-black
-                                    uppercase
-                                    tracking-wider
-                                    text-zinc-600
-                                "
-                            >
-                                Statut
+                            <!-- =================================
+                                 STATUT
+                                 ================================= -->
+                            <th class="px-5 py-4 text-left">
+
+                                <a
+                                    href="{{ route(
+                                        'admin.courses.index',
+                                        array_merge(
+                                            request()->query(),
+                                            [
+                                                'sort_by' => 'status',
+                                                'direction' =>
+                                                    $sortBy === 'status'
+                                                    && $direction === 'asc'
+                                                        ? 'desc'
+                                                        : 'asc',
+                                                'page' => null,
+                                            ]
+                                        )
+                                    ) }}"
+                                    class="
+                                        group
+                                        inline-flex
+                                        items-center
+                                        gap-2
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-600
+                                        transition
+                                        hover:text-red-600
+                                    "
+                                >
+                                    Statut
+
+                                    @if ($sortBy === 'status')
+
+                                        <span class="text-red-600">
+                                            {{ $direction === 'asc' ? '↑' : '↓' }}
+                                        </span>
+
+                                    @else
+
+                                        <span class="text-zinc-300 group-hover:text-red-400">
+                                            ↕
+                                        </span>
+
+                                    @endif
+
+                                </a>
+
                             </th>
 
 
+                            <!-- =================================
+                                 ACTIONS
+                                 ================================= -->
                             <th
                                 class="
                                     px-5
@@ -866,17 +887,23 @@
 
                         @forelse ($courses as $course)
 
-                            <tr class="hover:bg-zinc-50">
+                            <tr
+                                @class([
+                                    'transition hover:bg-zinc-50',
+                                    'bg-zinc-50 opacity-70' => $course->trashed(),
+                                ])
+                            >
 
 
                                 <!-- =====================================
-                                     COURS
+                                     ENTRAÎNEMENT
                                      ===================================== -->
                                 <td class="px-5 py-5">
 
                                     <p class="font-black text-zinc-900">
                                         {{ $course->title }}
                                     </p>
+
 
                                     <p class="mt-1 text-sm text-zinc-500">
                                         {{ $course->discipline }}
@@ -895,6 +922,23 @@
                                             "
                                         >
                                             {{ $course->description }}
+                                        </p>
+
+                                    @endif
+
+
+                                    @if ($course->trashed())
+
+                                        <p
+                                            class="
+                                                mt-2
+                                                text-xs
+                                                font-bold
+                                                text-red-600
+                                            "
+                                        >
+                                            Supprimé le
+                                            {{ $course->deleted_at->format('d/m/Y à H:i') }}
                                         </p>
 
                                     @endif
@@ -988,7 +1032,55 @@
                                      ===================================== -->
                                 <td class="px-5 py-5">
 
-                                    @if ($course->is_active)
+
+                                    <!-- =============================
+                                         1. SUPPRIMÉ
+                                         ============================= -->
+                                    @if ($course->trashed())
+
+                                        <span
+                                            class="
+                                                inline-flex
+                                                rounded-full
+                                                bg-red-100
+                                                px-3
+                                                py-1
+                                                text-xs
+                                                font-black
+                                                uppercase
+                                                text-red-700
+                                            "
+                                        >
+                                            Supprimé
+                                        </span>
+
+
+                                    <!-- =============================
+                                         2. TERMINÉ
+                                         ============================= -->
+                                    @elseif ($course->hasEnded())
+
+                                        <span
+                                            class="
+                                                inline-flex
+                                                rounded-full
+                                                bg-blue-100
+                                                px-3
+                                                py-1
+                                                text-xs
+                                                font-black
+                                                uppercase
+                                                text-blue-700
+                                            "
+                                        >
+                                            Terminé
+                                        </span>
+
+
+                                    <!-- =============================
+                                         3. ACTIF
+                                         ============================= -->
+                                    @elseif ($course->is_active)
 
                                         <span
                                             class="
@@ -1006,6 +1098,10 @@
                                             Actif
                                         </span>
 
+
+                                    <!-- =============================
+                                         4. INACTIF
+                                         ============================= -->
                                     @else
 
                                         <span
@@ -1042,52 +1138,145 @@
                                         "
                                     >
 
-                                        <!--
-                                            La modification sera activée
-                                            à l'étape suivante.
-                                        -->
-                                        <button
-                                            type="button"
-                                            disabled
-                                            class="
-                                                rounded-md
-                                                border
-                                                border-blue-300
-                                                px-3
-                                                py-2
-                                                text-xs
-                                                font-bold
-                                                uppercase
-                                                text-blue-600
-                                                opacity-50
-                                            "
-                                        >
-                                            Modifier
-                                        </button>
+
+                                        <!-- =================================
+                                             COURS SUPPRIMÉ
+                                             ================================= -->
+                                        @if ($course->trashed())
 
 
-                                        <!--
-                                            La suppression sera activée
-                                            à l'étape suivante.
-                                        -->
-                                        <button
-                                            type="button"
-                                            disabled
-                                            class="
-                                                rounded-md
-                                                border
-                                                border-red-300
-                                                px-3
-                                                py-2
-                                                text-xs
-                                                font-bold
-                                                uppercase
-                                                text-red-600
-                                                opacity-50
-                                            "
-                                        >
-                                            Supprimer
-                                        </button>
+                                            @if (auth()->user()->isSuperAdmin())
+
+                                                <form
+                                                    action="{{ route(
+                                                        'admin.courses.restore',
+                                                        $course->id
+                                                    ) }}"
+                                                    method="POST"
+                                                    onsubmit="
+                                                        return confirm(
+                                                            'Voulez-vous réactiver ce cours ?'
+                                                        );
+                                                    "
+                                                >
+
+                                                    @csrf
+                                                    @method('PATCH')
+
+
+                                                    <button
+                                                        type="submit"
+                                                        class="
+                                                            rounded-md
+                                                            border
+                                                            border-green-400
+                                                            px-3
+                                                            py-2
+                                                            text-xs
+                                                            font-bold
+                                                            uppercase
+                                                            text-green-700
+                                                            transition
+                                                            hover:bg-green-50
+                                                        "
+                                                    >
+                                                        Réactiver
+                                                    </button>
+
+                                                </form>
+
+                                            @else
+
+                                                <span
+                                                    class="
+                                                        px-3
+                                                        py-2
+                                                        text-xs
+                                                        font-bold
+                                                        uppercase
+                                                        text-zinc-400
+                                                    "
+                                                >
+                                                    Supprimé
+                                                </span>
+
+                                            @endif
+
+
+                                        <!-- =================================
+                                             COURS NON SUPPRIMÉ
+                                             ================================= -->
+                                        @else
+
+
+                                            <!-- =============================
+                                                 MODIFIER
+                                                 ============================= -->
+                                            <a
+                                                href="{{ route(
+                                                    'admin.courses.edit',
+                                                    $course
+                                                ) }}"
+                                                class="
+                                                    rounded-md
+                                                    border
+                                                    border-blue-300
+                                                    px-3
+                                                    py-2
+                                                    text-xs
+                                                    font-bold
+                                                    uppercase
+                                                    text-blue-600
+                                                    transition
+                                                    hover:bg-blue-50
+                                                "
+                                            >
+                                                Modifier
+                                            </a>
+
+
+                                            <!-- =============================
+                                                 SUPPRIMER
+                                                 ============================= -->
+                                            <form
+                                                action="{{ route(
+                                                    'admin.courses.destroy',
+                                                    $course
+                                                ) }}"
+                                                method="POST"
+                                                onsubmit="
+                                                    return confirm(
+                                                        'Voulez-vous vraiment supprimer ce cours ? Il pourra être réactivé ensuite par le Super Admin.'
+                                                    );
+                                                "
+                                            >
+
+                                                @csrf
+                                                @method('DELETE')
+
+
+                                                <button
+                                                    type="submit"
+                                                    class="
+                                                        rounded-md
+                                                        border
+                                                        border-red-300
+                                                        px-3
+                                                        py-2
+                                                        text-xs
+                                                        font-bold
+                                                        uppercase
+                                                        text-red-600
+                                                        transition
+                                                        hover:bg-red-50
+                                                    "
+                                                >
+                                                    Supprimer
+                                                </button>
+
+                                            </form>
+
+                                        @endif
 
                                     </div>
 

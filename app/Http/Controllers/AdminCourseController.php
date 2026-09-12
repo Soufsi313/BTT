@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class AdminCourseController extends Controller
 {
@@ -15,17 +15,18 @@ class AdminCourseController extends Controller
     | LISTE DES COURS
     |--------------------------------------------------------------------------
     |
-    | Cette méthode affiche tous les cours accessibles à l'administrateur.
+    | Cette page permet :
     |
-    | SUPER ADMIN :
-    | - peut consulter Homme + Femme ;
-    | - peut filtrer les deux catégories.
-    |
-    | ADMIN NORMAL :
-    | - ne voit que les cours correspondant à son propre genre ;
-    | - cette restriction est appliquée côté serveur.
+    | - la recherche ;
+    | - le filtrage par discipline ;
+    | - le filtrage par catégorie ;
+    | - le filtrage par statut ;
+    | - l'affichage des Soft Deletes ;
+    | - le tri rapide par colonne ;
+    | - la détection automatique des cours terminés.
     |
     */
+
     public function index(Request $request): View
     {
         $admin = $request->user();
@@ -33,53 +34,79 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | RÉCUPÉRATION DES FILTRES
+        | HEURE ACTUELLE DE BRUXELLES
+        |--------------------------------------------------------------------------
+        |
+        | Les horaires BTT sont des horaires locaux de Bruxelles.
+        |
+        | Nous utilisons donc explicitement Europe/Brussels pour éviter
+        | un éventuel décalage lié au fuseau UTC de Laravel.
+        |
+        */
+
+        $now = now('Europe/Brussels');
+
+        $nowSql = $now->format(
+            'Y-m-d H:i:s'
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RECHERCHE
         |--------------------------------------------------------------------------
         */
 
         $search = trim(
-            (string) $request->query('search', '')
+            (string) $request->query(
+                'search',
+                ''
+            )
         );
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | DISCIPLINE
+        |--------------------------------------------------------------------------
+        */
+
         $discipline = trim(
-            (string) $request->query('discipline', 'all')
+            (string) $request->query(
+                'discipline',
+                'all'
+            )
         );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATUT
+        |--------------------------------------------------------------------------
+        |
+        | all       = tous
+        | active    = actifs
+        | inactive  = inactifs
+        | completed = terminés
+        | deleted   = supprimés
+        |
+        */
 
         $status = (string) $request->query(
             'status',
             'all'
         );
 
-        $sort = (string) $request->query(
-            'sort',
-            'asc'
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION DU TRI
-        |--------------------------------------------------------------------------
-        |
-        | asc  = cours les plus proches en premier
-        | desc = cours les plus éloignés en premier
-        |
-        */
-
-        if (! in_array($sort, ['asc', 'desc'], true)) {
-            $sort = 'asc';
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION DU STATUT
-        |--------------------------------------------------------------------------
-        */
 
         if (! in_array(
             $status,
-            ['all', 'active', 'inactive'],
+            [
+                'all',
+                'active',
+                'inactive',
+                'completed',
+                'deleted',
+            ],
             true
         )) {
             $status = 'all';
@@ -88,7 +115,61 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTRE DE CATÉGORIE
+        | COLONNE DE TRI
+        |--------------------------------------------------------------------------
+        */
+
+        $sortBy = (string) $request->query(
+            'sort_by',
+            'date'
+        );
+
+
+        $allowedSorts = [
+            'title',
+            'date',
+            'time',
+            'category',
+            'status',
+        ];
+
+
+        if (! in_array(
+            $sortBy,
+            $allowedSorts,
+            true
+        )) {
+            $sortBy = 'date';
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DIRECTION DU TRI
+        |--------------------------------------------------------------------------
+        */
+
+        $direction = (string) $request->query(
+            'direction',
+            'desc'
+        );
+
+
+        if (! in_array(
+            $direction,
+            [
+                'asc',
+                'desc',
+            ],
+            true
+        )) {
+            $direction = 'desc';
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CATÉGORIE
         |--------------------------------------------------------------------------
         */
 
@@ -99,9 +180,14 @@ class AdminCourseController extends Controller
                 'all'
             );
 
+
             if (! in_array(
                 $gender,
-                ['all', 'homme', 'femme'],
+                [
+                    'all',
+                    'homme',
+                    'femme',
+                ],
                 true
             )) {
                 $gender = 'all';
@@ -110,15 +196,9 @@ class AdminCourseController extends Controller
         } else {
 
             /*
-            |--------------------------------------------------------------------------
-            | SÉCURITÉ ADMIN NORMAL
-            |--------------------------------------------------------------------------
-            |
-            | Même si un administrateur modifie manuellement l'URL,
-            | sa catégorie reste imposée côté serveur.
-            |
+            | Sécurité serveur :
+            | un Admin normal reste toujours limité à sa catégorie.
             */
-
             $gender = $admin->genre;
         }
 
@@ -127,32 +207,20 @@ class AdminCourseController extends Controller
         |--------------------------------------------------------------------------
         | DISCIPLINES DISPONIBLES
         |--------------------------------------------------------------------------
-        |
-        | Les disciplines sont récupérées directement dans la base.
-        |
-        | Ainsi, lorsqu'une nouvelle discipline est utilisée dans un cours,
-        | elle apparaît automatiquement dans le filtre.
-        |
         */
 
-        $disciplineQuery = Course::query();
+        $disciplineQuery = Course::withTrashed();
 
-        /*
-        | Un administrateur normal ne doit pas voir les disciplines
-        | appartenant exclusivement à l'autre catégorie.
-        */
+
         if (! $admin->isSuperAdmin()) {
+
             $disciplineQuery->where(
                 'target_gender',
                 $admin->genre
             );
         }
 
-        /*
-        | Si le Super Admin sélectionne une catégorie,
-        | les disciplines proposées correspondent également
-        | à cette catégorie.
-        */
+
         if (
             $admin->isSuperAdmin()
             && $gender !== 'all'
@@ -163,9 +231,14 @@ class AdminCourseController extends Controller
             );
         }
 
+
         $disciplines = $disciplineQuery
             ->whereNotNull('discipline')
-            ->where('discipline', '!=', '')
+            ->where(
+                'discipline',
+                '!=',
+                ''
+            )
             ->distinct()
             ->orderBy('discipline')
             ->pluck('discipline');
@@ -177,18 +250,19 @@ class AdminCourseController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $coursesQuery = Course::query();
+        $coursesQuery = Course::withTrashed();
 
 
         /*
         |--------------------------------------------------------------------------
-        | RESTRICTION PAR CATÉGORIE
+        | SÉCURITÉ CATÉGORIE
         |--------------------------------------------------------------------------
         */
 
         if ($admin->isSuperAdmin()) {
 
             if ($gender !== 'all') {
+
                 $coursesQuery->where(
                     'target_gender',
                     $gender
@@ -208,12 +282,6 @@ class AdminCourseController extends Controller
         |--------------------------------------------------------------------------
         | RECHERCHE TEXTE
         |--------------------------------------------------------------------------
-        |
-        | Recherche dans :
-        | - titre
-        | - discipline
-        | - description
-        |
         */
 
         if ($search !== '') {
@@ -244,7 +312,7 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTRE PAR DISCIPLINE
+        | FILTRE DISCIPLINE
         |--------------------------------------------------------------------------
         */
 
@@ -261,46 +329,234 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTRE PAR STATUT
+        | FILTRE STATUT
         |--------------------------------------------------------------------------
+        |
+        | IMPORTANT :
+        |
+        | La date et l'heure de FIN déterminent si le cours est terminé.
+        |
+        | TIMESTAMP(course_date, end_time)
+        | crée une date complète côté MySQL.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACTIFS
+        |--------------------------------------------------------------------------
+        |
+        | - non supprimés
+        | - activés manuellement
+        | - heure de fin pas encore passée
+        |
         */
 
         if ($status === 'active') {
 
-            $coursesQuery->where(
-                'is_active',
-                true
-            );
+            $coursesQuery
+                ->whereNull('deleted_at')
+                ->where(
+                    'is_active',
+                    true
+                )
+                ->whereRaw(
+                    'TIMESTAMP(course_date, end_time) > ?',
+                    [$nowSql]
+                );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | INACTIFS
+        |--------------------------------------------------------------------------
+        |
+        | - non supprimés
+        | - désactivés manuellement
+        | - heure de fin pas encore passée
+        |
+        */
 
         } elseif ($status === 'inactive') {
 
-            $coursesQuery->where(
-                'is_active',
-                false
+            $coursesQuery
+                ->whereNull('deleted_at')
+                ->where(
+                    'is_active',
+                    false
+                )
+                ->whereRaw(
+                    'TIMESTAMP(course_date, end_time) > ?',
+                    [$nowSql]
+                );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TERMINÉS
+        |--------------------------------------------------------------------------
+        |
+        | Peu importe l'ancienne valeur de is_active :
+        | une fois l'heure de fin passée, le cours est Terminé.
+        |
+        */
+
+        } elseif ($status === 'completed') {
+
+            $coursesQuery
+                ->whereNull('deleted_at')
+                ->whereRaw(
+                    'TIMESTAMP(course_date, end_time) <= ?',
+                    [$nowSql]
+                );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUPPRIMÉS
+        |--------------------------------------------------------------------------
+        */
+
+        } elseif ($status === 'deleted') {
+
+            $coursesQuery->onlyTrashed();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI DU TABLEAU
+        |--------------------------------------------------------------------------
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TITRE
+        |--------------------------------------------------------------------------
+        */
+
+        if ($sortBy === 'title') {
+
+            $coursesQuery->orderBy(
+                'title',
+                $direction
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATE
+        |--------------------------------------------------------------------------
+        */
+
+        } elseif ($sortBy === 'date') {
+
+            $coursesQuery
+                ->orderBy(
+                    'course_date',
+                    $direction
+                )
+                ->orderBy(
+                    'start_time',
+                    $direction
+                );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | HORAIRE
+        |--------------------------------------------------------------------------
+        */
+
+        } elseif ($sortBy === 'time') {
+
+            $coursesQuery
+                ->orderBy(
+                    'start_time',
+                    $direction
+                )
+                ->orderBy(
+                    'course_date',
+                    $direction
+                );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CATÉGORIE
+        |--------------------------------------------------------------------------
+        */
+
+        } elseif ($sortBy === 'category') {
+
+            $coursesQuery
+                ->orderBy(
+                    'target_gender',
+                    $direction
+                )
+                ->orderBy(
+                    'course_date',
+                    'desc'
+                );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATUT
+        |--------------------------------------------------------------------------
+        |
+        | Ordre logique croissant :
+        |
+        | 1 = Actif
+        | 2 = Inactif
+        | 3 = Terminé
+        | 4 = Supprimé
+        |
+        */
+
+        } elseif ($sortBy === 'status') {
+
+            $coursesQuery->orderByRaw(
+                "
+                CASE
+                    WHEN deleted_at IS NOT NULL THEN 4
+
+                    WHEN TIMESTAMP(course_date, end_time) <= ?
+                        THEN 3
+
+                    WHEN is_active = 0
+                        THEN 2
+
+                    ELSE 1
+                END {$direction}
+                ",
+                [$nowSql]
+            );
+
+
+            /*
+            | À statut identique :
+            | les dates les plus récentes passent en premier.
+            */
+            $coursesQuery->orderBy(
+                'course_date',
+                'desc'
             );
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | TRI PAR DATE
+        | ORDRE STABLE
         |--------------------------------------------------------------------------
-        |
-        | On ajoute également l'heure de début pour conserver
-        | un ordre logique lorsque plusieurs cours ont lieu
-        | le même jour.
-        |
         */
 
-        $coursesQuery
-            ->orderBy(
-                'course_date',
-                $sort
-            )
-            ->orderBy(
-                'start_time',
-                $sort
-            );
+        $coursesQuery->orderBy(
+            'id',
+            'desc'
+        );
 
 
         /*
@@ -316,7 +572,7 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | AFFICHAGE DE LA VUE
+        | VUE
         |--------------------------------------------------------------------------
         */
 
@@ -329,7 +585,8 @@ class AdminCourseController extends Controller
                 'disciplines' => $disciplines,
                 'gender' => $gender,
                 'status' => $status,
-                'sort' => $sort,
+                'sortBy' => $sortBy,
+                'direction' => $direction,
             ]
         );
     }
@@ -337,7 +594,7 @@ class AdminCourseController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | FORMULAIRE D'AJOUT D'UN COURS
+    | FORMULAIRE D'AJOUT
     |--------------------------------------------------------------------------
     */
 
@@ -348,17 +605,8 @@ class AdminCourseController extends Controller
         $forcedGender = null;
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | ADMIN NORMAL
-        |--------------------------------------------------------------------------
-        |
-        | Un administrateur normal ne peut créer un cours
-        | que dans sa propre catégorie.
-        |
-        */
-
         if (! $admin->isSuperAdmin()) {
+
             $forcedGender = $admin->genre;
         }
 
@@ -374,7 +622,7 @@ class AdminCourseController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | ENREGISTREMENT D'UN COURS
+    | ENREGISTREMENT D'UN NOUVEAU COURS
     |--------------------------------------------------------------------------
     */
 
@@ -387,7 +635,7 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | RÈGLES DE VALIDATION COMMUNES
+        | VALIDATION
         |--------------------------------------------------------------------------
         */
 
@@ -432,15 +680,6 @@ class AdminCourseController extends Controller
         ];
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | CATÉGORIE
-        |--------------------------------------------------------------------------
-        |
-        | Seul le Super Admin peut choisir Homme ou Femme.
-        |
-        */
-
         if ($admin->isSuperAdmin()) {
 
             $rules['target_gender'] = [
@@ -453,45 +692,15 @@ class AdminCourseController extends Controller
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATION DU FORMULAIRE
-        |--------------------------------------------------------------------------
-        */
-
         $validated = $request->validate(
             $rules,
-            [
-                'title.required' =>
-                    'Le titre du cours est obligatoire.',
-
-                'discipline.required' =>
-                    'La discipline est obligatoire.',
-
-                'course_date.required' =>
-                    'La date du cours est obligatoire.',
-
-                'course_date.date' =>
-                    'La date du cours est invalide.',
-
-                'start_time.required' =>
-                    'L’heure de début est obligatoire.',
-
-                'end_time.required' =>
-                    'L’heure de fin est obligatoire.',
-
-                'end_time.after' =>
-                    'L’heure de fin doit être postérieure à l’heure de début.',
-
-                'target_gender.required' =>
-                    'La catégorie du cours est obligatoire.',
-            ]
+            $this->validationMessages()
         );
 
 
         /*
         |--------------------------------------------------------------------------
-        | CATÉGORIE FINALE DU COURS
+        | CATÉGORIE
         |--------------------------------------------------------------------------
         */
 
@@ -502,11 +711,6 @@ class AdminCourseController extends Controller
 
         } else {
 
-            /*
-            | Sécurité serveur :
-            | un admin normal ne peut jamais forcer
-            | une autre catégorie via le navigateur.
-            */
             $targetGender =
                 $admin->genre;
         }
@@ -514,7 +718,7 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | CRÉATION DU COURS
+        | CRÉATION
         |--------------------------------------------------------------------------
         */
 
@@ -548,12 +752,6 @@ class AdminCourseController extends Controller
         ]);
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | RETOUR AU CALENDRIER ADMIN
-        |--------------------------------------------------------------------------
-        */
-
         return redirect()
             ->route('admin.courses.index')
             ->with(
@@ -565,12 +763,331 @@ class AdminCourseController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | VÉRIFICATION DES DROITS SUR UN COURS
+    | FORMULAIRE DE MODIFICATION
     |--------------------------------------------------------------------------
-    |
-    | Cette méthode servira également lorsque nous activerons
-    | prochainement la modification et la suppression.
-    |
+    */
+
+    public function edit(
+        Request $request,
+        Course $course
+    ): View {
+
+        $admin = $request->user();
+
+
+        if (! $this->canManageCourse(
+            $admin,
+            $course
+        )) {
+            abort(
+                403,
+                'Vous n’êtes pas autorisé à modifier ce cours.'
+            );
+        }
+
+
+        $forcedGender = null;
+
+
+        if (! $admin->isSuperAdmin()) {
+
+            $forcedGender = $admin->genre;
+        }
+
+
+        return view(
+            'admin.courses.edit',
+            [
+                'course' => $course,
+                'forcedGender' => $forcedGender,
+            ]
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MISE À JOUR D'UN COURS
+    |--------------------------------------------------------------------------
+    */
+
+    public function update(
+        Request $request,
+        Course $course
+    ): RedirectResponse {
+
+        $admin = $request->user();
+
+
+        if (! $this->canManageCourse(
+            $admin,
+            $course
+        )) {
+            abort(
+                403,
+                'Vous n’êtes pas autorisé à modifier ce cours.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        */
+
+        $rules = [
+            'title' => [
+                'required',
+                'string',
+                'max:150',
+            ],
+
+            'discipline' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'course_date' => [
+                'required',
+                'date',
+            ],
+
+            'start_time' => [
+                'required',
+                'date_format:H:i',
+            ],
+
+            'end_time' => [
+                'required',
+                'date_format:H:i',
+                'after:start_time',
+            ],
+
+            'description' => [
+                'nullable',
+                'string',
+            ],
+
+            'is_active' => [
+                'nullable',
+                'boolean',
+            ],
+        ];
+
+
+        if ($admin->isSuperAdmin()) {
+
+            $rules['target_gender'] = [
+                'required',
+                Rule::in([
+                    'homme',
+                    'femme',
+                ]),
+            ];
+        }
+
+
+        $validated = $request->validate(
+            $rules,
+            $this->validationMessages()
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CATÉGORIE
+        |--------------------------------------------------------------------------
+        */
+
+        if ($admin->isSuperAdmin()) {
+
+            $targetGender =
+                $validated['target_gender'];
+
+        } else {
+
+            $targetGender =
+                $admin->genre;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MISE À JOUR
+        |--------------------------------------------------------------------------
+        */
+
+        $course->update([
+            'title' =>
+                $validated['title'],
+
+            'discipline' =>
+                $validated['discipline'],
+
+            'course_date' =>
+                $validated['course_date'],
+
+            'start_time' =>
+                $validated['start_time'],
+
+            'end_time' =>
+                $validated['end_time'],
+
+            'target_gender' =>
+                $targetGender,
+
+            'description' =>
+                $validated['description'] ?? null,
+
+            'is_active' =>
+                $request->boolean('is_active'),
+        ]);
+
+
+        return redirect()
+            ->route('admin.courses.index')
+            ->with(
+                'success',
+                'Le cours a été modifié avec succès.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SOFT DELETE
+    |--------------------------------------------------------------------------
+    */
+
+    public function destroy(
+        Request $request,
+        Course $course
+    ): RedirectResponse {
+
+        $admin = $request->user();
+
+
+        if (! $this->canManageCourse(
+            $admin,
+            $course
+        )) {
+            abort(
+                403,
+                'Vous n’êtes pas autorisé à supprimer ce cours.'
+            );
+        }
+
+
+        $course->delete();
+
+
+        return redirect()
+            ->route('admin.courses.index')
+            ->with(
+                'success',
+                'Le cours a été supprimé du calendrier.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RÉACTIVATION D'UN COURS SUPPRIMÉ
+    |--------------------------------------------------------------------------
+    */
+
+    public function restore(
+        Request $request,
+        int $id
+    ): RedirectResponse {
+
+        $admin = $request->user();
+
+
+        if (! $admin->isSuperAdmin()) {
+
+            abort(
+                403,
+                'Seul le Super Admin peut réactiver un cours supprimé.'
+            );
+        }
+
+
+        $course = Course::withTrashed()
+            ->findOrFail($id);
+
+
+        if ($course->trashed()) {
+
+            $course->restore();
+
+
+            return redirect()
+                ->route('admin.courses.index')
+                ->with(
+                    'success',
+                    'Le cours a été réactivé avec succès.'
+                );
+        }
+
+
+        return redirect()
+            ->route('admin.courses.index')
+            ->with(
+                'success',
+                'Ce cours est déjà actif dans la base de données.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MESSAGES DE VALIDATION
+    |--------------------------------------------------------------------------
+    */
+
+    private function validationMessages(): array
+    {
+        return [
+            'title.required' =>
+                'Le titre du cours est obligatoire.',
+
+            'discipline.required' =>
+                'La discipline est obligatoire.',
+
+            'course_date.required' =>
+                'La date du cours est obligatoire.',
+
+            'course_date.date' =>
+                'La date du cours est invalide.',
+
+            'start_time.required' =>
+                'L’heure de début est obligatoire.',
+
+            'start_time.date_format' =>
+                'L’heure de début est invalide.',
+
+            'end_time.required' =>
+                'L’heure de fin est obligatoire.',
+
+            'end_time.date_format' =>
+                'L’heure de fin est invalide.',
+
+            'end_time.after' =>
+                'L’heure de fin doit être postérieure à l’heure de début.',
+
+            'target_gender.required' =>
+                'La catégorie du cours est obligatoire.',
+        ];
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VÉRIFICATION DES DROITS
+    |--------------------------------------------------------------------------
     */
 
     private function canManageCourse(
@@ -578,18 +1095,12 @@ class AdminCourseController extends Controller
         Course $course
     ): bool {
 
-        /*
-        | Le Super Admin peut tout gérer.
-        */
         if ($admin->isSuperAdmin()) {
+
             return true;
         }
 
 
-        /*
-        | Un administrateur normal ne peut gérer
-        | que les cours de sa catégorie.
-        */
         return $admin->isAdmin()
             && $course->target_gender === $admin->genre;
     }

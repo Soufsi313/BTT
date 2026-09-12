@@ -529,6 +529,9 @@
                                                 "
                                             >
 
+                                                <!-- =====================
+                                                     DISCIPLINE
+                                                     ===================== -->
                                                 <p
                                                     class="
                                                         text-[10px]
@@ -542,6 +545,9 @@
                                                 </p>
 
 
+                                                <!-- =====================
+                                                     TITRE DU COURS
+                                                     ===================== -->
                                                 <p
                                                     class="
                                                         mt-1
@@ -555,6 +561,9 @@
                                                 </p>
 
 
+                                                <!-- =====================
+                                                     HORAIRE
+                                                     ===================== -->
                                                 <p
                                                     class="
                                                         mt-1
@@ -568,6 +577,61 @@
 
                                                     {{ substr($course->end_time, 0, 5) }}
                                                 </p>
+
+
+                                                <!-- =====================
+                                                     STATUT DU COURS
+                                                     ===================== -->
+                                                <div class="mt-2">
+
+                                                    <!-- =================================
+                                                         COURS TERMINÉ
+                                                         ================================= -->
+                                                    @if ($course->hasEnded())
+
+                                                        <span
+                                                            class="
+                                                                inline-flex
+                                                                rounded-full
+                                                                bg-blue-500/15
+                                                                px-2.5
+                                                                py-1
+                                                                text-[9px]
+                                                                font-black
+                                                                uppercase
+                                                                tracking-wider
+                                                                text-blue-400
+                                                            "
+                                                        >
+                                                            Terminé
+                                                        </span>
+
+
+                                                    <!-- =================================
+                                                         COURS ACTIF
+                                                         ================================= -->
+                                                    @else
+
+                                                        <span
+                                                            class="
+                                                                inline-flex
+                                                                rounded-full
+                                                                bg-green-500/15
+                                                                px-2.5
+                                                                py-1
+                                                                text-[9px]
+                                                                font-black
+                                                                uppercase
+                                                                tracking-wider
+                                                                text-green-400
+                                                            "
+                                                        >
+                                                            Actif
+                                                        </span>
+
+                                                    @endif
+
+                                                </div>
 
                                             </div>
 
@@ -642,6 +706,9 @@
                 "
             >
 
+                <!-- =============================================
+                     DATE DU JOUR
+                     ============================================= -->
                 <div class="flex items-center gap-2">
 
                     <span
@@ -661,6 +728,9 @@
                 </div>
 
 
+                <!-- =============================================
+                     ENTRAÎNEMENT PROGRAMMÉ
+                     ============================================= -->
                 <div class="flex items-center gap-2">
 
                     <span class="h-4 w-1 bg-red-600">
@@ -668,6 +738,50 @@
 
                     <span>
                         Entraînement programmé
+                    </span>
+
+                </div>
+
+
+                <!-- =============================================
+                     COURS ACTIF
+                     ============================================= -->
+                <div class="flex items-center gap-2">
+
+                    <span
+                        class="
+                            h-3
+                            w-3
+                            rounded-full
+                            bg-green-500
+                        "
+                    >
+                    </span>
+
+                    <span>
+                        Cours actif
+                    </span>
+
+                </div>
+
+
+                <!-- =============================================
+                     COURS TERMINÉ
+                     ============================================= -->
+                <div class="flex items-center gap-2">
+
+                    <span
+                        class="
+                            h-3
+                            w-3
+                            rounded-full
+                            bg-blue-500
+                        "
+                    >
+                    </span>
+
+                    <span>
+                        Cours terminé
                     </span>
 
                 </div>

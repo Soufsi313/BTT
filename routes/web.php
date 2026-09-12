@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
+use App\Http\Controllers\AdminMessageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MemberCourseController;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +86,15 @@ Route::get('/abonnements', function () {
 |--------------------------------------------------------------------------
 | CONTACT
 |--------------------------------------------------------------------------
+|
+| La page Contact est accessible aussi bien :
+|
+| - aux visiteurs non connectés ;
+| - aux adhérents connectés.
+|
+| Le formulaire enregistre une conversation et son premier message
+| dans la base de données.
+|
 */
 
 Route::get('/contact', function () {
@@ -91,11 +102,23 @@ Route::get('/contact', function () {
 })->name('contact');
 
 
+Route::post(
+    '/contact',
+    [ContactController::class, 'store']
+)->name('contact.store');
+
+
 
 /*
 |--------------------------------------------------------------------------
 | VISITEURS NON CONNECTÉS
 |--------------------------------------------------------------------------
+|
+| Ces routes sont protégées par le middleware "guest".
+|
+| Un utilisateur déjà connecté ne doit normalement pas accéder
+| aux pages de connexion ou d'inscription.
+|
 */
 
 Route::middleware('guest')->group(function () {
@@ -142,10 +165,14 @@ Route::middleware('guest')->group(function () {
 });
 
 
+
 /*
 |--------------------------------------------------------------------------
 | DÉCONNEXION
 |--------------------------------------------------------------------------
+|
+| Seul un utilisateur connecté peut utiliser cette route.
+|
 */
 
 Route::post(
@@ -161,6 +188,10 @@ Route::post(
 |--------------------------------------------------------------------------
 | ESPACE ADHÉRENT
 |--------------------------------------------------------------------------
+|
+| Toutes les routes commençant par /membre sont réservées
+| aux utilisateurs connectés.
+|
 */
 
 Route::middleware('auth')
@@ -267,6 +298,10 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 | CONFIRMATION APRÈS SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
+|
+| Cette page reste accessible après la déconnexion automatique
+| provoquée par la suppression du compte.
+|
 */
 
 Route::get('/compte-supprime', function () {
@@ -279,6 +314,20 @@ Route::get('/compte-supprime', function () {
 |--------------------------------------------------------------------------
 | ESPACE ADMINISTRATION
 |--------------------------------------------------------------------------
+|
+| Toutes les routes de cette section sont protégées par :
+|
+| - auth  : l'utilisateur doit être connecté ;
+| - admin : l'utilisateur doit être Admin ou Super Admin.
+|
+| Toutes les URL commencent par :
+|
+| /admin
+|
+| Tous les noms de routes commencent par :
+|
+| admin.
+|
 */
 
 Route::middleware([
@@ -314,11 +363,32 @@ Route::middleware([
         )->name('members.index');
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | RÉACTIVER UN ADHÉRENT
+        |--------------------------------------------------------------------------
+        |
+        | Cette fonctionnalité utilise SoftDeletes.
+        |
+        | La protection Super Admin est également appliquée
+        | directement dans le contrôleur.
+        |
+        */
+
         Route::patch(
             '/adherents/{id}/reactiver',
             [AdminMemberController::class, 'restore']
         )->name('members.restore');
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | PROMOUVOIR UN ADHÉRENT ADMIN
+        |--------------------------------------------------------------------------
+        |
+        | Seul le Super Admin peut effectuer cette opération.
+        |
+        */
 
         Route::patch(
             '/adherents/{id}/promouvoir-admin',
@@ -339,10 +409,74 @@ Route::middleware([
         )->name('administrators.index');
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | RÉTROGRADER UN ADMINISTRATEUR
+        |--------------------------------------------------------------------------
+        |
+        | Permet au Super Admin de transformer un Admin
+        | en simple adhérent.
+        |
+        */
+
         Route::patch(
             '/administrateurs/{id}/retrograder',
             [AdminMemberController::class, 'demoteAdmin']
         )->name('administrators.demote');
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MESSAGERIE ADMINISTRATION
+        |--------------------------------------------------------------------------
+        |
+        | La messagerie permet aux administrateurs de consulter les
+        | conversations envoyées :
+        |
+        | - par les visiteurs du site ;
+        | - par les adhérents connectés.
+        |
+        | Tous les administrateurs consultent la même boîte de réception.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTE DES CONVERSATIONS
+        |--------------------------------------------------------------------------
+        |
+        | Exemple :
+        |
+        | /admin/messages
+        |
+        */
+
+        Route::get(
+            '/messages',
+            [AdminMessageController::class, 'index']
+        )->name('messages.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DÉTAIL D'UNE CONVERSATION
+        |--------------------------------------------------------------------------
+        |
+        | Exemple :
+        |
+        | /admin/messages/12
+        |
+        | Laravel récupère automatiquement la conversation grâce
+        | au Route Model Binding.
+        |
+        */
+
+        Route::get(
+            '/messages/{conversation}',
+            [AdminMessageController::class, 'show']
+        )->name('messages.show');
 
 
 
@@ -389,7 +523,8 @@ Route::middleware([
         |--------------------------------------------------------------------------
         |
         | Cette action est protégée également dans le contrôleur.
-        | Seul le Super Admin pourra restaurer un cours supprimé.
+        |
+        | Seul le Super Admin peut restaurer un cours supprimé.
         |
         */
 

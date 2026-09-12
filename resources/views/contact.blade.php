@@ -1,11 +1,14 @@
 @extends('layouts.app')
 
+
 @section('title', 'Contact - Brussels Top Team')
+
 
 @section(
     'meta_description',
     'Contactez Brussels Top Team pour toute question concernant les entraînements, les affiliations, les inscriptions ou toute autre demande.'
 )
+
 
 @section('content')
 
@@ -27,7 +30,9 @@
         "
     >
 
-        <!-- Élément graphique rouge discret -->
+        <!-- =====================================================
+             ÉLÉMENT GRAPHIQUE ROUGE
+             ===================================================== -->
         <div
             class="
                 pointer-events-none
@@ -73,6 +78,7 @@
                 "
             >
                 Une question ?
+
                 <span class="text-red-600">
                     Contactez-nous.
                 </span>
@@ -96,6 +102,7 @@
         </div>
 
     </section>
+
 
 
     <!-- =========================================================
@@ -169,7 +176,9 @@
                 </p>
 
 
-                <!-- Ligne décorative -->
+                <!-- =============================================
+                     LIGNE DÉCORATIVE
+                     ============================================= -->
                 <div class="my-10 h-px w-full bg-zinc-800">
 
                     <div class="h-px w-20 bg-red-600"></div>
@@ -177,7 +186,9 @@
                 </div>
 
 
-                <!-- Information visiteur -->
+                <!-- =============================================
+                     INFORMATION VISITEUR
+                     ============================================= -->
                 <div>
 
                     <p
@@ -200,14 +211,17 @@
                             text-zinc-300
                         "
                     >
-                        Ce formulaire sera votre moyen de contacter
-                        directement l'administration du club.
+                        Ce formulaire vous permet de contacter directement
+                        l'administration du club sans avoir besoin de créer
+                        un compte.
                     </p>
 
                 </div>
 
 
-                <!-- Information adhérent -->
+                <!-- =============================================
+                     INFORMATION ADHÉRENT
+                     ============================================= -->
                 <div class="mt-8">
 
                     <p
@@ -230,9 +244,10 @@
                             text-zinc-300
                         "
                     >
-                        Une fois connecté à votre espace personnel,
-                        vous disposerez également d'un accès direct
-                        à la messagerie de l'administration.
+                        Lorsque vous êtes connecté, votre demande est
+                        automatiquement rattachée à votre compte BTT.
+                        Votre identité et votre adresse email sont alors
+                        récupérées depuis votre profil.
                     </p>
 
                 </div>
@@ -240,29 +255,97 @@
             </div>
 
 
+
             <!-- =================================================
                  FORMULAIRE
                  ================================================= -->
             <div>
 
-                <!--
-                    IMPORTANT :
 
-                    Le formulaire est déjà préparé visuellement,
-                    mais son traitement sera développé plus tard.
+                <!-- =============================================
+                     MESSAGE DE CONFIRMATION
+                     ============================================= -->
+                @if (session('success'))
 
-                    Lorsque la messagerie sera créée, ce formulaire
-                    enregistrera les demandes dans la base de données
-                    avant de les transmettre à l'espace administrateur.
-                -->
+                    <div
+                        class="
+                            mb-8
+                            border
+                            border-green-700/50
+                            bg-green-950/40
+                            px-6
+                            py-5
+                            text-green-300
+                        "
+                    >
+                        <p class="font-bold">
+                            {{ session('success') }}
+                        </p>
+                    </div>
+
+                @endif
+
+
+                <!-- =============================================
+                     RÉSUMÉ DES ERREURS
+                     ============================================= -->
+                @if ($errors->any())
+
+                    <div
+                        class="
+                            mb-8
+                            border
+                            border-red-700/50
+                            bg-red-950/40
+                            px-6
+                            py-5
+                        "
+                    >
+
+                        <p class="font-black uppercase text-red-400">
+                            Votre demande n'a pas pu être envoyée.
+                        </p>
+
+                        <ul
+                            class="
+                                mt-3
+                                list-disc
+                                space-y-1
+                                pl-5
+                                text-sm
+                                text-red-300
+                            "
+                        >
+
+                            @foreach ($errors->all() as $error)
+
+                                <li>
+                                    {{ $error }}
+                                </li>
+
+                            @endforeach
+
+                        </ul>
+
+                    </div>
+
+                @endif
+
+
+                <!-- =============================================
+                     ENVOI VERS CONTACTCONTROLLER
+                     ============================================= -->
                 <form
-                    action="#"
+                    action="{{ route('contact.store') }}"
                     method="POST"
                     class="space-y-8"
                 >
 
+                    @csrf
+
+
                     <!-- =================================================
-                         NOM
+                         NOM ET PRÉNOM
                          ================================================= -->
                     <div>
 
@@ -285,13 +368,27 @@
                             type="text"
                             id="name"
                             name="name"
+                            value="{{ old(
+                                'name',
+                                auth()->check()
+                                    ? trim(auth()->user()->prenom . ' ' . auth()->user()->nom)
+                                    : ''
+                            ) }}"
                             placeholder="Votre nom et prénom"
                             autocomplete="name"
+                            required
+                            @auth
+                                readonly
+                            @endauth
                             class="
                                 mt-3
                                 w-full
                                 border
-                                border-zinc-800
+                                @error('name')
+                                    border-red-600
+                                @else
+                                    border-zinc-800
+                                @enderror
                                 bg-black
                                 px-5
                                 py-4
@@ -300,10 +397,32 @@
                                 transition
                                 placeholder:text-zinc-600
                                 focus:border-red-600
+                                read-only:cursor-not-allowed
+                                read-only:bg-zinc-900
+                                read-only:text-zinc-400
                             "
                         >
 
+
+                        @error('name')
+
+                            <p class="mt-2 text-sm font-bold text-red-500">
+                                {{ $message }}
+                            </p>
+
+                        @enderror
+
+
+                        @auth
+
+                            <p class="mt-3 text-sm leading-6 text-zinc-500">
+                                Cette identité provient de votre compte BTT.
+                            </p>
+
+                        @endauth
+
                     </div>
+
 
 
                     <!-- =================================================
@@ -330,13 +449,27 @@
                             type="email"
                             id="email"
                             name="email"
+                            value="{{ old(
+                                'email',
+                                auth()->check()
+                                    ? auth()->user()->email
+                                    : ''
+                            ) }}"
                             placeholder="exemple@email.com"
                             autocomplete="email"
+                            required
+                            @auth
+                                readonly
+                            @endauth
                             class="
                                 mt-3
                                 w-full
                                 border
-                                border-zinc-800
+                                @error('email')
+                                    border-red-600
+                                @else
+                                    border-zinc-800
+                                @enderror
                                 bg-black
                                 px-5
                                 py-4
@@ -345,8 +478,20 @@
                                 transition
                                 placeholder:text-zinc-600
                                 focus:border-red-600
+                                read-only:cursor-not-allowed
+                                read-only:bg-zinc-900
+                                read-only:text-zinc-400
                             "
                         >
+
+
+                        @error('email')
+
+                            <p class="mt-2 text-sm font-bold text-red-500">
+                                {{ $message }}
+                            </p>
+
+                        @enderror
 
 
                         <p
@@ -357,16 +502,17 @@
                                 text-zinc-500
                             "
                         >
-                            Cette adresse sera utilisée pour vous confirmer
-                            la réception de votre demande et vous transmettre
-                            la réponse de l'administration.
+                            Cette adresse permettra à l'administration
+                            de vous identifier et, lorsque le système email
+                            sera activé, de vous transmettre ses notifications.
                         </p>
 
                     </div>
 
 
+
                     <!-- =================================================
-                         THÈME DE LA DEMANDE
+                         SUJET DE LA DEMANDE
                          ================================================= -->
                     <div>
 
@@ -388,11 +534,16 @@
                         <select
                             id="subject"
                             name="subject"
+                            required
                             class="
                                 mt-3
                                 w-full
                                 border
-                                border-zinc-800
+                                @error('subject')
+                                    border-red-600
+                                @else
+                                    border-zinc-800
+                                @enderror
                                 bg-black
                                 px-5
                                 py-4
@@ -403,29 +554,58 @@
                             "
                         >
 
-                            <option value="">
+                            <option
+                                value=""
+                                @selected(old('subject') === null || old('subject') === '')
+                            >
                                 Sélectionnez un sujet
                             </option>
 
-                            <option value="abonnement">
+
+                            <option
+                                value="abonnement"
+                                @selected(old('subject') === 'abonnement')
+                            >
                                 Abonnements / Affiliation
                             </option>
 
-                            <option value="entrainements">
+
+                            <option
+                                value="entrainements"
+                                @selected(old('subject') === 'entrainements')
+                            >
                                 Nos entraînements
                             </option>
 
-                            <option value="inscription">
+
+                            <option
+                                value="compte"
+                                @selected(old('subject') === 'compte')
+                            >
                                 Inscription / Compte
                             </option>
 
-                            <option value="autre">
+
+                            <option
+                                value="autre"
+                                @selected(old('subject') === 'autre')
+                            >
                                 Autre demande
                             </option>
 
                         </select>
 
+
+                        @error('subject')
+
+                            <p class="mt-2 text-sm font-bold text-red-500">
+                                {{ $message }}
+                            </p>
+
+                        @enderror
+
                     </div>
+
 
 
                     <!-- =================================================
@@ -452,13 +632,20 @@
                             id="message"
                             name="message"
                             rows="8"
+                            minlength="10"
+                            maxlength="5000"
+                            required
                             placeholder="Expliquez-nous votre demande..."
                             class="
                                 mt-3
                                 w-full
                                 resize-y
                                 border
-                                border-zinc-800
+                                @error('message')
+                                    border-red-600
+                                @else
+                                    border-zinc-800
+                                @enderror
                                 bg-black
                                 px-5
                                 py-4
@@ -468,9 +655,24 @@
                                 placeholder:text-zinc-600
                                 focus:border-red-600
                             "
-                        ></textarea>
+                        >{{ old('message') }}</textarea>
+
+
+                        @error('message')
+
+                            <p class="mt-2 text-sm font-bold text-red-500">
+                                {{ $message }}
+                            </p>
+
+                        @enderror
+
+
+                        <p class="mt-3 text-sm text-zinc-600">
+                            10 caractères minimum — 5000 caractères maximum.
+                        </p>
 
                     </div>
+
 
 
                     <!-- =================================================
@@ -493,13 +695,13 @@
                                 text-zinc-400
                             "
                         >
-                            Après l'envoi de votre demande, une confirmation
-                            vous sera adressée par email. Votre message sera
-                            ensuite accessible à l'équipe d'administration
-                            de Brussels Top Team.
+                            Après l'envoi, votre demande sera enregistrée
+                            dans la messagerie Brussels Top Team et pourra
+                            être consultée par l'équipe d'administration.
                         </p>
 
                     </div>
+
 
 
                     <!-- =================================================
@@ -507,19 +709,10 @@
                          ================================================= -->
                     <div>
 
-                        <!--
-                            Le bouton reste désactivé pour le moment.
-
-                            Il sera activé lorsque le système de messagerie,
-                            la base de données et l'envoi des emails seront
-                            développés.
-                        -->
                         <button
-                            type="button"
-                            disabled
+                            type="submit"
                             class="
                                 inline-flex
-                                cursor-not-allowed
                                 items-center
                                 justify-center
                                 bg-red-600
@@ -530,7 +723,13 @@
                                 uppercase
                                 tracking-wider
                                 text-white
-                                opacity-50
+                                transition
+                                hover:bg-red-700
+                                focus:outline-none
+                                focus:ring-2
+                                focus:ring-red-600
+                                focus:ring-offset-2
+                                focus:ring-offset-zinc-950
                             "
                         >
                             Envoyer ma demande
@@ -544,7 +743,7 @@
                                 text-zinc-600
                             "
                         >
-                            L'envoi des messages sera activé prochainement.
+                            Votre message sera transmis à l'administration BTT.
                         </p>
 
                     </div>
@@ -558,8 +757,9 @@
     </section>
 
 
+
     <!-- =========================================================
-         FUTUR SUIVI DES MESSAGES
+         SUIVI DES MESSAGES
          ========================================================= -->
     <section
         class="
@@ -586,7 +786,9 @@
         >
 
 
-            <!-- Titre -->
+            <!-- =============================================
+                 TITRE
+                 ============================================= -->
             <div>
 
                 <p
@@ -618,7 +820,9 @@
             </div>
 
 
-            <!-- Explication -->
+            <!-- =============================================
+                 EXPLICATION
+                 ============================================= -->
             <div>
 
                 <p
@@ -629,9 +833,9 @@
                         text-zinc-400
                     "
                 >
-                    Les adhérents disposant d'un compte BTT pourront retrouver
-                    leurs échanges avec l'administration directement dans
-                    leur espace personnel.
+                    Les adhérents disposant d'un compte BTT pourront
+                    retrouver leurs échanges avec l'administration
+                    directement dans leur espace personnel.
                 </p>
 
 
@@ -643,9 +847,9 @@
                         text-zinc-500
                     "
                 >
-                    Lorsqu'une réponse sera disponible, elle apparaîtra
-                    dans leur boîte de réception BTT et une notification
-                    leur sera également envoyée par email.
+                    Nous développerons ensuite la boîte de réception privée
+                    permettant de consulter l'historique des conversations
+                    et les réponses de l'administration.
                 </p>
 
             </div>

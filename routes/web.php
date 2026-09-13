@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\AdminMessageController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MemberCourseController;
 use App\Http\Controllers\MemberMessageController;
@@ -55,11 +56,21 @@ Route::get('/coachs', function () {
 |--------------------------------------------------------------------------
 | BLOG
 |--------------------------------------------------------------------------
+|
+| La page Blog n'est désormais plus une simple vue statique.
+|
+| Le BlogController récupère les articles publiés depuis la base
+| de données et les transmet à la vue resources/views/blog.blade.php.
+|
+| Les brouillons et les articles supprimés ne seront donc pas
+| affichés publiquement.
+|
 */
 
-Route::get('/blog', function () {
-    return view('blog');
-})->name('blog');
+Route::get(
+    '/blog',
+    [BlogController::class, 'index']
+)->name('blog');
 
 
 /*

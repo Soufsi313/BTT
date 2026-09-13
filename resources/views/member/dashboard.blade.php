@@ -53,9 +53,319 @@
                 </h1>
 
 
+                <!-- =================================================
+                     MENU RAPIDE DU PROFIL
+                     =================================================
+                     Ce menu utilise les balises HTML details/summary.
+                     Aucun JavaScript supplémentaire n'est nécessaire.
+                     ================================================= -->
+                <details class="group relative mt-5 inline-block">
+
+                    <!-- =============================================
+                         BOUTON D'OUVERTURE DU MENU
+                         ============================================= -->
+                    <summary
+                        class="
+                            flex
+                            cursor-pointer
+                            list-none
+                            items-center
+                            gap-3
+                            rounded-md
+                            border
+                            border-zinc-700
+                            bg-zinc-900
+                            px-5
+                            py-3
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-wider
+                            text-white
+                            transition
+                            hover:border-red-600
+                            hover:text-red-500
+                        "
+                    >
+                        <span>
+                            Menu rapide
+                        </span>
+
+                        <span
+                            class="
+                                text-red-500
+                                transition-transform
+                                duration-200
+                                group-open:rotate-180
+                            "
+                        >
+                            ▼
+                        </span>
+                    </summary>
+
+
+                    <!-- =============================================
+                         CONTENU DU MENU
+                         ============================================= -->
+                    <div
+                        class="
+                            absolute
+                            left-0
+                            z-40
+                            mt-2
+                            w-72
+                            overflow-hidden
+                            rounded-lg
+                            border
+                            border-zinc-700
+                            bg-zinc-900
+                            shadow-2xl
+                        "
+                    >
+
+
+                        <!-- =========================================
+                             MON CALENDRIER
+                             ========================================= -->
+                        <a
+                            href="{{ route('member.courses') }}"
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                                border-b
+                                border-zinc-800
+                                px-5
+                                py-4
+                                text-sm
+                                font-bold
+                                text-zinc-300
+                                transition
+                                hover:bg-zinc-800
+                                hover:text-white
+                            "
+                        >
+                            <span>
+                                Mon calendrier
+                            </span>
+
+                            <span class="text-red-500">
+                                →
+                            </span>
+                        </a>
+
+
+                        <!-- =========================================
+                             MES MESSAGES
+                             =========================================
+                             Accès direct à la boîte de réception privée
+                             de l'adhérent.
+                             ========================================= -->
+                        <a
+                            href="{{ route('member.messages.index') }}"
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                                border-b
+                                border-zinc-800
+                                px-5
+                                py-4
+                                text-sm
+                                font-bold
+                                text-zinc-300
+                                transition
+                                hover:bg-zinc-800
+                                hover:text-white
+                            "
+                        >
+                            <span>
+                                Mes messages
+                            </span>
+
+                            <span class="text-red-500">
+                                →
+                            </span>
+                        </a>
+
+
+                        <!-- =========================================
+                             MODIFIER LE PROFIL
+                             ========================================= -->
+                        <a
+                            href="{{ route('member.profile') }}"
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                                border-b
+                                border-zinc-800
+                                px-5
+                                py-4
+                                text-sm
+                                font-bold
+                                text-zinc-300
+                                transition
+                                hover:bg-zinc-800
+                                hover:text-white
+                            "
+                        >
+                            <span>
+                                Modifier mon profil
+                            </span>
+
+                            <span class="text-red-500">
+                                →
+                            </span>
+                        </a>
+
+
+                        <!-- =========================================
+                             MODIFIER L'EMAIL
+                             ========================================= -->
+                        <a
+                            href="{{ route('member.email') }}"
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                                border-b
+                                border-zinc-800
+                                px-5
+                                py-4
+                                text-sm
+                                font-bold
+                                text-zinc-300
+                                transition
+                                hover:bg-zinc-800
+                                hover:text-white
+                            "
+                        >
+                            <span>
+                                Modifier mon email
+                            </span>
+
+                            <span class="text-red-500">
+                                →
+                            </span>
+                        </a>
+
+
+                        <!-- =========================================
+                             MODIFIER LE MOT DE PASSE
+                             ========================================= -->
+                        <a
+                            href="{{ route('member.password') }}"
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                                border-b
+                                border-zinc-800
+                                px-5
+                                py-4
+                                text-sm
+                                font-bold
+                                text-zinc-300
+                                transition
+                                hover:bg-zinc-800
+                                hover:text-white
+                            "
+                        >
+                            <span>
+                                Modifier mon mot de passe
+                            </span>
+
+                            <span class="text-red-500">
+                                →
+                            </span>
+                        </a>
+
+
+                        <!-- =========================================
+                             ADMINISTRATION
+                             Visible uniquement pour Admin
+                             et Super Admin.
+                             ========================================= -->
+                        @if (auth()->user()->canAccessAdmin())
+
+                            <a
+                                href="{{ route('admin.dashboard') }}"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                    border-b
+                                    border-zinc-800
+                                    px-5
+                                    py-4
+                                    text-sm
+                                    font-black
+                                    text-red-500
+                                    transition
+                                    hover:bg-red-600
+                                    hover:text-white
+                                "
+                            >
+                                <span>
+                                    Administration
+                                </span>
+
+                                <span>
+                                    →
+                                </span>
+                            </a>
+
+                        @endif
+
+
+                        <!-- =========================================
+                             DÉCONNEXION
+                             ========================================= -->
+                        <form
+                            action="{{ route('logout') }}"
+                            method="POST"
+                        >
+
+                            @csrf
+
+                            <button
+                                type="submit"
+                                class="
+                                    flex
+                                    w-full
+                                    items-center
+                                    justify-between
+                                    px-5
+                                    py-4
+                                    text-left
+                                    text-sm
+                                    font-black
+                                    text-red-500
+                                    transition
+                                    hover:bg-red-600
+                                    hover:text-white
+                                "
+                            >
+                                <span>
+                                    Déconnexion
+                                </span>
+
+                                <span>
+                                    →
+                                </span>
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </details>
+
+
                 <p
                     class="
-                        mt-5
+                        mt-6
                         max-w-2xl
                         text-base
                         leading-7
@@ -257,7 +567,7 @@
 
 
                     <!-- =========================================
-                         CALENDRIER DES ENTRAÎNEMENTS
+                         CALENDRIER
                          ========================================= -->
                     <div
                         class="
@@ -278,8 +588,8 @@
                             </h3>
 
                             <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                Consultez les prochains entraînements
-                                correspondant à votre catégorie.
+                                Consultez les entraînements correspondant
+                                à votre catégorie dans votre calendrier privé.
                             </p>
 
                         </div>
@@ -372,6 +682,11 @@
 
                     <!-- =========================================
                          MESSAGERIE
+                         =========================================
+                         La messagerie est maintenant active.
+
+                         Ce bouton mène vers la boîte de réception
+                         privée de l'adhérent.
                          ========================================= -->
                     <div
                         class="
@@ -388,29 +703,41 @@
                         <div>
 
                             <h3 class="text-lg font-black uppercase text-white">
-                                Contacter l'administration
+                                Mes messages
                             </h3>
 
                             <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                Une messagerie directe avec l'administration
-                                BTT sera disponible depuis votre espace.
+                                Consultez vos conversations avec l'administration
+                                BTT et retrouvez les réponses reçues.
                             </p>
 
                         </div>
 
 
-                        <span
+                        <a
+                            href="{{ route('member.messages.index') }}"
                             class="
+                                inline-flex
                                 shrink-0
+                                items-center
+                                justify-center
+                                rounded-md
+                                border
+                                border-red-600/50
+                                px-5
+                                py-3
                                 text-xs
                                 font-black
                                 uppercase
                                 tracking-wider
-                                text-zinc-600
+                                text-red-500
+                                transition
+                                hover:bg-red-600
+                                hover:text-white
                             "
                         >
-                            Prochainement
-                        </span>
+                            Voir mes messages
+                        </a>
 
                     </div>
 
@@ -420,39 +747,27 @@
 
 
             <!-- =================================================
-                 DÉCONNEXION
+                 INFORMATION
+                 =================================================
+                 La déconnexion se trouve dans le menu rapide situé
+                 sous le pseudo.
+
+                 La messagerie est également maintenant accessible
+                 depuis ce menu.
                  ================================================= -->
-            <div class="mt-14 flex justify-end">
-
-                <form
-                    action="{{ route('logout') }}"
-                    method="POST"
-                >
-
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="
-                            rounded-md
-                            border
-                            border-red-600/50
-                            px-5
-                            py-3
-                            text-sm
-                            font-black
-                            uppercase
-                            text-red-500
-                            transition
-                            hover:bg-red-600
-                            hover:text-white
-                        "
-                    >
-                        Déconnexion
-                    </button>
-
-                </form>
-
+            <div
+                class="
+                    mt-14
+                    border-t
+                    border-zinc-800
+                    pt-8
+                    text-sm
+                    text-zinc-600
+                "
+            >
+                Utilisez le menu rapide en haut de votre espace pour accéder
+                à votre calendrier, vos messages, gérer votre compte ou vous
+                déconnecter.
             </div>
 
         </div>

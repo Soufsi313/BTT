@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminMessageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MemberCourseController;
+use App\Http\Controllers\MemberMessageController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -87,13 +88,13 @@ Route::get('/abonnements', function () {
 | CONTACT
 |--------------------------------------------------------------------------
 |
-| La page Contact est accessible :
+| La page de contact est accessible :
 |
-| - aux visiteurs non connectés ;
+| - aux visiteurs ;
 | - aux adhérents connectés.
 |
-| Le formulaire enregistre une conversation et son premier message
-| dans la base de données.
+| Le formulaire permet de créer une nouvelle conversation dans la
+| messagerie BTT.
 |
 */
 
@@ -113,53 +114,51 @@ Route::post(
 |--------------------------------------------------------------------------
 | VISITEURS NON CONNECTÉS
 |--------------------------------------------------------------------------
-|
-| Ces routes sont protégées par le middleware "guest".
-|
 */
 
-Route::middleware('guest')->group(function () {
+Route::middleware('guest')
+    ->group(function () {
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | INSCRIPTION
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | INSCRIPTION
+        |--------------------------------------------------------------------------
+        */
 
-    Route::get('/inscription', function () {
-        return view('register');
-    })->name('register');
-
-
-    Route::post(
-        '/inscription',
-        [AuthController::class, 'register']
-    )->name('register.store');
+        Route::get('/inscription', function () {
+            return view('register');
+        })->name('register');
 
 
-    Route::get('/inscription-reussie', function () {
-        return view('register-success');
-    })->name('register.success');
+        Route::post(
+            '/inscription',
+            [AuthController::class, 'register']
+        )->name('register.store');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | CONNEXION
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get('/connexion', function () {
-        return view('login');
-    })->name('login');
+        Route::get('/inscription-reussie', function () {
+            return view('register-success');
+        })->name('register.success');
 
 
-    Route::post(
-        '/connexion',
-        [AuthController::class, 'login']
-    )->name('login.store');
+        /*
+        |--------------------------------------------------------------------------
+        | CONNEXION
+        |--------------------------------------------------------------------------
+        */
 
-});
+        Route::get('/connexion', function () {
+            return view('login');
+        })->name('login');
+
+
+        Route::post(
+            '/connexion',
+            [AuthController::class, 'login']
+        )->name('login.store');
+
+    });
 
 
 
@@ -183,8 +182,17 @@ Route::post(
 | ESPACE ADHÉRENT
 |--------------------------------------------------------------------------
 |
-| Toutes les routes commençant par /membre sont réservées
-| aux utilisateurs connectés.
+| Toutes les routes placées dans ce groupe nécessitent une connexion.
+|
+| Grâce au préfixe :
+|
+|     /membre
+|
+| et au préfixe de nom :
+|
+|     member.
+|
+| toutes les fonctionnalités privées de l'adhérent sont regroupées ici.
 |
 */
 
@@ -207,7 +215,7 @@ Route::middleware('auth')
 
         /*
         |--------------------------------------------------------------------------
-        | CALENDRIER
+        | CALENDRIER ADHÉRENT
         |--------------------------------------------------------------------------
         */
 
@@ -215,6 +223,77 @@ Route::middleware('auth')
             '/calendrier',
             [MemberCourseController::class, 'index']
         )->name('courses');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MESSAGERIE ADHÉRENT
+        |--------------------------------------------------------------------------
+        |
+        | Ces routes permettent à l'adhérent :
+        |
+        | - de consulter ses conversations ;
+        | - d'ouvrir une conversation ;
+        | - de répondre à une conversation ouverte.
+        |
+        | La vérification de propriété de la conversation est effectuée
+        | dans MemberMessageController.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTE DES CONVERSATIONS
+        |--------------------------------------------------------------------------
+        |
+        | URL :
+        |
+        | /membre/messages
+        |
+        */
+
+        Route::get(
+            '/messages',
+            [MemberMessageController::class, 'index']
+        )->name('messages.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | AFFICHER UNE CONVERSATION
+        |--------------------------------------------------------------------------
+        |
+        | Exemple :
+        |
+        | /membre/messages/3
+        |
+        */
+
+        Route::get(
+            '/messages/{conversation}',
+            [MemberMessageController::class, 'show']
+        )->name('messages.show');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉPONDRE À UNE CONVERSATION
+        |--------------------------------------------------------------------------
+        |
+        | Cette route reçoit le formulaire de réponse.
+        |
+        | L'adhérent ne peut répondre que si :
+        |
+        | - la conversation lui appartient ;
+        | - la conversation est ouverte.
+        |
+        */
+
+        Route::post(
+            '/messages/{conversation}/repondre',
+            [MemberMessageController::class, 'reply']
+        )->name('messages.reply');
 
 
         /*
@@ -292,6 +371,10 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 | CONFIRMATION APRÈS SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
+|
+| Cette page reste publique car l'utilisateur est automatiquement
+| déconnecté après la suppression de son compte.
+|
 */
 
 Route::get('/compte-supprime', function () {
@@ -305,13 +388,10 @@ Route::get('/compte-supprime', function () {
 | ESPACE ADMINISTRATION
 |--------------------------------------------------------------------------
 |
-| Toutes les routes de cette section sont protégées par :
+| Toutes les routes de cette section nécessitent :
 |
-| - auth  : l'utilisateur doit être connecté ;
-| - admin : l'utilisateur doit être Admin ou Super Admin.
-|
-| Toutes les URL commencent par /admin.
-| Tous les noms de routes commencent par admin.
+| - d'être connecté ;
+| - d'avoir accès à l'administration.
 |
 */
 
@@ -333,7 +413,6 @@ Route::middleware([
         Route::get('/', function () {
             return view('admin.dashboard');
         })->name('dashboard');
-
 
 
         /*
@@ -372,7 +451,6 @@ Route::middleware([
         )->name('members.promote');
 
 
-
         /*
         |--------------------------------------------------------------------------
         | GESTION DES ADMINISTRATEURS
@@ -397,19 +475,10 @@ Route::middleware([
         )->name('administrators.demote');
 
 
-
         /*
         |--------------------------------------------------------------------------
         | MESSAGERIE ADMINISTRATION
         |--------------------------------------------------------------------------
-        |
-        | Tous les administrateurs utilisent la même boîte de réception.
-        |
-        | Les conversations peuvent provenir :
-        |
-        | - d'un visiteur ;
-        | - d'un adhérent connecté.
-        |
         */
 
 
@@ -417,9 +486,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | LISTE DES CONVERSATIONS
         |--------------------------------------------------------------------------
-        |
-        | GET /admin/messages
-        |
         */
 
         Route::get(
@@ -432,9 +498,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | AFFICHER UNE CONVERSATION
         |--------------------------------------------------------------------------
-        |
-        | GET /admin/messages/1
-        |
         */
 
         Route::get(
@@ -447,13 +510,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | RÉPONDRE À UNE CONVERSATION
         |--------------------------------------------------------------------------
-        |
-        | POST /admin/messages/1/repondre
-        |
-        | La réponse est enregistrée dans la table "messages" avec :
-        |
-        | sender_type = admin
-        |
         */
 
         Route::post(
@@ -467,15 +523,8 @@ Route::middleware([
         | FERMER UNE CONVERSATION
         |--------------------------------------------------------------------------
         |
-        | PATCH /admin/messages/1/fermer
-        |
-        | Cette action ne supprime absolument rien.
-        |
-        | Elle modifie uniquement le champ :
-        |
-        | status = closed
-        |
-        | L'intégralité de l'historique reste conservée.
+        | Fermer une conversation ne supprime ni la conversation
+        | ni son historique.
         |
         */
 
@@ -489,16 +538,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | ROUVRIR UNE CONVERSATION
         |--------------------------------------------------------------------------
-        |
-        | PATCH /admin/messages/1/rouvrir
-        |
-        | Cette action permet de reprendre une conversation précédemment
-        | fermée.
-        |
-        | Elle modifie :
-        |
-        | status = open
-        |
         */
 
         Route::patch(
@@ -507,10 +546,9 @@ Route::middleware([
         )->name('messages.reopen');
 
 
-
         /*
         |--------------------------------------------------------------------------
-        | CALENDRIER ADMIN
+        | CALENDRIER ADMINISTRATION
         |--------------------------------------------------------------------------
         */
 
@@ -549,6 +587,11 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | RÉACTIVER UN COURS SUPPRIMÉ
         |--------------------------------------------------------------------------
+        |
+        | Cette action reste également protégée dans le contrôleur.
+        |
+        | Seul le Super Admin peut restaurer un cours supprimé.
+        |
         */
 
         Route::patch(
@@ -580,8 +623,7 @@ Route::middleware([
         | SUPPRIMER UN COURS
         |--------------------------------------------------------------------------
         |
-        | Grâce à SoftDeletes, cette suppression renseigne deleted_at
-        | au lieu d'effacer définitivement la ligne.
+        | La suppression utilise le Soft Delete.
         |
         */
 

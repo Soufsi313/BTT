@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminArticleController;
+use App\Http\Controllers\AdminArticleImageController;
 use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\AdminMessageController;
@@ -581,6 +582,33 @@ Route::middleware([
             '/articles',
             [AdminArticleController::class, 'store']
         )->name('articles.store');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPLOAD D'UNE IMAGE DANS LE CONTENU D'UN ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | Cette route est utilisée par l'éditeur Quill.
+        |
+        | Elle permet à un administrateur d'envoyer une image directement
+        | depuis l'éditeur de texte.
+        |
+        | L'image sera enregistrée dans :
+        |
+        | storage/app/public/articles/content/
+        |
+        | Cette route reste protégée par les middlewares :
+        |
+        | - auth
+        | - admin
+        |
+        */
+
+        Route::post(
+            '/articles/images',
+            [AdminArticleImageController::class, 'store']
+        )->name('articles.images.store');
 
 
         /*

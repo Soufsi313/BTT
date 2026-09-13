@@ -15,6 +15,21 @@
 
 
     <!-- =========================================================
+         TOKEN CSRF LARAVEL
+         =========================================================
+         Ce token permet à notre JavaScript d'envoyer des requêtes
+         POST sécurisées à Laravel.
+
+         Il sera notamment utilisé par Quill pour envoyer les images
+         insérées directement dans le contenu des articles.
+         ========================================================= -->
+    <meta
+        name="csrf-token"
+        content="{{ csrf_token() }}"
+    >
+
+
+    <!-- =========================================================
          DESCRIPTION SEO
          Chaque page peut personnaliser cette description.
          ========================================================= -->
@@ -62,9 +77,7 @@
          Chaque vue Blade injecte son contenu ici.
          ========================================================= -->
     <main>
-
         @yield('content')
-
     </main>
 
 

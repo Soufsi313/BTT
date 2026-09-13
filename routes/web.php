@@ -56,11 +56,10 @@ Route::get('/coachs', function () {
 | BLOG
 |--------------------------------------------------------------------------
 |
-| Pour le moment, la page publique du blog utilise encore la vue
-| temporaire actuelle.
+| Pour le moment, cette route affiche encore la page temporaire
+| du Blog.
 |
-| Plus tard, cette route sera reliée à un contrôleur public qui
-| récupérera uniquement les articles publiés.
+| Elle sera plus tard reliée aux articles publiés.
 |
 */
 
@@ -95,12 +94,6 @@ Route::get('/abonnements', function () {
 |--------------------------------------------------------------------------
 | CONTACT
 |--------------------------------------------------------------------------
-|
-| La page Contact est accessible à tout le monde.
-|
-| Les visiteurs comme les adhérents connectés peuvent envoyer
-| une demande à l'administration BTT.
-|
 */
 
 Route::get('/contact', function () {
@@ -118,10 +111,6 @@ Route::post(
 |--------------------------------------------------------------------------
 | VISITEURS NON CONNECTÉS
 |--------------------------------------------------------------------------
-|
-| Ces routes ne sont accessibles qu'aux personnes qui ne sont
-| pas encore connectées.
-|
 */
 
 Route::middleware('guest')->group(function () {
@@ -185,18 +174,6 @@ Route::post(
 |--------------------------------------------------------------------------
 | ESPACE ADHÉRENT
 |--------------------------------------------------------------------------
-|
-| Toutes les routes placées dans ce groupe nécessitent une
-| authentification.
-|
-| Les URL commencent par :
-|
-| /membre/...
-|
-| Les noms des routes commencent par :
-|
-| member....
-|
 */
 
 Route::middleware('auth')
@@ -218,7 +195,7 @@ Route::middleware('auth')
 
         /*
         |--------------------------------------------------------------------------
-        | CALENDRIER PRIVÉ
+        | CALENDRIER
         |--------------------------------------------------------------------------
         */
 
@@ -235,11 +212,8 @@ Route::middleware('auth')
         |
         | IMPORTANT :
         |
-        | La route /messages/nouveau doit rester AVANT
+        | La route /messages/nouveau doit rester placée avant
         | /messages/{conversation}.
-        |
-        | Sinon Laravel pourrait interpréter "nouveau" comme étant
-        | l'identifiant d'une conversation.
         |
         */
 
@@ -372,8 +346,8 @@ Route::middleware('auth')
 | CONFIRMATION APRÈS SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
 |
-| Cette page se trouve en dehors du middleware auth car l'utilisateur
-| est automatiquement déconnecté après la suppression de son compte.
+| Cette page reste en dehors du middleware auth car l'utilisateur
+| est automatiquement déconnecté lorsque son compte est supprimé.
 |
 */
 
@@ -387,12 +361,10 @@ Route::get('/compte-supprime', function () {
 | ESPACE ADMINISTRATION
 |--------------------------------------------------------------------------
 |
-| Toutes les routes de ce groupe nécessitent :
+| Toutes les routes ci-dessous nécessitent :
 |
-| - d'être connecté ;
-| - d'avoir accès à l'administration.
-|
-| Le middleware "admin" vérifie les droits de l'utilisateur.
+| - une connexion ;
+| - les droits administrateur.
 |
 */
 
@@ -407,7 +379,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | TABLEAU DE BORD ADMIN
+        | TABLEAU DE BORD
         |--------------------------------------------------------------------------
         */
 
@@ -442,7 +414,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | PROMOUVOIR UN ADHÉRENT ADMIN
+        | PROMOUVOIR UN ADHÉRENT
         |--------------------------------------------------------------------------
         */
 
@@ -454,7 +426,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | GESTION DES ADMINISTRATEURS
+        | ADMINISTRATEURS
         |--------------------------------------------------------------------------
         */
 
@@ -515,14 +487,8 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | RÉACTIVER UN COURS SUPPRIMÉ
+        | RESTAURER UN COURS
         |--------------------------------------------------------------------------
-        |
-        | La vérification des droits est également effectuée dans
-        | le contrôleur.
-        |
-        | Seul le Super Admin peut restaurer un cours supprimé.
-        |
         */
 
         Route::patch(
@@ -630,14 +596,11 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | ARTICLES DU BLOG
+        | GESTION DES ARTICLES
         |--------------------------------------------------------------------------
         |
-        | Cette première route donne accès à la liste des articles
-        | depuis l'administration.
-        |
-        | Les routes de création, modification, suppression,
-        | restauration et publication seront ajoutées progressivement.
+        | Cette partie gère progressivement le Blog BTT depuis
+        | l'administration.
         |
         */
 
@@ -652,4 +615,40 @@ Route::middleware([
             '/articles',
             [AdminArticleController::class, 'index']
         )->name('articles.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | NOUVEL ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | Cette route affiche le formulaire permettant de rédiger
+        | un nouvel article.
+        |
+        | Elle doit rester AVANT les futures routes du type :
+        |
+        | /articles/{article}
+        |
+        */
+
+        Route::get(
+            '/articles/nouveau',
+            [AdminArticleController::class, 'create']
+        )->name('articles.create');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ENREGISTRER UN ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | Cette route reçoit les informations envoyées par le
+        | formulaire puis appelle la méthode store() du contrôleur.
+        |
+        */
+
+        Route::post(
+            '/articles',
+            [AdminArticleController::class, 'store']
+        )->name('articles.store');
     });

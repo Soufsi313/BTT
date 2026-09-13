@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 
 /**
@@ -12,25 +14,25 @@ use Illuminate\Http\Request;
  * CONTRÔLEUR DE GESTION DES ARTICLES - ADMINISTRATION
  * ================================================================
  *
- * Ce contrôleur sera responsable de toute la gestion des articles
- * du blog depuis l'espace d'administration Brussels Top Team.
+ * Ce contrôleur gère les articles du blog Brussels Top Team
+ * depuis l'espace d'administration.
  *
- * Pour le moment, nous mettons uniquement en place :
+ * À ce stade, il permet :
  *
- * - la liste des articles ;
- * - l'affichage des articles actifs et supprimés ;
- * - l'ordre d'affichage ;
- * - la pagination.
+ * - d'afficher la liste des articles ;
+ * - d'afficher les articles supprimés ;
+ * - de trier les articles ;
+ * - d'afficher le formulaire de création ;
+ * - d'enregistrer un nouvel article.
  *
  * Les prochaines étapes ajouteront :
  *
- * - la création d'un article ;
  * - la modification ;
- * - la publication ;
  * - la suppression ;
  * - la restauration ;
  * - la bannière ;
- * - les images intégrées dans l'article.
+ * - les images intégrées dans le contenu ;
+ * - la publication publique du blog.
  *
  * ================================================================
  */
@@ -40,13 +42,6 @@ class AdminArticleController extends Controller
      * ===============================================================
      * LISTE DES ARTICLES
      * ===============================================================
-     *
-     * Affiche tous les articles du blog dans l'administration.
-     *
-     * Nous utilisons withTrashed() afin de pouvoir également afficher
-     * les articles supprimés par Soft Delete.
-     *
-     * Cela permettra plus tard au Super Admin de restaurer un article.
      */
     public function index(Request $request): View
     {
@@ -54,8 +49,6 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * TRI PAR DÉFAUT
          * -----------------------------------------------------------
-         *
-         * Les articles les plus récents apparaissent en premier.
          */
         $sort = $request->query(
             'sort',
@@ -67,9 +60,6 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * DIRECTION DU TRI
          * -----------------------------------------------------------
-         *
-         * desc = du plus récent au plus ancien
-         * asc  = du plus ancien au plus récent
          */
         $direction = $request->query(
             'direction',
@@ -81,9 +71,6 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * COLONNES AUTORISÉES POUR LE TRI
          * -----------------------------------------------------------
-         *
-         * Cela évite d'accepter n'importe quelle colonne provenant
-         * directement de l'URL.
          */
         $allowedSorts = [
             'title',
@@ -113,15 +100,6 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * RÉCUPÉRATION DES ARTICLES
          * -----------------------------------------------------------
-         *
-         * withTrashed()
-         * permet également de récupérer les articles supprimés.
-         *
-         * with('author')
-         * récupère l'auteur de chaque article en une seule fois.
-         *
-         * paginate(20)
-         * limite la liste à 20 articles par page.
          */
         $articles = Article::query()
             ->withTrashed()
@@ -140,12 +118,8 @@ class AdminArticleController extends Controller
 
         /**
          * -----------------------------------------------------------
-         * AFFICHAGE DE LA VUE
+         * AFFICHAGE DE LA LISTE
          * -----------------------------------------------------------
-         *
-         * La vue sera créée juste après :
-         *
-         * resources/views/admin/articles/index.blade.php
          */
         return view(
             'admin.articles.index',
@@ -155,5 +129,182 @@ class AdminArticleController extends Controller
                 'direction' => $direction,
             ]
         );
+    }
+
+
+    /**
+     * ===============================================================
+     * FORMULAIRE DE CRÉATION
+     * ===============================================================
+     *
+     * Affiche la page permettant de créer un nouvel article.
+     */
+    public function create(): View
+    {
+        return view('admin.articles.create');
+    }
+
+
+    /**
+     * ===============================================================
+     * ENREGISTREMENT D'UN NOUVEL ARTICLE
+     * ===============================================================
+     *
+     * Cette méthode :
+     *
+     * 1. vérifie les données du formulaire ;
+     * 2. génère automatiquement un slug ;
+     * 3. associe l'article à l'administrateur connecté ;
+     * 4. définit la date de publication si nécessaire ;
+     * 5. crée l'article dans la base de données.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        /**
+         * -----------------------------------------------------------
+         * VALIDATION
+         * -----------------------------------------------------------
+         */
+        $validated = $request->validate([
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'category' => [
+                'required',
+                'string',
+                'max:100',
+                'in:Actualité,Futsal,Boxe,HYROX,Association,Événement',
+            ],
+
+            'excerpt' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+
+            'content' => [
+                'required',
+                'string',
+                'min:10',
+            ],
+
+            'status' => [
+                'required',
+                'in:draft,published',
+            ],
+
+            'is_featured' => [
+                'nullable',
+                'boolean',
+            ],
+        ]);
+
+
+        /**
+         * -----------------------------------------------------------
+         * GÉNÉRATION DU SLUG
+         * -----------------------------------------------------------
+         *
+         * Exemple :
+         *
+         * "Brussels Top Team au tournoi"
+         *
+         * devient :
+         *
+         * brussels-top-team-au-tournoi
+         */
+        $baseSlug = Str::slug(
+            $validated['title']
+        );
+
+        $slug = $baseSlug;
+
+        $counter = 2;
+
+
+        /**
+         * -----------------------------------------------------------
+         * SLUG UNIQUE
+         * -----------------------------------------------------------
+         *
+         * Si un article possède déjà le même slug :
+         *
+         * article
+         * article-2
+         * article-3
+         * etc.
+         *
+         * Nous vérifions également les articles supprimés afin
+         * d'éviter une collision avec leur slug.
+         */
+        while (
+            Article::withTrashed()
+                ->where('slug', $slug)
+                ->exists()
+        ) {
+            $slug = $baseSlug . '-' . $counter;
+
+            $counter++;
+        }
+
+
+        /**
+         * -----------------------------------------------------------
+         * CRÉATION DE L'ARTICLE
+         * -----------------------------------------------------------
+         */
+        Article::create([
+            'author_id' => auth()->id(),
+
+            'title' => $validated['title'],
+
+            'slug' => $slug,
+
+            'category' => $validated['category'],
+
+            'excerpt' => $validated['excerpt'] ?? null,
+
+            'content' => $validated['content'],
+
+            /**
+             * La bannière sera ajoutée plus tard.
+             */
+            'banner_image' => null,
+
+            'status' => $validated['status'],
+
+            /**
+             * Une case non cochée n'est pas envoyée par HTML.
+             */
+            'is_featured' => $request->boolean(
+                'is_featured'
+            ),
+
+            /**
+             * Si l'article est publié immédiatement,
+             * nous enregistrons la date actuelle.
+             *
+             * Un brouillon n'a pas encore de date de publication.
+             */
+            'published_at' => $validated['status'] === 'published'
+                ? now()
+                : null,
+        ]);
+
+
+        /**
+         * -----------------------------------------------------------
+         * RETOUR À LA LISTE
+         * -----------------------------------------------------------
+         */
+        return redirect()
+            ->route('admin.articles.index')
+            ->with(
+                'success',
+                'L’article a été créé avec succès.'
+            );
     }
 }

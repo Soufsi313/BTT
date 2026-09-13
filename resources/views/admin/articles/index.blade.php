@@ -354,15 +354,15 @@
 
 
                         <!-- =====================================
-                             BOUTON FUTUR DE CRÉATION
+                             CRÉER UN NOUVEL ARTICLE
                              =====================================
-                             La route de création sera ajoutée
-                             lors de l'étape suivante.
+                             Le bouton est maintenant relié à la
+                             route admin.articles.create.
                              ===================================== -->
-                        <span
+                        <a
+                            href="{{ route('admin.articles.create') }}"
                             class="
                                 inline-flex
-                                cursor-not-allowed
                                 items-center
                                 justify-center
                                 rounded-md
@@ -374,11 +374,12 @@
                                 uppercase
                                 tracking-wider
                                 text-white
-                                opacity-50
+                                transition
+                                hover:bg-red-700
                             "
                         >
                             + Nouvel article
-                        </span>
+                        </a>
 
                     </div>
 
@@ -389,6 +390,35 @@
                      CONTENU
                      ============================================= -->
                 <main class="bg-white px-6 py-8 lg:px-10 lg:py-10">
+
+
+                    <!-- =========================================
+                         MESSAGE DE CONFIRMATION
+                         =========================================
+                         Ce message apparaît après la création
+                         réussie d'un article.
+                         ========================================= -->
+                    @if (session('success'))
+
+                        <div
+                            class="
+                                mb-8
+                                rounded-md
+                                border
+                                border-green-200
+                                bg-green-50
+                                px-5
+                                py-4
+                            "
+                        >
+
+                            <p class="text-sm font-bold text-green-800">
+                                {{ session('success') }}
+                            </p>
+
+                        </div>
+
+                    @endif
 
 
                     <!-- =========================================
@@ -438,6 +468,7 @@
 
 
                         <p class="text-sm font-bold text-zinc-500">
+
                             {{ $articles->total() }}
 
                             @if ($articles->total() > 1)
@@ -445,6 +476,7 @@
                             @else
                                 article
                             @endif
+
                         </p>
 
                     </div>
@@ -466,6 +498,7 @@
                         <div class="overflow-x-auto">
 
                             <table class="w-full min-w-[900px]">
+
 
                                 <!-- =============================
                                      EN-TÊTES DU TABLEAU
@@ -734,14 +767,10 @@
                                                  ================= -->
                                             <td class="px-5 py-5">
 
-                                                <p
-                                                    class="
-                                                        font-bold
-                                                        text-zinc-900
-                                                    "
-                                                >
+                                                <p class="font-bold text-zinc-900">
                                                     {{ $article->title }}
                                                 </p>
+
 
                                                 @if ($article->deleted_at)
 
@@ -759,6 +788,7 @@
                                                     </p>
 
                                                 @endif
+
 
                                                 @if ($article->is_featured)
 
@@ -933,6 +963,7 @@
 
                                     @empty
 
+
                                         <!-- =====================
                                              AUCUN ARTICLE
                                              ===================== -->
@@ -947,12 +978,7 @@
                                                 "
                                             >
 
-                                                <div
-                                                    class="
-                                                        mx-auto
-                                                        max-w-md
-                                                    "
-                                                >
+                                                <div class="mx-auto max-w-md">
 
                                                     <p
                                                         class="
@@ -976,6 +1002,31 @@
                                                         été créé dans le blog
                                                         Brussels Top Team.
                                                     </p>
+
+
+                                                    <!-- =================
+                                                         PREMIER ARTICLE
+                                                         ================= -->
+                                                    <a
+                                                        href="{{ route('admin.articles.create') }}"
+                                                        class="
+                                                            mt-6
+                                                            inline-flex
+                                                            items-center
+                                                            justify-center
+                                                            rounded-md
+                                                            bg-red-600
+                                                            px-5
+                                                            py-3
+                                                            text-sm
+                                                            font-black
+                                                            text-white
+                                                            transition
+                                                            hover:bg-red-700
+                                                        "
+                                                    >
+                                                        Créer le premier article
+                                                    </a>
 
                                                 </div>
 

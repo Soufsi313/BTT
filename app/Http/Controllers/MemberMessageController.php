@@ -6,6 +6,7 @@ use App\Models\Conversation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MemberMessageController extends Controller
 {
@@ -17,10 +18,8 @@ class MemberMessageController extends Controller
     | Cette méthode affiche uniquement les conversations appartenant
     | à l'utilisateur actuellement connecté.
     |
-    | C'est très important pour la sécurité :
-    |
-    | un adhérent ne doit jamais pouvoir consulter les conversations
-    | d'un autre adhérent.
+    | Un adhérent ne doit jamais pouvoir consulter les conversations
+    | d'un autre utilisateur.
     |
     */
     public function index(
@@ -39,17 +38,10 @@ class MemberMessageController extends Controller
         | RÉCUPÉRATION DES CONVERSATIONS
         |--------------------------------------------------------------------------
         |
-        | Nous filtrons obligatoirement avec :
+        | Nous récupérons uniquement les conversations de l'utilisateur.
         |
-        | user_id = utilisateur connecté
-        |
-        | Nous calculons également le nombre de réponses non lues envoyées
-        | par l'administration.
-        |
-        | Contrairement à la boîte admin :
-        |
-        | - les messages "member" ne sont pas considérés comme nouveaux ;
-        | - seuls les messages "admin" peuvent être nouveaux pour l'adhérent.
+        | Nous calculons également le nombre de réponses non lues
+        | envoyées par l'administration.
         |
         */
         $conversations = Conversation::query()
@@ -84,13 +76,178 @@ class MemberMessageController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | FORMULAIRE DE NOUVELLE CONVERSATION
+    |--------------------------------------------------------------------------
+    |
+    | Cette page permet à l'adhérent connecté de démarrer directement
+    | une nouvelle conversation avec l'administration.
+    |
+    | Son identité et son adresse email seront automatiquement récupérées
+    | depuis son compte.
+    |
+    */
+    public function create(): View
+    {
+        return view('member.messages.create');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ENREGISTRER UNE NOUVELLE CONVERSATION
+    |--------------------------------------------------------------------------
+    |
+    | Cette méthode :
+    |
+    | 1. valide le sujet et le message ;
+    | 2. crée la conversation ;
+    | 3. crée le premier message de l'adhérent ;
+    | 4. redirige vers la conversation nouvellement créée.
+    |
+    */
+    public function store(
+        Request $request
+    ): RedirectResponse {
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        |
+        | Nous utilisons exactement les mêmes sujets que pour le système
+        | de contact déjà existant.
+        |
+        */
+        $validated = $request->validate(
+            [
+                'subject' => [
+                    'required',
+                    'string',
+                    'in:abonnement,entrainements,compte,autre',
+                ],
+
+                'message' => [
+                    'required',
+                    'string',
+                    'min:10',
+                    'max:5000',
+                ],
+            ],
+            [
+                'subject.required' => 'Veuillez sélectionner le sujet de votre demande.',
+                'subject.in' => 'Le sujet sélectionné n’est pas valide.',
+
+                'message.required' => 'Veuillez écrire votre message.',
+                'message.string' => 'Le message indiqué n’est pas valide.',
+                'message.min' => 'Votre message doit contenir au moins 10 caractères.',
+                'message.max' => 'Votre message ne peut pas dépasser 5000 caractères.',
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | UTILISATEUR CONNECTÉ
+        |--------------------------------------------------------------------------
+        |
+        | Nous n'utilisons aucun nom ou email provenant du formulaire.
+        |
+        | Cela évite qu'un adhérent puisse envoyer une conversation
+        | sous l'identité d'une autre personne.
+        |
+        */
+        $user = $request->user();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CRÉATION DE LA CONVERSATION ET DU PREMIER MESSAGE
+        |--------------------------------------------------------------------------
+        |
+        | Nous utilisons une transaction :
+        |
+        | soit la conversation ET le message sont créés ;
+        | soit aucune des deux opérations n'est conservée.
+        |
+        */
+        $conversation = DB::transaction(
+            function () use (
+                $user,
+                $validated
+            ) {
+                /*
+                |--------------------------------------------------------------------------
+                | CRÉATION DE LA CONVERSATION
+                |--------------------------------------------------------------------------
+                */
+                $conversation = Conversation::create([
+                    'user_id' => $user->id,
+
+                    'name' => trim(
+                        $user->prenom . ' ' . $user->nom
+                    ),
+
+                    'email' => $user->email,
+
+                    'subject' => $validated['subject'],
+
+                    'status' => 'open',
+                ]);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | PREMIER MESSAGE DE L'ADHÉRENT
+                |--------------------------------------------------------------------------
+                |
+                | is_read = false signifie que l'administration n'a pas
+                | encore consulté ce nouveau message.
+                |
+                */
+                $conversation
+                    ->messages()
+                    ->create([
+                        'user_id' => $user->id,
+                        'sender_type' => 'member',
+                        'body' => $validated['message'],
+                        'is_read' => false,
+                    ]);
+
+
+                return $conversation;
+            }
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECTION
+        |--------------------------------------------------------------------------
+        |
+        | Après l'envoi, l'adhérent arrive directement dans la conversation
+        | qu'il vient de créer.
+        |
+        */
+        return redirect()
+            ->route(
+                'member.messages.show',
+                $conversation
+            )
+            ->with(
+                'success',
+                'Votre message a bien été envoyé à l’administration.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
     | AFFICHER UNE CONVERSATION
     |--------------------------------------------------------------------------
     |
     | Cette méthode affiche l'historique complet d'une conversation.
     |
-    | Avant toute chose, nous vérifions que la conversation appartient
-    | réellement à l'utilisateur connecté.
+    | Avant toute chose, nous vérifions qu'elle appartient bien
+    | à l'utilisateur connecté.
     |
     */
     public function show(
@@ -101,16 +258,6 @@ class MemberMessageController extends Controller
         |--------------------------------------------------------------------------
         | SÉCURITÉ : PROPRIÉTAIRE DE LA CONVERSATION
         |--------------------------------------------------------------------------
-        |
-        | Même si quelqu'un modifie manuellement l'identifiant dans l'URL,
-        | il ne pourra pas ouvrir la conversation d'un autre adhérent.
-        |
-        | Exemple interdit :
-        |
-        | /membre/messages/5
-        |
-        | si la conversation 5 appartient à un autre utilisateur.
-        |
         */
         $this->ensureConversationBelongsToUser(
             $request,
@@ -122,10 +269,6 @@ class MemberMessageController extends Controller
         |--------------------------------------------------------------------------
         | CHARGEMENT DE L'HISTORIQUE
         |--------------------------------------------------------------------------
-        |
-        | Nous récupérons tous les messages de la conversation dans
-        | l'ordre chronologique.
-        |
         */
         $conversation->load([
             'messages' => function ($query) {
@@ -141,12 +284,8 @@ class MemberMessageController extends Controller
         | MARQUER LES RÉPONSES ADMIN COMME LUES
         |--------------------------------------------------------------------------
         |
-        | Lorsqu'un adhérent ouvre une conversation, toutes les réponses
-        | non lues de l'administration passent à :
-        |
-        | is_read = true
-        |
-        | Les propres messages de l'adhérent ne sont pas concernés.
+        | Dès que l'adhérent ouvre la conversation, les messages admin
+        | non lus deviennent lus.
         |
         */
         $conversation
@@ -177,9 +316,9 @@ class MemberMessageController extends Controller
     | RÉPONDRE À UNE CONVERSATION
     |--------------------------------------------------------------------------
     |
-    | Un adhérent peut répondre à une conversation existante uniquement :
+    | Un adhérent peut répondre uniquement :
     |
-    | - si elle lui appartient ;
+    | - si la conversation lui appartient ;
     | - si elle est encore ouverte.
     |
     */
@@ -202,10 +341,6 @@ class MemberMessageController extends Controller
         |--------------------------------------------------------------------------
         | CONVERSATION FERMÉE
         |--------------------------------------------------------------------------
-        |
-        | Une conversation fermée reste consultable mais l'adhérent ne peut
-        | plus y ajouter de nouveau message.
-        |
         */
         if ($conversation->isClosed()) {
             return back()->with(
@@ -251,14 +386,8 @@ class MemberMessageController extends Controller
         | ENREGISTREMENT DU MESSAGE
         |--------------------------------------------------------------------------
         |
-        | sender_type = member
-        |
-        | permet de savoir que le message a été envoyé depuis l'espace
-        | privé d'un adhérent.
-        |
-        | is_read = false
-        |
-        | signifie que l'administration ne l'a pas encore lu.
+        | is_read = false signifie que le message devra apparaître comme
+        | nouveau dans la messagerie de l'administration.
         |
         */
         $conversation
@@ -276,10 +405,7 @@ class MemberMessageController extends Controller
         | ACTUALISATION DE LA CONVERSATION
         |--------------------------------------------------------------------------
         |
-        | Cela met à jour updated_at.
-        |
-        | La conversation remontera ainsi dans la boîte de réception admin
-        | et dans la liste de l'adhérent.
+        | La conversation remonte ainsi en tête des listes.
         |
         */
         $conversation->touch();
@@ -302,10 +428,11 @@ class MemberMessageController extends Controller
     | VÉRIFIER LE PROPRIÉTAIRE D'UNE CONVERSATION
     |--------------------------------------------------------------------------
     |
-    | Cette méthode privée centralise notre contrôle de sécurité.
+    | Cette méthode privée centralise le contrôle de sécurité.
     |
-    | Une conversation peut être ouverte depuis l'espace adhérent seulement
-    | lorsque son user_id correspond exactement à l'utilisateur connecté.
+    | Même si un utilisateur modifie manuellement l'identifiant d'une
+    | conversation dans son URL, il ne pourra pas consulter celle
+    | appartenant à un autre adhérent.
     |
     */
     private function ensureConversationBelongsToUser(
@@ -324,13 +451,6 @@ class MemberMessageController extends Controller
         |--------------------------------------------------------------------------
         | REFUS D'ACCÈS
         |--------------------------------------------------------------------------
-        |
-        | abort_unless() arrête immédiatement la requête avec une erreur 403
-        | si la condition n'est pas respectée.
-        |
-        | Nous convertissons les IDs en entiers pour effectuer une
-        | comparaison stricte et prévisible.
-        |
         */
         abort_unless(
             (int) $conversation->user_id === (int) $user->id,

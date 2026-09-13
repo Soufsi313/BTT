@@ -31,7 +31,6 @@
 
         <div class="mx-auto max-w-5xl">
 
-
             <!-- =================================================
                  EN-TÊTE
                  ================================================= -->
@@ -287,7 +286,12 @@
                 @foreach ($conversation->messages as $message)
 
                     <!-- =============================================
-                         MESSAGE ADMINISTRATION
+                         MESSAGE DE L'ADMINISTRATION
+                         =============================================
+                         Fond sombre neutre pour améliorer le confort
+                         de lecture.
+
+                         On évite volontairement le rouge en fond.
                          ============================================= -->
                     @if ($message->sender_type === 'admin')
 
@@ -296,8 +300,10 @@
                             <div
                                 class="
                                     max-w-3xl
+                                    rounded-lg
+                                    border
+                                    border-zinc-700
                                     border-l-4
-                                    border-red-600
                                     bg-zinc-900
                                     px-6
                                     py-5
@@ -321,7 +327,7 @@
                                             font-black
                                             uppercase
                                             tracking-wider
-                                            text-red-500
+                                            text-zinc-300
                                         "
                                     >
                                         Administration BTT
@@ -353,7 +359,13 @@
 
 
                     <!-- =============================================
-                         MESSAGE ADHÉRENT
+                         MESSAGE DE L'ADHÉRENT
+                         =============================================
+                         Les messages de l'adhérent restent alignés
+                         à droite pour les différencier.
+
+                         Le fond rouge a été remplacé par un gris
+                         légèrement plus clair que celui de l'admin.
                          ============================================= -->
                     @else
 
@@ -362,10 +374,12 @@
                             <div
                                 class="
                                     max-w-3xl
-                                    bg-red-600
+                                    rounded-lg
+                                    border
+                                    border-zinc-700
+                                    bg-zinc-800
                                     px-6
                                     py-5
-                                    text-white
                                 "
                             >
 
@@ -393,7 +407,7 @@
                                     </p>
 
 
-                                    <p class="text-xs text-red-100">
+                                    <p class="text-xs text-zinc-500">
                                         {{ $message->created_at->format('d/m/Y H:i') }}
                                     </p>
 
@@ -406,7 +420,7 @@
                                         whitespace-pre-line
                                         text-sm
                                         leading-7
-                                        text-white
+                                        text-zinc-200
                                     "
                                 >
                                     {{ $message->body }}

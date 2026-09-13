@@ -1,4 +1,71 @@
 <!-- =========================================================
+     CALCUL DES NOTIFICATIONS DE MESSAGERIE
+     =========================================================
+     Lorsqu'un utilisateur est connecté, nous recherchons
+     les réponses de l'administration qui n'ont pas encore
+     été lues par cet utilisateur.
+
+     La pastille verte sera affichée uniquement lorsque
+     ce nombre est supérieur à zéro.
+     ========================================================= -->
+@php
+
+    $unreadMemberMessagesCount = 0;
+
+    if (auth()->check()) {
+
+        $unreadMemberMessagesCount = \App\Models\Message::query()
+
+            /*
+            |--------------------------------------------------------------------------
+            | UNIQUEMENT LES MESSAGES ENVOYÉS PAR L'ADMINISTRATION
+            |--------------------------------------------------------------------------
+            */
+            ->where(
+                'sender_type',
+                'admin'
+            )
+
+            /*
+            |--------------------------------------------------------------------------
+            | UNIQUEMENT LES MESSAGES NON LUS
+            |--------------------------------------------------------------------------
+            */
+            ->where(
+                'is_read',
+                false
+            )
+
+            /*
+            |--------------------------------------------------------------------------
+            | UNIQUEMENT LES CONVERSATIONS DE L'UTILISATEUR CONNECTÉ
+            |--------------------------------------------------------------------------
+            */
+            ->whereHas(
+                'conversation',
+                function ($query) {
+
+                    $query->where(
+                        'user_id',
+                        auth()->id()
+                    );
+
+                }
+            )
+
+            /*
+            |--------------------------------------------------------------------------
+            | NOMBRE TOTAL DE RÉPONSES NON LUES
+            |--------------------------------------------------------------------------
+            */
+            ->count();
+
+    }
+
+@endphp
+
+
+<!-- =========================================================
      HEADER GLOBAL
      ========================================================= -->
 <header
@@ -62,6 +129,7 @@
             "
         >
 
+            <!-- ACCUEIL -->
             <a
                 href="{{ url('/') }}"
                 class="
@@ -76,6 +144,7 @@
             </a>
 
 
+            <!-- DISCIPLINES -->
             <a
                 href="{{ route('disciplines') }}"
                 class="
@@ -90,6 +159,7 @@
             </a>
 
 
+            <!-- COACHS -->
             <a
                 href="{{ route('coachs') }}"
                 class="
@@ -104,6 +174,7 @@
             </a>
 
 
+            <!-- BLOG -->
             <a
                 href="{{ route('blog') }}"
                 class="
@@ -118,6 +189,7 @@
             </a>
 
 
+            <!-- HUMANITAIRE -->
             <a
                 href="{{ route('humanitaire') }}"
                 class="
@@ -132,6 +204,7 @@
             </a>
 
 
+            <!-- ABONNEMENTS -->
             <a
                 href="{{ route('abonnements') }}"
                 class="
@@ -146,6 +219,7 @@
             </a>
 
 
+            <!-- CONTACT -->
             <a
                 href="{{ route('contact') }}"
                 class="
@@ -173,7 +247,6 @@
             "
         >
 
-
             @guest
 
                 <!-- =================================================
@@ -181,6 +254,7 @@
                      ================================================= -->
                 <div class="flex items-center gap-3">
 
+                    <!-- CONNEXION -->
                     <a
                         href="{{ route('login') }}"
                         class="
@@ -203,6 +277,7 @@
                     </a>
 
 
+                    <!-- INSCRIPTION -->
                     <a
                         href="{{ route('register') }}"
                         class="
@@ -235,8 +310,9 @@
 
                     <!-- =============================================
                          PSEUDO
-                         Le pseudo reste également cliquable et permet
-                         d'accéder directement à l'espace personnel.
+                         =============================================
+                         La pastille verte apparaît à côté du pseudo
+                         lorsqu'une réponse admin n'a pas encore été lue.
                          ============================================= -->
                     <a
                         href="{{ route('member.dashboard') }}"
@@ -259,7 +335,53 @@
                         </span>
 
 
-                        <!-- Petite flèche du menu -->
+                        <!-- =========================================
+                             NOTIFICATION GLOBALE
+                             ========================================= -->
+                        @if ($unreadMemberMessagesCount > 0)
+
+                            <span
+                                class="
+                                    relative
+                                    flex
+                                    h-3
+                                    w-3
+                                "
+                                title="{{ $unreadMemberMessagesCount }} message(s) non lu(s)"
+                            >
+
+                                <!-- Cercle animé -->
+                                <span
+                                    class="
+                                        absolute
+                                        inline-flex
+                                        h-full
+                                        w-full
+                                        animate-ping
+                                        rounded-full
+                                        bg-green-400
+                                        opacity-75
+                                    "
+                                ></span>
+
+                                <!-- Cercle fixe -->
+                                <span
+                                    class="
+                                        relative
+                                        inline-flex
+                                        h-3
+                                        w-3
+                                        rounded-full
+                                        bg-green-500
+                                    "
+                                ></span>
+
+                            </span>
+
+                        @endif
+
+
+                        <!-- PETITE FLÈCHE -->
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -294,7 +416,7 @@
                             right-0
                             top-full
                             z-50
-                            w-56
+                            w-64
                             translate-y-1
                             border
                             border-zinc-800
@@ -335,17 +457,44 @@
                                 Mon compte
                             </p>
 
-                            <p
+
+                            <div
                                 class="
                                     mt-1
-                                    truncate
-                                    text-sm
-                                    font-black
-                                    text-white
+                                    flex
+                                    items-center
+                                    gap-2
                                 "
                             >
-                                {{ auth()->user()->pseudo }}
-                            </p>
+
+                                <p
+                                    class="
+                                        truncate
+                                        text-sm
+                                        font-black
+                                        text-white
+                                    "
+                                >
+                                    {{ auth()->user()->pseudo }}
+                                </p>
+
+
+                                @if ($unreadMemberMessagesCount > 0)
+
+                                    <span
+                                        class="
+                                            inline-flex
+                                            h-2.5
+                                            w-2.5
+                                            shrink-0
+                                            rounded-full
+                                            bg-green-500
+                                        "
+                                    ></span>
+
+                                @endif
+
+                            </div>
 
                         </div>
 
@@ -383,7 +532,12 @@
                                     stroke-linejoin="round"
                                     d="M20 21a8 8 0 0 0-16 0"
                                 />
-                                <circle cx="12" cy="7" r="4"/>
+
+                                <circle
+                                    cx="12"
+                                    cy="7"
+                                    r="4"
+                                />
                             </svg>
 
                             Mon profil
@@ -426,10 +580,129 @@
                                     y="4"
                                     rx="2"
                                 />
+
                                 <path d="M16 2v4M8 2v4M3 10h18"/>
                             </svg>
 
                             Mon calendrier
+
+                        </a>
+
+
+                        <!-- =========================================
+                             MES MESSAGES
+                             =========================================
+                             La pastille verte est affichée ici lorsque
+                             l'administration a répondu à l'adhérent.
+                             ========================================= -->
+                        <a
+                            href="{{ route('member.messages.index') }}"
+                            class="
+                                flex
+                                items-center
+                                justify-between
+                                gap-3
+                                px-5
+                                py-3.5
+                                text-sm
+                                font-bold
+                                text-zinc-300
+                                transition
+                                hover:bg-zinc-900
+                                hover:text-red-500
+                            "
+                        >
+
+                            <span
+                                class="
+                                    flex
+                                    items-center
+                                    gap-3
+                                "
+                            >
+
+                                <!-- ICÔNE MESSAGERIE -->
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    class="h-4 w-4"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"
+                                    />
+                                </svg>
+
+                                Mes messages
+
+                            </span>
+
+
+                            @if ($unreadMemberMessagesCount > 0)
+
+                                <span
+                                    class="
+                                        flex
+                                        items-center
+                                        gap-2
+                                    "
+                                >
+
+                                    <!-- NOMBRE DE MESSAGES -->
+                                    <span
+                                        class="
+                                            text-xs
+                                            font-black
+                                            text-green-500
+                                        "
+                                    >
+                                        {{ $unreadMemberMessagesCount }}
+                                    </span>
+
+
+                                    <!-- PASTILLE VERTE -->
+                                    <span
+                                        class="
+                                            relative
+                                            flex
+                                            h-2.5
+                                            w-2.5
+                                        "
+                                    >
+
+                                        <span
+                                            class="
+                                                absolute
+                                                inline-flex
+                                                h-full
+                                                w-full
+                                                animate-ping
+                                                rounded-full
+                                                bg-green-400
+                                                opacity-75
+                                            "
+                                        ></span>
+
+                                        <span
+                                            class="
+                                                relative
+                                                inline-flex
+                                                h-2.5
+                                                w-2.5
+                                                rounded-full
+                                                bg-green-500
+                                            "
+                                        ></span>
+
+                                    </span>
+
+                                </span>
+
+                            @endif
 
                         </a>
 
@@ -473,6 +746,7 @@
                                         stroke-linejoin="round"
                                         d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"
                                     />
+
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
@@ -533,6 +807,7 @@
                                         stroke-linejoin="round"
                                         d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
                                     />
+
                                     <path
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
@@ -564,6 +839,7 @@
             aria-label="Ouvrir le menu"
             aria-expanded="false"
             class="
+                relative
                 flex
                 h-11
                 w-11
@@ -618,6 +894,59 @@
                 />
             </svg>
 
+
+            <!-- =================================================
+                 NOTIFICATION MOBILE
+                 =================================================
+                 Sur petit écran le pseudo n'est pas visible dans
+                 le header. La pastille est donc également placée
+                 directement sur le bouton du menu.
+                 ================================================= -->
+            @auth
+
+                @if ($unreadMemberMessagesCount > 0)
+
+                    <span
+                        class="
+                            absolute
+                            -right-1
+                            -top-1
+                            flex
+                            h-3
+                            w-3
+                        "
+                    >
+
+                        <span
+                            class="
+                                absolute
+                                inline-flex
+                                h-full
+                                w-full
+                                animate-ping
+                                rounded-full
+                                bg-green-400
+                                opacity-75
+                            "
+                        ></span>
+
+                        <span
+                            class="
+                                relative
+                                inline-flex
+                                h-3
+                                w-3
+                                rounded-full
+                                bg-green-500
+                            "
+                        ></span>
+
+                    </span>
+
+                @endif
+
+            @endauth
+
         </button>
 
     </div>
@@ -653,6 +982,8 @@
                 <!-- =================================================
                      NAVIGATION PRINCIPALE
                      ================================================= -->
+
+                <!-- ACCUEIL -->
                 <a
                     href="{{ url('/') }}"
                     class="
@@ -670,6 +1001,7 @@
                 </a>
 
 
+                <!-- DISCIPLINES -->
                 <a
                     href="{{ route('disciplines') }}"
                     class="
@@ -687,6 +1019,7 @@
                 </a>
 
 
+                <!-- COACHS -->
                 <a
                     href="{{ route('coachs') }}"
                     class="
@@ -704,6 +1037,7 @@
                 </a>
 
 
+                <!-- BLOG -->
                 <a
                     href="{{ route('blog') }}"
                     class="
@@ -721,6 +1055,7 @@
                 </a>
 
 
+                <!-- HUMANITAIRE -->
                 <a
                     href="{{ route('humanitaire') }}"
                     class="
@@ -738,6 +1073,7 @@
                 </a>
 
 
+                <!-- ABONNEMENTS -->
                 <a
                     href="{{ route('abonnements') }}"
                     class="
@@ -755,6 +1091,7 @@
                 </a>
 
 
+                <!-- CONTACT -->
                 <a
                     href="{{ route('contact') }}"
                     class="
@@ -777,7 +1114,6 @@
                      ================================================= -->
                 <div class="mt-5">
 
-
                     @guest
 
                         <!-- =========================================
@@ -785,6 +1121,7 @@
                              ========================================= -->
                         <div class="flex flex-col gap-3">
 
+                            <!-- CONNEXION -->
                             <a
                                 href="{{ route('login') }}"
                                 class="
@@ -810,6 +1147,7 @@
                             </a>
 
 
+                            <!-- INSCRIPTION -->
                             <a
                                 href="{{ route('register') }}"
                                 class="
@@ -867,16 +1205,67 @@
                                     Mon compte
                                 </p>
 
-                                <p
+
+                                <div
                                     class="
                                         mt-1
-                                        text-sm
-                                        font-black
-                                        text-white
+                                        flex
+                                        items-center
+                                        gap-2
                                     "
                                 >
-                                    {{ auth()->user()->pseudo }}
-                                </p>
+
+                                    <p
+                                        class="
+                                            text-sm
+                                            font-black
+                                            text-white
+                                        "
+                                    >
+                                        {{ auth()->user()->pseudo }}
+                                    </p>
+
+
+                                    @if ($unreadMemberMessagesCount > 0)
+
+                                        <span
+                                            class="
+                                                relative
+                                                flex
+                                                h-2.5
+                                                w-2.5
+                                            "
+                                        >
+
+                                            <span
+                                                class="
+                                                    absolute
+                                                    inline-flex
+                                                    h-full
+                                                    w-full
+                                                    animate-ping
+                                                    rounded-full
+                                                    bg-green-400
+                                                    opacity-75
+                                                "
+                                            ></span>
+
+                                            <span
+                                                class="
+                                                    relative
+                                                    inline-flex
+                                                    h-2.5
+                                                    w-2.5
+                                                    rounded-full
+                                                    bg-green-500
+                                                "
+                                            ></span>
+
+                                        </span>
+
+                                    @endif
+
+                                </div>
 
                             </div>
 
@@ -934,6 +1323,94 @@
                                 "
                             >
                                 Mon calendrier
+                            </a>
+
+
+                            <!-- =====================================
+                                 MES MESSAGES
+                                 ===================================== -->
+                            <a
+                                href="{{ route('member.messages.index') }}"
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    rounded-md
+                                    border
+                                    border-zinc-700
+                                    px-4
+                                    py-3
+                                    text-xs
+                                    font-black
+                                    uppercase
+                                    tracking-wider
+                                    text-white
+                                    transition
+                                    hover:border-red-600
+                                    hover:text-red-500
+                                "
+                            >
+
+                                <span>
+                                    Mes messages
+                                </span>
+
+
+                                @if ($unreadMemberMessagesCount > 0)
+
+                                    <span
+                                        class="
+                                            flex
+                                            items-center
+                                            gap-1.5
+                                        "
+                                    >
+
+                                        <span class="text-green-500">
+                                            {{ $unreadMemberMessagesCount }}
+                                        </span>
+
+
+                                        <span
+                                            class="
+                                                relative
+                                                flex
+                                                h-2.5
+                                                w-2.5
+                                            "
+                                        >
+
+                                            <span
+                                                class="
+                                                    absolute
+                                                    inline-flex
+                                                    h-full
+                                                    w-full
+                                                    animate-ping
+                                                    rounded-full
+                                                    bg-green-400
+                                                    opacity-75
+                                                "
+                                            ></span>
+
+                                            <span
+                                                class="
+                                                    relative
+                                                    inline-flex
+                                                    h-2.5
+                                                    w-2.5
+                                                    rounded-full
+                                                    bg-green-500
+                                                "
+                                            ></span>
+
+                                        </span>
+
+                                    </span>
+
+                                @endif
+
                             </a>
 
 

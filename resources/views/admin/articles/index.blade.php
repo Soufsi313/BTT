@@ -355,9 +355,6 @@
 
                         <!-- =====================================
                              CRÉER UN NOUVEL ARTICLE
-                             =====================================
-                             Le bouton est maintenant relié à la
-                             route admin.articles.create.
                              ===================================== -->
                         <a
                             href="{{ route('admin.articles.create') }}"
@@ -394,9 +391,6 @@
 
                     <!-- =========================================
                          MESSAGE DE CONFIRMATION
-                         =========================================
-                         Ce message apparaît après la création
-                         réussie d'un article.
                          ========================================= -->
                     @if (session('success'))
 
@@ -497,7 +491,7 @@
 
                         <div class="overflow-x-auto">
 
-                            <table class="w-full min-w-[900px]">
+                            <table class="w-full min-w-[1100px]">
 
 
                                 <!-- =============================
@@ -506,6 +500,25 @@
                                 <thead class="bg-zinc-50">
 
                                     <tr class="border-b border-zinc-200">
+
+
+                                        <!-- =====================
+                                             BANNIÈRE
+                                             ===================== -->
+                                        <th
+                                            class="
+                                                px-5
+                                                py-4
+                                                text-left
+                                                text-xs
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-zinc-500
+                                            "
+                                        >
+                                            Bannière
+                                        </th>
 
 
                                         <!-- =====================
@@ -763,11 +776,99 @@
 
 
                                             <!-- =================
+                                                 BANNIÈRE
+                                                 ================= -->
+                                            <td class="px-5 py-4">
+
+                                                @if ($article->banner_image)
+
+                                                    <!--
+                                                        L'image est enregistrée
+                                                        dans storage/app/public.
+
+                                                        Le lien symbolique créé avec
+                                                        "php artisan storage:link"
+                                                        permet d'y accéder via
+                                                        /storage/...
+                                                    -->
+                                                    <div
+                                                        class="
+                                                            h-20
+                                                            w-32
+                                                            overflow-hidden
+                                                            rounded-md
+                                                            border
+                                                            border-zinc-200
+                                                            bg-zinc-100
+                                                        "
+                                                    >
+
+                                                        <img
+                                                            src="{{ asset('storage/' . $article->banner_image) }}"
+                                                            alt="Bannière de {{ $article->title }}"
+                                                            class="
+                                                                h-full
+                                                                w-full
+                                                                object-cover
+                                                            "
+                                                        >
+
+                                                    </div>
+
+                                                @else
+
+                                                    <!--
+                                                        Les anciens articles créés
+                                                        avant l'ajout des bannières
+                                                        peuvent encore avoir une
+                                                        valeur NULL.
+                                                    -->
+                                                    <div
+                                                        class="
+                                                            flex
+                                                            h-20
+                                                            w-32
+                                                            items-center
+                                                            justify-center
+                                                            rounded-md
+                                                            border
+                                                            border-dashed
+                                                            border-zinc-300
+                                                            bg-zinc-50
+                                                            px-3
+                                                            text-center
+                                                        "
+                                                    >
+
+                                                        <span
+                                                            class="
+                                                                text-xs
+                                                                font-bold
+                                                                text-zinc-400
+                                                            "
+                                                        >
+                                                            Aucune bannière
+                                                        </span>
+
+                                                    </div>
+
+                                                @endif
+
+                                            </td>
+
+
+                                            <!-- =================
                                                  TITRE
                                                  ================= -->
                                             <td class="px-5 py-5">
 
-                                                <p class="font-bold text-zinc-900">
+                                                <p
+                                                    class="
+                                                        max-w-xs
+                                                        font-bold
+                                                        text-zinc-900
+                                                    "
+                                                >
                                                     {{ $article->title }}
                                                 </p>
 
@@ -970,7 +1071,7 @@
                                         <tr>
 
                                             <td
-                                                colspan="6"
+                                                colspan="7"
                                                 class="
                                                     px-6
                                                     py-16

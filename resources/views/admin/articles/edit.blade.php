@@ -15,10 +15,135 @@
     <!-- =========================================================
          ESPACE ADMINISTRATION - MODIFICATION D'UN ARTICLE
          ========================================================= -->
+
     <section class="min-h-screen bg-white text-zinc-900">
 
-        <div class="flex min-h-screen">
+        <!-- =====================================================
+             STYLES SPÉCIFIQUES À L'ÉDITEUR QUILL
+             ===================================================== -->
+        <style>
+            /* -----------------------------------------------------
+               ZONE PRINCIPALE DE L'ÉDITEUR
+               ----------------------------------------------------- */
+            #article-editor {
+                min-height: 420px;
+                font-size: 16px;
+                line-height: 1.75;
+                background: #ffffff;
+                color: #18181b;
+            }
 
+            #article-editor .ql-editor {
+                min-height: 420px;
+                padding: 24px;
+            }
+
+            /* -----------------------------------------------------
+               BARRE D'OUTILS QUILL
+               ----------------------------------------------------- */
+            .ql-toolbar.ql-snow {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                border-color: #d4d4d8;
+                background: #fafafa;
+            }
+
+            .ql-container.ql-snow {
+                border-color: #d4d4d8;
+            }
+
+            /* -----------------------------------------------------
+               COULEUR BTT SUR LES BOUTONS ACTIFS / SURVOLÉS
+               ----------------------------------------------------- */
+            .ql-snow .ql-toolbar button:hover,
+            .ql-snow.ql-toolbar button:hover,
+            .ql-snow .ql-toolbar button.ql-active,
+            .ql-snow.ql-toolbar button.ql-active {
+                color: #dc2626;
+            }
+
+            .ql-snow .ql-toolbar button:hover .ql-stroke,
+            .ql-snow.ql-toolbar button:hover .ql-stroke,
+            .ql-snow .ql-toolbar button.ql-active .ql-stroke,
+            .ql-snow.ql-toolbar button.ql-active .ql-stroke {
+                stroke: #dc2626;
+            }
+
+            .ql-snow .ql-toolbar button:hover .ql-fill,
+            .ql-snow.ql-toolbar button:hover .ql-fill,
+            .ql-snow .ql-toolbar button.ql-active .ql-fill,
+            .ql-snow.ql-toolbar button.ql-active .ql-fill {
+                fill: #dc2626;
+            }
+
+            /* -----------------------------------------------------
+               POLICES DISPONIBLES
+               ----------------------------------------------------- */
+            .ql-font-arial {
+                font-family: Arial, sans-serif;
+            }
+
+            .ql-font-georgia {
+                font-family: Georgia, serif;
+            }
+
+            .ql-font-times-new-roman {
+                font-family: "Times New Roman", Times, serif;
+            }
+
+            .ql-font-verdana {
+                font-family: Verdana, sans-serif;
+            }
+
+            .ql-font-courier-new {
+                font-family: "Courier New", Courier, monospace;
+            }
+
+            /* -----------------------------------------------------
+               NOMS AFFICHÉS DANS LE MENU DES POLICES
+               ----------------------------------------------------- */
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="arial"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="arial"]::before {
+                content: "Arial";
+                font-family: Arial, sans-serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="georgia"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="georgia"]::before {
+                content: "Georgia";
+                font-family: Georgia, serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="times-new-roman"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="times-new-roman"]::before {
+                content: "Times New Roman";
+                font-family: "Times New Roman", Times, serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="verdana"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="verdana"]::before {
+                content: "Verdana";
+                font-family: Verdana, sans-serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="courier-new"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="courier-new"]::before {
+                content: "Courier New";
+                font-family: "Courier New", Courier, monospace;
+            }
+
+            .ql-snow .ql-picker.ql-font {
+                width: 150px;
+            }
+
+            .ql-snow .ql-picker-options {
+                z-index: 50;
+            }
+        </style>
+
+
+        <div class="flex min-h-screen">
 
             <!-- =================================================
                  BARRE LATÉRALE ADMIN
@@ -84,7 +209,6 @@
 
                     <div class="space-y-1">
 
-
                         <!-- TABLEAU DE BORD -->
                         <a
                             href="{{ route('admin.dashboard') }}"
@@ -148,10 +272,7 @@
                         </a>
 
 
-                        <!-- =====================================
-                             ARTICLES
-                             PAGE ACTIVE
-                             ===================================== -->
+                        <!-- ARTICLES - PAGE ACTIVE -->
                         <a
                             href="{{ route('admin.articles.index') }}"
                             class="
@@ -269,7 +390,6 @@
                  ================================================= -->
             <div class="min-w-0 flex-1">
 
-
                 <!-- =============================================
                      EN-TÊTE
                      ============================================= -->
@@ -332,14 +452,14 @@
                                     text-zinc-500
                                 "
                             >
-                                Modifiez les informations, le contenu,
-                                la bannière et la publication de l'article.
+                                Modifiez le contenu, la bannière et les
+                                paramètres de publication de l'article.
                             </p>
 
                         </div>
 
 
-                        <!-- RETOUR -->
+                        <!-- RETOUR AUX ARTICLES -->
                         <a
                             href="{{ route('admin.articles.index') }}"
                             class="
@@ -356,6 +476,7 @@
                                 font-black
                                 text-zinc-700
                                 transition
+                                hover:border-zinc-400
                                 hover:bg-zinc-50
                             "
                         >
@@ -373,7 +494,6 @@
                 <main class="bg-white px-6 py-8 lg:px-10 lg:py-10">
 
                     <div class="mx-auto max-w-5xl">
-
 
                         <!-- =====================================
                              ERREURS DE VALIDATION
@@ -425,10 +545,11 @@
                         <!-- =====================================
                              FORMULAIRE DE MODIFICATION
                              =====================================
-                             PATCH est utilisé car nous modifions
-                             une ressource déjà existante.
+                             L'identifiant article-form est utilisé
+                             par notre JavaScript Quill.
                              ===================================== -->
                         <form
+                            id="article-form"
                             action="{{ route('admin.articles.update', $article) }}"
                             method="POST"
                             enctype="multipart/form-data"
@@ -467,22 +588,19 @@
                                         Informations
                                     </p>
 
-                                    <h2
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-black
-                                            text-zinc-900
-                                        "
-                                    >
+                                    <h2 class="mt-2 text-xl font-black text-zinc-900">
                                         Informations principales
                                     </h2>
+
+                                    <p class="mt-2 text-sm text-zinc-500">
+                                        Modifiez le titre, la catégorie
+                                        et le résumé de l'article.
+                                    </p>
 
                                 </div>
 
 
                                 <div class="mt-6 space-y-6">
-
 
                                     <!-- =========================
                                          TITRE
@@ -491,12 +609,7 @@
 
                                         <label
                                             for="title"
-                                            class="
-                                                block
-                                                text-sm
-                                                font-black
-                                                text-zinc-800
-                                            "
+                                            class="block text-sm font-black text-zinc-800"
                                         >
                                             Titre de l'article
                                             <span class="text-red-600">*</span>
@@ -521,16 +634,12 @@
                                                 text-zinc-900
                                                 outline-none
                                                 transition
+                                                placeholder:text-zinc-400
                                                 focus:border-red-600
                                                 focus:ring-2
                                                 focus:ring-red-600/20
                                             "
                                         >
-
-                                        <p class="mt-2 text-xs text-zinc-500">
-                                            Le slug de l'article sera automatiquement
-                                            recalculé si le titre est modifié.
-                                        </p>
 
                                     </div>
 
@@ -542,12 +651,7 @@
 
                                         <label
                                             for="category"
-                                            class="
-                                                block
-                                                text-sm
-                                                font-black
-                                                text-zinc-800
-                                            "
+                                            class="block text-sm font-black text-zinc-800"
                                         >
                                             Catégorie
                                             <span class="text-red-600">*</span>
@@ -577,60 +681,42 @@
 
                                             <option
                                                 value="Actualité"
-                                                @selected(
-                                                    old('category', $article->category)
-                                                    === 'Actualité'
-                                                )
+                                                @selected(old('category', $article->category) === 'Actualité')
                                             >
                                                 Actualité
                                             </option>
 
                                             <option
                                                 value="Futsal"
-                                                @selected(
-                                                    old('category', $article->category)
-                                                    === 'Futsal'
-                                                )
+                                                @selected(old('category', $article->category) === 'Futsal')
                                             >
                                                 Futsal
                                             </option>
 
                                             <option
                                                 value="Boxe"
-                                                @selected(
-                                                    old('category', $article->category)
-                                                    === 'Boxe'
-                                                )
+                                                @selected(old('category', $article->category) === 'Boxe')
                                             >
                                                 Boxe
                                             </option>
 
                                             <option
                                                 value="HYROX"
-                                                @selected(
-                                                    old('category', $article->category)
-                                                    === 'HYROX'
-                                                )
+                                                @selected(old('category', $article->category) === 'HYROX')
                                             >
                                                 HYROX
                                             </option>
 
                                             <option
                                                 value="Association"
-                                                @selected(
-                                                    old('category', $article->category)
-                                                    === 'Association'
-                                                )
+                                                @selected(old('category', $article->category) === 'Association')
                                             >
                                                 Association
                                             </option>
 
                                             <option
                                                 value="Événement"
-                                                @selected(
-                                                    old('category', $article->category)
-                                                    === 'Événement'
-                                                )
+                                                @selected(old('category', $article->category) === 'Événement')
                                             >
                                                 Événement
                                             </option>
@@ -647,12 +733,7 @@
 
                                         <label
                                             for="excerpt"
-                                            class="
-                                                block
-                                                text-sm
-                                                font-black
-                                                text-zinc-800
-                                            "
+                                            class="block text-sm font-black text-zinc-800"
                                         >
                                             Résumé
                                         </label>
@@ -675,6 +756,7 @@
                                                 text-zinc-900
                                                 outline-none
                                                 transition
+                                                placeholder:text-zinc-400
                                                 focus:border-red-600
                                                 focus:ring-2
                                                 focus:ring-red-600/20
@@ -689,7 +771,7 @@
 
 
                             <!-- =================================
-                                 BANNIÈRE
+                                 BANNIÈRE DE L'ARTICLE
                                  ================================= -->
                             <section
                                 class="
@@ -716,42 +798,28 @@
                                         Visuel
                                     </p>
 
-                                    <h2
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-black
-                                            text-zinc-900
-                                        "
-                                    >
+                                    <h2 class="mt-2 text-xl font-black text-zinc-900">
                                         Bannière de l'article
                                     </h2>
 
                                     <p class="mt-2 text-sm text-zinc-500">
-                                        Vous pouvez conserver la bannière actuelle
-                                        ou la remplacer par une nouvelle image.
+                                        Conservez la bannière actuelle ou
+                                        choisissez une nouvelle image.
                                     </p>
 
                                 </div>
 
 
-                                <!-- =============================
+                                <!-- =========================
                                      BANNIÈRE ACTUELLE
-                                     ============================= -->
-                                <div class="mt-6">
+                                     ========================= -->
+                                @if ($article->banner_image)
 
-                                    <p
-                                        class="
-                                            text-sm
-                                            font-black
-                                            text-zinc-800
-                                        "
-                                    >
-                                        Bannière actuelle
-                                    </p>
+                                    <div class="mt-6">
 
-
-                                    @if ($article->banner_image)
+                                        <p class="text-sm font-black text-zinc-800">
+                                            Bannière actuelle
+                                        </p>
 
                                         <div
                                             class="
@@ -760,86 +828,35 @@
                                                 rounded-lg
                                                 border
                                                 border-zinc-200
-                                                bg-zinc-100
+                                                bg-black
                                             "
                                         >
 
                                             <img
                                                 src="{{ asset('storage/' . $article->banner_image) }}"
-                                                alt="Bannière actuelle de {{ $article->title }}"
+                                                alt="{{ $article->title }}"
                                                 class="
-                                                    h-64
+                                                    max-h-[420px]
                                                     w-full
-                                                    object-cover
-                                                    sm:h-80
+                                                    object-contain
                                                 "
                                             >
 
                                         </div>
 
-                                    @else
+                                    </div>
 
-                                        <!--
-                                            Les articles créés avant
-                                            l'implémentation des bannières
-                                            peuvent ne pas avoir d'image.
-                                        -->
-                                        <div
-                                            class="
-                                                mt-3
-                                                flex
-                                                min-h-40
-                                                items-center
-                                                justify-center
-                                                rounded-lg
-                                                border
-                                                border-dashed
-                                                border-zinc-300
-                                                bg-zinc-50
-                                                px-6
-                                                text-center
-                                            "
-                                        >
-
-                                            <div>
-
-                                                <p class="font-black text-zinc-700">
-                                                    Aucune bannière
-                                                </p>
-
-                                                <p
-                                                    class="
-                                                        mt-2
-                                                        text-sm
-                                                        text-zinc-500
-                                                    "
-                                                >
-                                                    Vous pouvez ajouter une bannière
-                                                    à cet article ci-dessous.
-                                                </p>
-
-                                            </div>
-
-                                        </div>
-
-                                    @endif
-
-                                </div>
+                                @endif
 
 
-                                <!-- =============================
+                                <!-- =========================
                                      NOUVELLE BANNIÈRE
-                                     ============================= -->
+                                     ========================= -->
                                 <div class="mt-6">
 
                                     <label
                                         for="banner_image"
-                                        class="
-                                            block
-                                            text-sm
-                                            font-black
-                                            text-zinc-800
-                                        "
+                                        class="block text-sm font-black text-zinc-800"
                                     >
                                         Remplacer la bannière
                                     </label>
@@ -880,17 +897,11 @@
                                             "
                                         >
 
-                                        <div
-                                            class="
-                                                mt-4
-                                                space-y-1
-                                                text-xs
-                                                text-zinc-500
-                                            "
-                                        >
+                                        <div class="mt-4 space-y-1 text-xs text-zinc-500">
+
                                             <p>
                                                 Laissez ce champ vide pour
-                                                conserver l'image actuelle.
+                                                conserver la bannière actuelle.
                                             </p>
 
                                             <p>
@@ -902,6 +913,7 @@
                                                 Taille maximale :
                                                 5 Mo.
                                             </p>
+
                                         </div>
 
                                     </div>
@@ -912,7 +924,7 @@
 
 
                             <!-- =================================
-                                 CONTENU
+                                 CONTENU DE L'ARTICLE
                                  ================================= -->
                             <section
                                 class="
@@ -939,16 +951,14 @@
                                         Rédaction
                                     </p>
 
-                                    <h2
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-black
-                                            text-zinc-900
-                                        "
-                                    >
+                                    <h2 class="mt-2 text-xl font-black text-zinc-900">
                                         Contenu de l'article
                                     </h2>
+
+                                    <p class="mt-2 text-sm leading-6 text-zinc-500">
+                                        Modifiez librement le texte et sa
+                                        mise en forme.
+                                    </p>
 
                                 </div>
 
@@ -956,48 +966,89 @@
                                 <div class="mt-6">
 
                                     <label
-                                        for="content"
-                                        class="
-                                            block
-                                            text-sm
-                                            font-black
-                                            text-zinc-800
-                                        "
+                                        for="article-editor"
+                                        class="block text-sm font-black text-zinc-800"
                                     >
                                         Texte de l'article
                                         <span class="text-red-600">*</span>
                                     </label>
 
+
+                                    <!-- =========================
+                                         CONTENU RÉEL ENVOYÉ À LARAVEL
+                                         =========================
+                                         Cette zone contient :
+                                         - soit la valeur old() après erreur ;
+                                         - soit le contenu actuel de l'article.
+
+                                         app.js récupère ensuite cette valeur
+                                         et l'injecte dans Quill.
+                                         ========================= -->
                                     <textarea
-                                        id="content"
+                                        id="article-content"
                                         name="content"
-                                        rows="16"
-                                        required
-                                        class="
-                                            mt-2
-                                            w-full
-                                            resize-y
-                                            rounded-md
-                                            border
-                                            border-zinc-300
-                                            bg-white
-                                            px-4
-                                            py-3
-                                            leading-7
-                                            text-zinc-900
-                                            outline-none
-                                            transition
-                                            focus:border-red-600
-                                            focus:ring-2
-                                            focus:ring-red-600/20
-                                        "
+                                        class="hidden"
                                     >{{ old('content', $article->content) }}</textarea>
 
-                                    <p class="mt-2 text-xs text-zinc-500">
-                                        Les images intégrées directement dans le
-                                        contenu seront ajoutées lors d'une étape
-                                        ultérieure.
-                                    </p>
+
+                                    <!-- =========================
+                                         ÉDITEUR QUILL
+                                         ========================= -->
+                                    <div
+                                        class="
+                                            mt-2
+                                            overflow-visible
+                                            rounded-md
+                                        "
+                                    >
+                                        <div id="article-editor"></div>
+                                    </div>
+
+
+                                    <!-- =========================
+                                         AIDE
+                                         ========================= -->
+                                    <div
+                                        class="
+                                            mt-4
+                                            rounded-md
+                                            border
+                                            border-zinc-200
+                                            bg-zinc-50
+                                            px-4
+                                            py-4
+                                        "
+                                    >
+
+                                        <p
+                                            class="
+                                                text-xs
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-zinc-700
+                                            "
+                                        >
+                                            Mise en forme disponible
+                                        </p>
+
+                                        <p
+                                            class="
+                                                mt-2
+                                                text-xs
+                                                leading-5
+                                                text-zinc-500
+                                            "
+                                        >
+                                            Police, taille, titres, gras,
+                                            italique, soulignement, texte barré,
+                                            couleurs, surlignage, alignement
+                                            gauche, centré, droite et justifié,
+                                            listes, indentation, citations
+                                            et liens.
+                                        </p>
+
+                                    </div>
 
                                 </div>
 
@@ -1032,29 +1083,14 @@
                                         Publication
                                     </p>
 
-                                    <h2
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-black
-                                            text-zinc-900
-                                        "
-                                    >
+                                    <h2 class="mt-2 text-xl font-black text-zinc-900">
                                         Visibilité de l'article
                                     </h2>
 
                                 </div>
 
 
-                                <div
-                                    class="
-                                        mt-6
-                                        grid
-                                        gap-6
-                                        lg:grid-cols-2
-                                    "
-                                >
-
+                                <div class="mt-6 grid gap-6 lg:grid-cols-2">
 
                                     <!-- =========================
                                          STATUT
@@ -1063,12 +1099,7 @@
 
                                         <label
                                             for="status"
-                                            class="
-                                                block
-                                                text-sm
-                                                font-black
-                                                text-zinc-800
-                                            "
+                                            class="block text-sm font-black text-zinc-800"
                                         >
                                             Statut
                                             <span class="text-red-600">*</span>
@@ -1099,8 +1130,10 @@
                                             <option
                                                 value="draft"
                                                 @selected(
-                                                    old('status', $article->status)
-                                                    === 'draft'
+                                                    old(
+                                                        'status',
+                                                        $article->status
+                                                    ) === 'draft'
                                                 )
                                             >
                                                 Brouillon
@@ -1109,8 +1142,10 @@
                                             <option
                                                 value="published"
                                                 @selected(
-                                                    old('status', $article->status)
-                                                    === 'published'
+                                                    old(
+                                                        'status',
+                                                        $article->status
+                                                    ) === 'published'
                                                 )
                                             >
                                                 Publié
@@ -1118,21 +1153,10 @@
 
                                         </select>
 
-
-                                        @if ($article->published_at)
-
-                                            <p class="mt-2 text-xs text-zinc-500">
-                                                Première publication :
-                                                {{ $article->published_at->format('d/m/Y H:i') }}
-                                            </p>
-
-                                        @else
-
-                                            <p class="mt-2 text-xs text-zinc-500">
-                                                Cet article n'a pas encore été publié.
-                                            </p>
-
-                                        @endif
+                                        <p class="mt-2 text-xs text-zinc-500">
+                                            Un brouillon n'apparaît pas
+                                            dans le Blog public.
+                                        </p>
 
                                     </div>
 
@@ -1142,14 +1166,7 @@
                                          ========================= -->
                                     <div>
 
-                                        <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-black
-                                                text-zinc-800
-                                            "
-                                        >
+                                        <p class="block text-sm font-black text-zinc-800">
                                             Mise en avant
                                         </p>
 
@@ -1212,9 +1229,8 @@
                                                         text-zinc-500
                                                     "
                                                 >
-                                                    Les articles mis en avant
-                                                    bénéficieront plus tard d'une
-                                                    place privilégiée dans le Blog.
+                                                    L'article sera prioritaire
+                                                    dans la bibliothèque du Blog.
                                                 </span>
 
                                             </span>
@@ -1259,78 +1275,25 @@
                                         grid
                                         gap-4
                                         text-sm
+                                        text-zinc-600
                                         sm:grid-cols-2
                                     "
                                 >
 
                                     <div>
+                                        <span class="font-black text-zinc-800">
+                                            Créé le :
+                                        </span>
 
-                                        <p class="font-bold text-zinc-500">
-                                            Auteur
-                                        </p>
-
-                                        <p class="mt-1 font-black text-zinc-900">
-
-                                            @if ($article->author)
-
-                                                {{ $article->author->prenom }}
-                                                {{ $article->author->nom }}
-
-                                            @else
-
-                                                Auteur indisponible
-
-                                            @endif
-
-                                        </p>
-
+                                        {{ $article->created_at->format('d/m/Y à H:i') }}
                                     </div>
 
-
                                     <div>
+                                        <span class="font-black text-zinc-800">
+                                            Dernière modification :
+                                        </span>
 
-                                        <p class="font-bold text-zinc-500">
-                                            Créé le
-                                        </p>
-
-                                        <p class="mt-1 font-black text-zinc-900">
-                                            {{ $article->created_at->format('d/m/Y H:i') }}
-                                        </p>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <p class="font-bold text-zinc-500">
-                                            Slug actuel
-                                        </p>
-
-                                        <p
-                                            class="
-                                                mt-1
-                                                break-all
-                                                font-mono
-                                                text-sm
-                                                text-zinc-700
-                                            "
-                                        >
-                                            {{ $article->slug }}
-                                        </p>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <p class="font-bold text-zinc-500">
-                                            Dernière modification
-                                        </p>
-
-                                        <p class="mt-1 font-black text-zinc-900">
-                                            {{ $article->updated_at->format('d/m/Y H:i') }}
-                                        </p>
-
+                                        {{ $article->updated_at->format('d/m/Y à H:i') }}
                                     </div>
 
                                 </div>
@@ -1378,7 +1341,7 @@
                                 </a>
 
 
-                                <!-- ENREGISTRER -->
+                                <!-- ENREGISTRER LES MODIFICATIONS -->
                                 <button
                                     type="submit"
                                     class="

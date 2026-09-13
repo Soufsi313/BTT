@@ -15,10 +15,152 @@
     <!-- =========================================================
          ESPACE ADMINISTRATION - CRÉATION D'UN ARTICLE
          ========================================================= -->
+
     <section class="min-h-screen bg-white text-zinc-900">
 
-        <div class="flex min-h-screen">
+        <!-- =====================================================
+             STYLES SPÉCIFIQUES À L'ÉDITEUR QUILL
+             =====================================================
+             Quill possède son propre CSS principal.
 
+             Ces règles complètent simplement son apparence afin
+             de mieux l'intégrer à l'administration BTT.
+             ===================================================== -->
+        <style>
+            /* -----------------------------------------------------
+               ZONE PRINCIPALE DE L'ÉDITEUR
+               ----------------------------------------------------- */
+            #article-editor {
+                min-height: 420px;
+                font-size: 16px;
+                line-height: 1.75;
+                background: #ffffff;
+                color: #18181b;
+            }
+
+            #article-editor .ql-editor {
+                min-height: 420px;
+                padding: 24px;
+            }
+
+            /*
+             * La barre d'outils peut passer sur plusieurs lignes
+             * si l'écran n'est pas suffisamment large.
+             */
+            .ql-toolbar.ql-snow {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                border-color: #d4d4d8;
+                background: #fafafa;
+            }
+
+            .ql-container.ql-snow {
+                border-color: #d4d4d8;
+            }
+
+            /*
+             * Couleur rouge BTT lorsque la souris passe
+             * sur certains boutons de Quill.
+             */
+            .ql-snow .ql-toolbar button:hover,
+            .ql-snow.ql-toolbar button:hover,
+            .ql-snow .ql-toolbar button.ql-active,
+            .ql-snow.ql-toolbar button.ql-active {
+                color: #dc2626;
+            }
+
+            .ql-snow .ql-toolbar button:hover .ql-stroke,
+            .ql-snow.ql-toolbar button:hover .ql-stroke,
+            .ql-snow .ql-toolbar button.ql-active .ql-stroke,
+            .ql-snow.ql-toolbar button.ql-active .ql-stroke {
+                stroke: #dc2626;
+            }
+
+            .ql-snow .ql-toolbar button:hover .ql-fill,
+            .ql-snow.ql-toolbar button:hover .ql-fill,
+            .ql-snow .ql-toolbar button.ql-active .ql-fill,
+            .ql-snow.ql-toolbar button.ql-active .ql-fill {
+                fill: #dc2626;
+            }
+
+            /* -----------------------------------------------------
+               POLICES DISPONIBLES DANS L'ÉDITEUR
+               ----------------------------------------------------- */
+
+            .ql-font-arial {
+                font-family: Arial, sans-serif;
+            }
+
+            .ql-font-georgia {
+                font-family: Georgia, serif;
+            }
+
+            .ql-font-times-new-roman {
+                font-family: "Times New Roman", Times, serif;
+            }
+
+            .ql-font-verdana {
+                font-family: Verdana, sans-serif;
+            }
+
+            .ql-font-courier-new {
+                font-family: "Courier New", Courier, monospace;
+            }
+
+            /* -----------------------------------------------------
+               NOMS AFFICHÉS DANS LE MENU DES POLICES
+               ----------------------------------------------------- */
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="arial"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="arial"]::before {
+                content: "Arial";
+                font-family: Arial, sans-serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="georgia"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="georgia"]::before {
+                content: "Georgia";
+                font-family: Georgia, serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="times-new-roman"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="times-new-roman"]::before {
+                content: "Times New Roman";
+                font-family: "Times New Roman", Times, serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="verdana"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="verdana"]::before {
+                content: "Verdana";
+                font-family: Verdana, sans-serif;
+            }
+
+            .ql-snow .ql-picker.ql-font .ql-picker-label[data-value="courier-new"]::before,
+            .ql-snow .ql-picker.ql-font .ql-picker-item[data-value="courier-new"]::before {
+                content: "Courier New";
+                font-family: "Courier New", Courier, monospace;
+            }
+
+            /*
+             * Largeur du menu des polices afin que
+             * "Times New Roman" ne soit pas coupé.
+             */
+            .ql-snow .ql-picker.ql-font {
+                width: 150px;
+            }
+
+            /*
+             * Le menu déroulant passe au-dessus des autres
+             * éléments de l'administration.
+             */
+            .ql-snow .ql-picker-options {
+                z-index: 50;
+            }
+        </style>
+
+
+        <div class="flex min-h-screen">
 
             <!-- =================================================
                  BARRE LATÉRALE ADMIN
@@ -83,7 +225,6 @@
                 <nav class="flex-1 px-4 py-6">
 
                     <div class="space-y-1">
-
 
                         <!-- =====================================
                              TABLEAU DE BORD
@@ -283,7 +424,6 @@
                  ================================================= -->
             <div class="min-w-0 flex-1">
 
-
                 <!-- =============================================
                      EN-TÊTE
                      ============================================= -->
@@ -442,10 +582,15 @@
                         <!-- =====================================
                              FORMULAIRE
                              =====================================
-                             enctype="multipart/form-data" est
-                             indispensable pour envoyer des fichiers.
+                             L'identifiant article-form est utilisé
+                             par resources/js/app.js afin de
+                             synchroniser Quill avant l'envoi.
+
+                             multipart/form-data reste indispensable
+                             pour l'envoi de la bannière.
                              ===================================== -->
                         <form
+                            id="article-form"
                             action="{{ route('admin.articles.store') }}"
                             method="POST"
                             enctype="multipart/form-data"
@@ -503,7 +648,6 @@
 
 
                                 <div class="mt-6 space-y-6">
-
 
                                     <!-- =========================
                                          TITRE
@@ -810,6 +954,7 @@
                                                 text-zinc-500
                                             "
                                         >
+
                                             <p>
                                                 Formats acceptés :
                                                 JPG, JPEG, PNG et WEBP.
@@ -825,6 +970,7 @@
                                                 privilégiez une image horizontale
                                                 de bonne qualité.
                                             </p>
+
                                         </div>
 
                                     </div>
@@ -873,9 +1019,9 @@
                                         Contenu de l'article
                                     </h2>
 
-                                    <p class="mt-2 text-sm text-zinc-500">
-                                        Rédigez le contenu principal de votre
-                                        actualité.
+                                    <p class="mt-2 text-sm leading-6 text-zinc-500">
+                                        Rédigez et mettez en forme votre article
+                                        comme dans un véritable traitement de texte.
                                     </p>
 
                                 </div>
@@ -884,7 +1030,7 @@
                                 <div class="mt-6">
 
                                     <label
-                                        for="content"
+                                        for="article-editor"
                                         class="
                                             block
                                             text-sm
@@ -896,38 +1042,119 @@
                                         <span class="text-red-600">*</span>
                                     </label>
 
+
+                                    <!-- =========================
+                                         CHAMP ENVOYÉ À LARAVEL
+                                         =========================
+                                         Quill n'est pas directement un
+                                         champ de formulaire HTML.
+
+                                         Ce textarea caché contient donc
+                                         le HTML généré par l'éditeur.
+
+                                         resources/js/app.js le met à jour
+                                         automatiquement.
+                                         ========================= -->
                                     <textarea
-                                        id="content"
+                                        id="article-content"
                                         name="content"
-                                        rows="16"
-                                        required
-                                        class="
-                                            mt-2
-                                            w-full
-                                            resize-y
-                                            rounded-md
-                                            border
-                                            border-zinc-300
-                                            bg-white
-                                            px-4
-                                            py-3
-                                            leading-7
-                                            text-zinc-900
-                                            outline-none
-                                            transition
-                                            placeholder:text-zinc-400
-                                            focus:border-red-600
-                                            focus:ring-2
-                                            focus:ring-red-600/20
-                                        "
-                                        placeholder="Rédigez ici le contenu de votre article..."
+                                        class="hidden"
                                     >{{ old('content') }}</textarea>
 
-                                    <p class="mt-2 text-xs text-zinc-500">
-                                        L'ajout d'images directement dans le
-                                        contenu sera développé lors d'une
-                                        prochaine étape.
-                                    </p>
+
+                                    <!-- =========================
+                                         ÉDITEUR QUILL
+                                         =========================
+                                         La barre d'outils est générée
+                                         automatiquement par app.js.
+
+                                         Elle permet notamment :
+                                         - titres ;
+                                         - polices ;
+                                         - tailles ;
+                                         - gras ;
+                                         - italique ;
+                                         - souligné ;
+                                         - barré ;
+                                         - couleurs ;
+                                         - surlignage ;
+                                         - alignements ;
+                                         - listes ;
+                                         - indentation ;
+                                         - citation ;
+                                         - liens.
+                                         ========================= -->
+                                    <div
+                                        class="
+                                            mt-2
+                                            overflow-visible
+                                            rounded-md
+                                        "
+                                    >
+
+                                        <div id="article-editor"></div>
+
+                                    </div>
+
+
+                                    <!-- =========================
+                                         AIDE À LA RÉDACTION
+                                         ========================= -->
+                                    <div
+                                        class="
+                                            mt-4
+                                            rounded-md
+                                            border
+                                            border-zinc-200
+                                            bg-zinc-50
+                                            px-4
+                                            py-4
+                                        "
+                                    >
+
+                                        <p
+                                            class="
+                                                text-xs
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-zinc-700
+                                            "
+                                        >
+                                            Mise en forme disponible
+                                        </p>
+
+                                        <p
+                                            class="
+                                                mt-2
+                                                text-xs
+                                                leading-5
+                                                text-zinc-500
+                                            "
+                                        >
+                                            Vous pouvez modifier la police,
+                                            la taille, les titres, le gras,
+                                            l'italique, le soulignement,
+                                            les couleurs, les listes et
+                                            l'alignement gauche, centré,
+                                            droite ou justifié.
+                                        </p>
+
+                                        <p
+                                            class="
+                                                mt-2
+                                                text-xs
+                                                leading-5
+                                                text-zinc-500
+                                            "
+                                        >
+                                            L'insertion de photos directement
+                                            entre les paragraphes sera ajoutée
+                                            à l'étape suivante avec un véritable
+                                            système d'envoi d'images Laravel.
+                                        </p>
+
+                                    </div>
 
                                 </div>
 
@@ -984,7 +1211,6 @@
                                         lg:grid-cols-2
                                     "
                                 >
-
 
                                     <!-- =========================
                                          STATUT
@@ -1120,9 +1346,9 @@
                                                         text-zinc-500
                                                     "
                                                 >
-                                                    Cette option permettra plus
-                                                    tard d'accorder une place plus
-                                                    importante à l'article sur le Blog.
+                                                    Cette option permet d'accorder
+                                                    une place plus importante à
+                                                    l'article dans le Blog.
                                                 </span>
 
                                             </span>

@@ -57,20 +57,49 @@ Route::get('/coachs', function () {
 | BLOG
 |--------------------------------------------------------------------------
 |
-| La page Blog n'est désormais plus une simple vue statique.
+| Le blog public fonctionne maintenant avec BlogController.
 |
-| Le BlogController récupère les articles publiés depuis la base
-| de données et les transmet à la vue resources/views/blog.blade.php.
+| La première route affiche la bibliothèque des articles.
 |
-| Les brouillons et les articles supprimés ne seront donc pas
-| affichés publiquement.
+| La seconde route affiche un article individuel grâce à son slug.
 |
+| Exemple :
+|
+| /blog
+|
+| /blog/retour-sur-notre-entrainement-boxe
+|
+*/
+
+
+/*
+|--------------------------------------------------------------------------
+| LISTE DES ARTICLES
+|--------------------------------------------------------------------------
 */
 
 Route::get(
     '/blog',
     [BlogController::class, 'index']
 )->name('blog');
+
+
+/*
+|--------------------------------------------------------------------------
+| LECTURE D'UN ARTICLE
+|--------------------------------------------------------------------------
+|
+| Le paramètre {slug} correspond à l'URL propre générée lors de
+| la création ou de la modification de l'article.
+|
+| Cette route doit rester APRÈS /blog.
+|
+*/
+
+Route::get(
+    '/blog/{slug}',
+    [BlogController::class, 'show']
+)->name('blog.show');
 
 
 /*
@@ -540,10 +569,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | CRÉER UN ARTICLE
         |--------------------------------------------------------------------------
-        |
-        | Cette route reste avant les routes dynamiques
-        | contenant {article}.
-        |
         */
 
         Route::get(
@@ -562,15 +587,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | RESTAURER UN ARTICLE SUPPRIMÉ
         |--------------------------------------------------------------------------
-        |
-        | Nous utilisons ici l'ID directement.
-        |
-        | Le contrôleur utilise ensuite :
-        |
-        | Article::withTrashed()->findOrFail($id)
-        |
-        | afin de pouvoir retrouver un article supprimé.
-        |
         */
 
         Route::patch(
@@ -607,11 +623,6 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | SUPPRIMER UN ARTICLE
         |--------------------------------------------------------------------------
-        |
-        | Cette suppression utilise SoftDeletes.
-        |
-        | L'article ne sera donc pas effacé définitivement.
-        |
         */
 
         Route::delete(

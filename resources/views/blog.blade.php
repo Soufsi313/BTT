@@ -20,12 +20,8 @@
 
          Les articles sont récupérés par BlogController@index.
 
-         Seuls les articles :
-         - publiés ;
-         - non supprimés ;
-         - dont la date de publication est atteinte ;
-
-         arrivent jusqu'à cette vue.
+         Chaque vignette est maintenant cliquable et renvoie vers
+         la page complète de l'article.
          ========================================================= -->
 
 
@@ -92,7 +88,6 @@
 
             <div class="max-w-4xl">
 
-                <!-- PETIT TITRE -->
                 <p
                     class="
                         text-xs
@@ -107,7 +102,6 @@
                 </p>
 
 
-                <!-- TITRE PRINCIPAL -->
                 <h1
                     class="
                         mt-5
@@ -125,7 +119,6 @@
                 </h1>
 
 
-                <!-- LIGNE ROUGE -->
                 <div
                     class="
                         mt-6
@@ -136,7 +129,6 @@
                 ></div>
 
 
-                <!-- DESCRIPTION -->
                 <p
                     class="
                         mt-7
@@ -225,9 +217,6 @@
                 </div>
 
 
-                <!-- =============================================
-                     NOMBRE D'ARTICLES
-                     ============================================= -->
                 <p
                     class="
                         text-sm
@@ -268,147 +257,112 @@
                     @foreach ($articles as $article)
 
                         <!-- =====================================
-                             CARTE ARTICLE
+                             LIEN VERS L'ARTICLE COMPLET
                              =====================================
-                             La carte utilise maintenant un format
-                             horizontal adapté aux bannières.
-
-                             L'image complète est conservée afin
-                             d'éviter de rogner les éléments présents
-                             sur la bannière.
+                             Toute la vignette est maintenant
+                             cliquable.
                              ===================================== -->
-                        <article
+                        <a
+                            href="{{ route('blog.show', $article->slug) }}"
                             class="
                                 group
-                                relative
-                                overflow-hidden
-                                border
-                                border-zinc-800
-                                bg-zinc-900
-                                transition
-                                duration-300
-                                hover:-translate-y-1
-                                hover:border-red-600
-                                hover:shadow-2xl
-                                hover:shadow-black/40
+                                block
+                                focus:outline-none
+                                focus-visible:ring-2
+                                focus-visible:ring-red-500
+                                focus-visible:ring-offset-2
+                                focus-visible:ring-offset-zinc-950
                             "
                         >
 
-
                             <!-- =================================
-                                 BANNIÈRE DE L'ARTICLE
-                                 =================================
-                                 aspect-video correspond à un cadre
-                                 16:9.
-
-                                 object-contain garantit que l'image
-                                 complète reste visible.
-
-                                 Contrairement à object-cover,
-                                 aucune partie de la bannière n'est
-                                 volontairement découpée.
+                                 CARTE ARTICLE
                                  ================================= -->
-                            <div
+                            <article
                                 class="
                                     relative
-                                    aspect-video
+                                    h-full
                                     overflow-hidden
-                                    bg-black
+                                    border
+                                    border-zinc-800
+                                    bg-zinc-900
+                                    transition
+                                    duration-300
+                                    group-hover:-translate-y-1
+                                    group-hover:border-red-600
+                                    group-hover:shadow-2xl
+                                    group-hover:shadow-black/40
                                 "
                             >
 
-                                @if ($article->banner_image)
 
-                                    <img
-                                        src="{{ asset('storage/' . $article->banner_image) }}"
-                                        alt="{{ $article->title }}"
-                                        loading="lazy"
-                                        class="
-                                            h-full
-                                            w-full
-                                            object-contain
-                                            transition
-                                            duration-500
-                                            group-hover:scale-[1.02]
-                                        "
-                                    >
-
-                                @else
-
-                                    <!-- =========================
-                                         ANCIEN ARTICLE SANS
-                                         BANNIÈRE
-                                         ========================= -->
-                                    <div
-                                        class="
-                                            flex
-                                            h-full
-                                            w-full
-                                            items-center
-                                            justify-center
-                                            bg-zinc-900
-                                            px-6
-                                            text-center
-                                        "
-                                    >
-
-                                        <span
-                                            class="
-                                                text-xs
-                                                font-black
-                                                uppercase
-                                                tracking-[0.25em]
-                                                text-zinc-600
-                                            "
-                                        >
-                                            Brussels Top Team
-                                        </span>
-
-                                    </div>
-
-                                @endif
-
-
-                                <!-- =============================
-                                     CATÉGORIE
-                                     ============================= -->
+                                <!-- =================================
+                                     BANNIÈRE DE L'ARTICLE
+                                     ================================= -->
                                 <div
                                     class="
-                                        absolute
-                                        left-3
-                                        top-3
+                                        relative
+                                        aspect-video
+                                        overflow-hidden
+                                        bg-black
                                     "
                                 >
 
-                                    <span
-                                        class="
-                                            inline-flex
-                                            bg-red-600
-                                            px-2.5
-                                            py-1.5
-                                            text-[10px]
-                                            font-black
-                                            uppercase
-                                            tracking-wider
-                                            text-white
-                                            shadow-lg
-                                        "
-                                    >
-                                        {{ $article->category }}
-                                    </span>
+                                    @if ($article->banner_image)
 
-                                </div>
+                                        <img
+                                            src="{{ asset('storage/' . $article->banner_image) }}"
+                                            alt="{{ $article->title }}"
+                                            loading="lazy"
+                                            class="
+                                                h-full
+                                                w-full
+                                                object-contain
+                                                transition
+                                                duration-500
+                                                group-hover:scale-[1.02]
+                                            "
+                                        >
+
+                                    @else
+
+                                        <div
+                                            class="
+                                                flex
+                                                h-full
+                                                w-full
+                                                items-center
+                                                justify-center
+                                                bg-zinc-900
+                                                px-6
+                                                text-center
+                                            "
+                                        >
+
+                                            <span
+                                                class="
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-[0.25em]
+                                                    text-zinc-600
+                                                "
+                                            >
+                                                Brussels Top Team
+                                            </span>
+
+                                        </div>
+
+                                    @endif
 
 
-                                <!-- =============================
-                                     ARTICLE MIS EN AVANT
-                                     ============================= -->
-                                @if ($article->is_featured)
-
+                                    <!-- =============================
+                                         CATÉGORIE
+                                         ============================= -->
                                     <div
                                         class="
                                             absolute
-                                            right-3
+                                            left-3
                                             top-3
                                         "
                                     >
@@ -416,183 +370,219 @@
                                         <span
                                             class="
                                                 inline-flex
-                                                bg-black/80
-                                                px-2
+                                                bg-red-600
+                                                px-2.5
                                                 py-1.5
-                                                text-[9px]
+                                                text-[10px]
                                                 font-black
                                                 uppercase
                                                 tracking-wider
                                                 text-white
-                                                backdrop-blur
+                                                shadow-lg
                                             "
                                         >
-                                            À la une
+                                            {{ $article->category }}
                                         </span>
 
                                     </div>
 
-                                @endif
 
-                            </div>
+                                    <!-- =============================
+                                         ARTICLE MIS EN AVANT
+                                         ============================= -->
+                                    @if ($article->is_featured)
 
-
-                            <!-- =================================
-                                 INFORMATIONS DE L'ARTICLE
-                                 ================================= -->
-                            <div class="p-5">
-
-
-                                <!-- =============================
-                                     DATE
-                                     ============================= -->
-                                <p
-                                    class="
-                                        text-[10px]
-                                        font-black
-                                        uppercase
-                                        tracking-[0.2em]
-                                        text-red-500
-                                    "
-                                >
-                                    {{ $article->published_at->format('d/m/Y') }}
-                                </p>
-
-
-                                <!-- =============================
-                                     TITRE
-                                     ============================= -->
-                                <h3
-                                    class="
-                                        mt-2
-                                        text-lg
-                                        font-black
-                                        leading-tight
-                                        text-white
-                                        transition
-                                        group-hover:text-red-500
-                                    "
-                                >
-                                    {{ $article->title }}
-                                </h3>
-
-
-                                <!-- =============================
-                                     RÉSUMÉ
-                                     ============================= -->
-                                @if ($article->excerpt)
-
-                                    <p
-                                        class="
-                                            mt-3
-                                            line-clamp-3
-                                            text-sm
-                                            leading-6
-                                            text-zinc-400
-                                        "
-                                    >
-                                        {{ $article->excerpt }}
-                                    </p>
-
-                                @else
-
-                                    <p
-                                        class="
-                                            mt-3
-                                            text-sm
-                                            italic
-                                            leading-6
-                                            text-zinc-600
-                                        "
-                                    >
-                                        Découvrez cette actualité du
-                                        Brussels Top Team.
-                                    </p>
-
-                                @endif
-
-
-                                <!-- =============================
-                                     AUTEUR
-                                     ============================= -->
-                                <div
-                                    class="
-                                        mt-5
-                                        flex
-                                        items-center
-                                        justify-between
-                                        gap-3
-                                        border-t
-                                        border-zinc-800
-                                        pt-4
-                                    "
-                                >
-
-                                    <div class="min-w-0">
-
-                                        <p
+                                        <div
                                             class="
-                                                text-[9px]
-                                                font-black
-                                                uppercase
-                                                tracking-[0.2em]
-                                                text-zinc-600
+                                                absolute
+                                                right-3
+                                                top-3
                                             "
                                         >
-                                            Publication
-                                        </p>
 
+                                            <span
+                                                class="
+                                                    inline-flex
+                                                    bg-black/80
+                                                    px-2
+                                                    py-1.5
+                                                    text-[9px]
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wider
+                                                    text-white
+                                                    backdrop-blur
+                                                "
+                                            >
+                                                À la une
+                                            </span>
+
+                                        </div>
+
+                                    @endif
+
+                                </div>
+
+
+                                <!-- =================================
+                                     INFORMATIONS DE L'ARTICLE
+                                     ================================= -->
+                                <div class="p-5">
+
+                                    <p
+                                        class="
+                                            text-[10px]
+                                            font-black
+                                            uppercase
+                                            tracking-[0.2em]
+                                            text-red-500
+                                        "
+                                    >
+                                        {{ $article->published_at->format('d/m/Y') }}
+                                    </p>
+
+
+                                    <h3
+                                        class="
+                                            mt-2
+                                            text-lg
+                                            font-black
+                                            leading-tight
+                                            text-white
+                                            transition
+                                            group-hover:text-red-500
+                                        "
+                                    >
+                                        {{ $article->title }}
+                                    </h3>
+
+
+                                    @if ($article->excerpt)
 
                                         <p
                                             class="
-                                                mt-1
-                                                truncate
-                                                text-xs
-                                                font-bold
+                                                mt-3
+                                                line-clamp-3
+                                                text-sm
+                                                leading-6
                                                 text-zinc-400
                                             "
                                         >
-
-                                            @if ($article->author)
-
-                                                {{ $article->author->pseudo }}
-
-                                            @else
-
-                                                Brussels Top Team
-
-                                            @endif
-
+                                            {{ $article->excerpt }}
                                         </p>
 
-                                    </div>
+                                    @else
+
+                                        <p
+                                            class="
+                                                mt-3
+                                                text-sm
+                                                italic
+                                                leading-6
+                                                text-zinc-600
+                                            "
+                                        >
+                                            Découvrez cette actualité du
+                                            Brussels Top Team.
+                                        </p>
+
+                                    @endif
 
 
-                                    <!-- =========================
-                                         MARQUE VISUELLE BTT
-                                         ========================= -->
+                                    <!-- =============================
+                                         AUTEUR + INDICATION DE LECTURE
+                                         ============================= -->
                                     <div
                                         class="
+                                            mt-5
                                             flex
-                                            h-8
-                                            w-8
-                                            shrink-0
                                             items-center
-                                            justify-center
-                                            bg-red-600
-                                            text-[10px]
-                                            font-black
-                                            text-white
+                                            justify-between
+                                            gap-3
+                                            border-t
+                                            border-zinc-800
+                                            pt-4
                                         "
                                     >
-                                        BTT
+
+                                        <div class="min-w-0">
+
+                                            <p
+                                                class="
+                                                    text-[9px]
+                                                    font-black
+                                                    uppercase
+                                                    tracking-[0.2em]
+                                                    text-zinc-600
+                                                "
+                                            >
+                                                Publication
+                                            </p>
+
+
+                                            <p
+                                                class="
+                                                    mt-1
+                                                    truncate
+                                                    text-xs
+                                                    font-bold
+                                                    text-zinc-400
+                                                "
+                                            >
+
+                                                @if ($article->author)
+
+                                                    {{ $article->author->pseudo }}
+
+                                                @else
+
+                                                    Brussels Top Team
+
+                                                @endif
+
+                                            </p>
+
+                                        </div>
+
+
+                                        <!-- =========================
+                                             INDICATION VISUELLE
+                                             ========================= -->
+                                        <div
+                                            class="
+                                                flex
+                                                items-center
+                                                gap-2
+                                                text-xs
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-zinc-500
+                                                transition
+                                                group-hover:text-red-500
+                                            "
+                                        >
+                                            Lire
+
+                                            <span
+                                                class="
+                                                    transition
+                                                    duration-300
+                                                    group-hover:translate-x-1
+                                                "
+                                                aria-hidden="true"
+                                            >
+                                                →
+                                            </span>
+                                        </div>
+
                                     </div>
 
                                 </div>
 
-                            </div>
+                            </article>
 
-                        </article>
+                        </a>
 
                     @endforeach
 

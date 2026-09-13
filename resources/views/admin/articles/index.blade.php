@@ -332,8 +332,8 @@
                                     text-zinc-500
                                 "
                             >
-                                Créez, gérez et publiez les actualités
-                                du Brussels Top Team.
+                                Créez, modifiez, publiez, supprimez
+                                et restaurez les actualités du Brussels Top Team.
                             </p>
 
                         </div>
@@ -477,7 +477,7 @@
 
                         <div class="overflow-x-auto">
 
-                            <table class="w-full min-w-[1250px]">
+                            <table class="w-full min-w-[1350px]">
 
 
                                 <!-- =============================
@@ -727,9 +727,7 @@
                                         </th>
 
 
-                                        <!-- =====================
-                                             ACTIONS
-                                             ===================== -->
+                                        <!-- ACTIONS -->
                                         <th
                                             class="
                                                 px-5
@@ -816,13 +814,7 @@
                                                         "
                                                     >
 
-                                                        <span
-                                                            class="
-                                                                text-xs
-                                                                font-bold
-                                                                text-zinc-400
-                                                            "
-                                                        >
+                                                        <span class="text-xs font-bold text-zinc-400">
                                                             Aucune bannière
                                                         </span>
 
@@ -1040,60 +1032,147 @@
                                             <!-- =================
                                                  ACTIONS
                                                  ================= -->
-                                            <td class="px-5 py-5 text-right">
+                                            <td class="px-5 py-5">
 
-                                                @if (! $article->deleted_at)
+                                                <div
+                                                    class="
+                                                        flex
+                                                        items-center
+                                                        justify-end
+                                                        gap-2
+                                                    "
+                                                >
 
-                                                    <!--
-                                                        Un article actif peut être
-                                                        modifié normalement.
-                                                    -->
-                                                    <a
-                                                        href="{{ route(
-                                                            'admin.articles.edit',
-                                                            $article
-                                                        ) }}"
-                                                        class="
-                                                            inline-flex
-                                                            items-center
-                                                            justify-center
-                                                            rounded-md
-                                                            border
-                                                            border-zinc-300
-                                                            bg-white
-                                                            px-4
-                                                            py-2
-                                                            text-xs
-                                                            font-black
-                                                            uppercase
-                                                            tracking-wider
-                                                            text-zinc-700
-                                                            transition
-                                                            hover:border-red-600
-                                                            hover:text-red-600
-                                                        "
-                                                    >
-                                                        Modifier
-                                                    </a>
 
-                                                @else
+                                                    @if ($article->deleted_at)
 
-                                                    <!--
-                                                        Les articles supprimés
-                                                        seront gérés plus tard
-                                                        par la restauration.
-                                                    -->
-                                                    <span
-                                                        class="
-                                                            text-xs
-                                                            font-bold
-                                                            text-zinc-400
-                                                        "
-                                                    >
-                                                        Indisponible
-                                                    </span>
+                                                        <!-- =================
+                                                             RESTAURER
+                                                             ================= -->
+                                                        <form
+                                                            action="{{ route(
+                                                                'admin.articles.restore',
+                                                                $article->id
+                                                            ) }}"
+                                                            method="POST"
+                                                        >
 
-                                                @endif
+                                                            @csrf
+                                                            @method('PATCH')
+
+                                                            <button
+                                                                type="submit"
+                                                                class="
+                                                                    inline-flex
+                                                                    items-center
+                                                                    justify-center
+                                                                    rounded-md
+                                                                    bg-green-600
+                                                                    px-4
+                                                                    py-2
+                                                                    text-xs
+                                                                    font-black
+                                                                    uppercase
+                                                                    tracking-wider
+                                                                    text-white
+                                                                    transition
+                                                                    hover:bg-green-700
+                                                                "
+                                                            >
+                                                                Restaurer
+                                                            </button>
+
+                                                        </form>
+
+                                                    @else
+
+                                                        <!-- =================
+                                                             MODIFIER
+                                                             ================= -->
+                                                        <a
+                                                            href="{{ route(
+                                                                'admin.articles.edit',
+                                                                $article
+                                                            ) }}"
+                                                            class="
+                                                                inline-flex
+                                                                items-center
+                                                                justify-center
+                                                                rounded-md
+                                                                border
+                                                                border-zinc-300
+                                                                bg-white
+                                                                px-4
+                                                                py-2
+                                                                text-xs
+                                                                font-black
+                                                                uppercase
+                                                                tracking-wider
+                                                                text-zinc-700
+                                                                transition
+                                                                hover:border-red-600
+                                                                hover:text-red-600
+                                                            "
+                                                        >
+                                                            Modifier
+                                                        </a>
+
+
+                                                        <!-- =================
+                                                             SUPPRIMER
+                                                             =================
+                                                             Un message de
+                                                             confirmation évite
+                                                             les suppressions
+                                                             accidentelles.
+                                                             ================= -->
+                                                        <form
+                                                            action="{{ route(
+                                                                'admin.articles.destroy',
+                                                                $article
+                                                            ) }}"
+                                                            method="POST"
+                                                            onsubmit="
+                                                                return confirm(
+                                                                    'Voulez-vous vraiment supprimer cet article ?'
+                                                                );
+                                                            "
+                                                        >
+
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button
+                                                                type="submit"
+                                                                class="
+                                                                    inline-flex
+                                                                    items-center
+                                                                    justify-center
+                                                                    rounded-md
+                                                                    border
+                                                                    border-red-200
+                                                                    bg-red-50
+                                                                    px-4
+                                                                    py-2
+                                                                    text-xs
+                                                                    font-black
+                                                                    uppercase
+                                                                    tracking-wider
+                                                                    text-red-700
+                                                                    transition
+                                                                    hover:border-red-600
+                                                                    hover:bg-red-600
+                                                                    hover:text-white
+                                                                "
+                                                            >
+                                                                Supprimer
+                                                            </button>
+
+                                                        </form>
+
+                                                    @endif
+
+                                                </div>
 
                                             </td>
 

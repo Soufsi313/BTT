@@ -28,7 +28,14 @@ use Illuminate\Support\Str;
  * - d'enregistrer une bannière ;
  * - d'afficher le formulaire de modification ;
  * - de modifier un article existant ;
- * - de remplacer sa bannière.
+ * - de remplacer sa bannière ;
+ * - de supprimer temporairement un article ;
+ * - de restaurer un article supprimé.
+ *
+ * Les suppressions utilisent SoftDeletes.
+ *
+ * Cela signifie qu'un article supprimé reste dans la base de
+ * données avec une date renseignée dans la colonne deleted_at.
  *
  * ================================================================
  */
@@ -212,7 +219,7 @@ class AdminArticleController extends Controller
         /**
          * Sécurité supplémentaire :
          *
-         * si un titre ne génère exceptionnellement aucun slug,
+         * si le titre ne génère exceptionnellement aucun slug,
          * on utilise "article".
          */
         if ($baseSlug === '') {
@@ -229,6 +236,9 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * SLUG UNIQUE
          * -----------------------------------------------------------
+         *
+         * On vérifie également les articles supprimés afin d'éviter
+         * deux articles possédant le même slug en cas de restauration.
          */
         while (
             Article::withTrashed()
@@ -312,12 +322,6 @@ class AdminArticleController extends Controller
      *
      * Laravel récupère automatiquement l'article correspondant
      * au paramètre {article} présent dans l'URL.
-     *
-     * Exemple :
-     *
-     * /admin/articles/4/modifier
-     *
-     * Laravel injectera automatiquement l'article ayant l'ID 4.
      */
     public function edit(Article $article): View
     {
@@ -334,18 +338,6 @@ class AdminArticleController extends Controller
      * ===============================================================
      * MODIFICATION D'UN ARTICLE
      * ===============================================================
-     *
-     * Cette méthode permet de modifier :
-     *
-     * - le titre ;
-     * - le slug ;
-     * - la catégorie ;
-     * - le résumé ;
-     * - le contenu ;
-     * - la bannière ;
-     * - le statut ;
-     * - la mise en avant ;
-     * - la date de publication.
      */
     public function update(
         Request $request,
@@ -356,11 +348,10 @@ class AdminArticleController extends Controller
          * VALIDATION
          * -----------------------------------------------------------
          *
-         * Contrairement à la création, la bannière n'est pas
-         * obligatoire.
+         * La bannière n'est pas obligatoire lors d'une modification.
          *
-         * Si aucune nouvelle image n'est envoyée, l'ancienne bannière
-         * est simplement conservée.
+         * Si aucune nouvelle bannière n'est envoyée,
+         * l'ancienne est conservée.
          */
         $validated = $request->validate([
             'title' => [
@@ -411,16 +402,6 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * NOUVEAU SLUG
          * -----------------------------------------------------------
-         *
-         * Le slug est recalculé à partir du titre.
-         *
-         * Exemple :
-         *
-         * "Tournoi BTT Bruxelles"
-         *
-         * devient :
-         *
-         * tournoi-btt-bruxelles
          */
         $baseSlug = Str::slug(
             $validated['title']
@@ -442,10 +423,7 @@ class AdminArticleController extends Controller
          * VÉRIFICATION DE L'UNICITÉ DU SLUG
          * -----------------------------------------------------------
          *
-         * On vérifie également les articles supprimés.
-         *
-         * En revanche, on ignore l'article actuellement modifié,
-         * puisqu'il peut évidemment conserver son propre slug.
+         * On ignore l'article actuellement modifié.
          */
         while (
             Article::withTrashed()
@@ -463,8 +441,6 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * BANNIÈRE ACTUELLE
          * -----------------------------------------------------------
-         *
-         * Par défaut, nous conservons l'image déjà enregistrée.
          */
         $bannerPath = $article->banner_image;
 
@@ -476,10 +452,7 @@ class AdminArticleController extends Controller
          */
         if ($request->hasFile('banner_image')) {
             /**
-             * On conserve temporairement le chemin de l'ancienne image.
-             *
-             * Elle sera supprimée seulement après l'enregistrement
-             * de la nouvelle bannière.
+             * On mémorise le chemin de l'ancienne bannière.
              */
             $oldBannerPath = $article->banner_image;
 
@@ -496,9 +469,10 @@ class AdminArticleController extends Controller
 
 
             /**
-             * Suppression de l'ancienne bannière.
+             * Suppression de l'ancienne bannière physique.
              *
-             * On vérifie d'abord qu'elle existe réellement.
+             * Ici c'est logique car elle vient réellement d'être
+             * remplacée par une nouvelle image.
              */
             if (
                 $oldBannerPath
@@ -521,11 +495,10 @@ class AdminArticleController extends Controller
 
         if ($validated['status'] === 'published') {
             /**
-             * Si l'article était déjà publié, on conserve sa première
-             * date de publication.
+             * Si l'article était déjà publié, on conserve sa
+             * première date de publication.
              *
-             * S'il passe de brouillon à publié, on utilise la date
-             * actuelle.
+             * S'il passe de brouillon à publié, on utilise maintenant.
              */
             $publishedAt = $article->published_at ?? now();
         }
@@ -569,6 +542,122 @@ class AdminArticleController extends Controller
             ->with(
                 'success',
                 'L’article a été modifié avec succès.'
+            );
+    }
+
+
+    /**
+     * ===============================================================
+     * SUPPRESSION D'UN ARTICLE
+     * ===============================================================
+     *
+     * Grâce à SoftDeletes, delete() ne supprime pas définitivement
+     * l'article de la base de données.
+     *
+     * Laravel renseigne simplement la colonne deleted_at.
+     *
+     * Exemple :
+     *
+     * deleted_at = 2026-09-13 14:30:00
+     *
+     * L'article pourra donc être restauré plus tard.
+     *
+     * IMPORTANT :
+     *
+     * Nous ne supprimons PAS la bannière du stockage ici.
+     *
+     * Pourquoi ?
+     *
+     * Parce qu'une suppression douce doit rester réversible.
+     * Si l'article est restauré, sa bannière doit également
+     * réapparaître immédiatement.
+     * ===============================================================
+     */
+    public function destroy(Article $article): RedirectResponse
+    {
+        /**
+         * -----------------------------------------------------------
+         * SUPPRESSION DOUCE
+         * -----------------------------------------------------------
+         */
+        $article->delete();
+
+
+        /**
+         * -----------------------------------------------------------
+         * RETOUR À LA LISTE
+         * -----------------------------------------------------------
+         */
+        return redirect()
+            ->route('admin.articles.index')
+            ->with(
+                'success',
+                'L’article a été supprimé avec succès.'
+            );
+    }
+
+
+    /**
+     * ===============================================================
+     * RESTAURATION D'UN ARTICLE SUPPRIMÉ
+     * ===============================================================
+     *
+     * Contrairement aux méthodes edit(), update() et destroy(),
+     * nous n'utilisons pas directement :
+     *
+     * Article $article
+     *
+     * dans les paramètres.
+     *
+     * Pourquoi ?
+     *
+     * Le Route Model Binding classique de Laravel ne récupère pas
+     * automatiquement les modèles supprimés par SoftDeletes.
+     *
+     * Nous récupérons donc manuellement l'article grâce à son ID
+     * avec withTrashed().
+     * ===============================================================
+     */
+    public function restore(int $id): RedirectResponse
+    {
+        /**
+         * -----------------------------------------------------------
+         * RECHERCHE DE L'ARTICLE
+         * -----------------------------------------------------------
+         *
+         * withTrashed() permet de rechercher également parmi les
+         * articles dont deleted_at n'est pas NULL.
+         *
+         * findOrFail() provoque une erreur 404 si l'article
+         * demandé n'existe pas.
+         */
+        $article = Article::withTrashed()
+            ->findOrFail($id);
+
+
+        /**
+         * -----------------------------------------------------------
+         * VÉRIFICATION
+         * -----------------------------------------------------------
+         *
+         * Nous ne lançons la restauration que si l'article est
+         * réellement supprimé.
+         */
+        if ($article->trashed()) {
+            $article->restore();
+        }
+
+
+        /**
+         * -----------------------------------------------------------
+         * RETOUR À LA LISTE
+         * -----------------------------------------------------------
+         */
+        return redirect()
+            ->route('admin.articles.index')
+            ->with(
+                'success',
+                'L’article a été restauré avec succès.'
             );
     }
 }

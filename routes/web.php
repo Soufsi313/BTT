@@ -95,12 +95,6 @@ Route::get('/contact', function () {
 })->name('contact');
 
 
-/*
-|--------------------------------------------------------------------------
-| ENVOI DU FORMULAIRE DE CONTACT
-|--------------------------------------------------------------------------
-*/
-
 Route::post(
     '/contact',
     [ContactController::class, 'store']
@@ -209,15 +203,6 @@ Route::middleware('auth')
         |--------------------------------------------------------------------------
         | MESSAGERIE ADHÉRENT
         |--------------------------------------------------------------------------
-        |
-        | IMPORTANT :
-        |
-        | La route /messages/nouveau doit rester placée AVANT
-        | /messages/{conversation}.
-        |
-        | Sinon Laravel pourrait interpréter "nouveau" comme
-        | l'identifiant d'une conversation.
-        |
         */
 
         Route::get(
@@ -226,6 +211,14 @@ Route::middleware('auth')
         )->name('messages.index');
 
 
+        /*
+         * Cette route doit rester avant :
+         *
+         * /messages/{conversation}
+         *
+         * afin que Laravel n'interprète pas "nouveau"
+         * comme l'identifiant d'une conversation.
+         */
         Route::get(
             '/messages/nouveau',
             [MemberMessageController::class, 'create']
@@ -537,8 +530,8 @@ Route::middleware([
         | CRÉER UN ARTICLE
         |--------------------------------------------------------------------------
         |
-        | Cette route doit rester avant toute route dynamique
-        | du type /articles/{article}.
+        | Cette route reste avant les routes dynamiques
+        | contenant {article}.
         |
         */
 
@@ -556,16 +549,29 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | MODIFIER UN ARTICLE
+        | RESTAURER UN ARTICLE SUPPRIMÉ
         |--------------------------------------------------------------------------
         |
-        | Exemple :
+        | Nous utilisons ici l'ID directement.
         |
-        | /admin/articles/3/modifier
+        | Le contrôleur utilise ensuite :
         |
-        | Laravel récupère automatiquement l'article correspondant
-        | grâce au Route Model Binding.
+        | Article::withTrashed()->findOrFail($id)
         |
+        | afin de pouvoir retrouver un article supprimé.
+        |
+        */
+
+        Route::patch(
+            '/articles/{id}/reactiver',
+            [AdminArticleController::class, 'restore']
+        )->name('articles.restore');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MODIFIER UN ARTICLE
+        |--------------------------------------------------------------------------
         */
 
         Route::get(
@@ -578,14 +584,27 @@ Route::middleware([
         |--------------------------------------------------------------------------
         | ENREGISTRER LES MODIFICATIONS
         |--------------------------------------------------------------------------
-        |
-        | La méthode PATCH indique que l'on modifie une ressource
-        | déjà existante.
-        |
         */
 
         Route::patch(
             '/articles/{article}',
             [AdminArticleController::class, 'update']
         )->name('articles.update');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUPPRIMER UN ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | Cette suppression utilise SoftDeletes.
+        |
+        | L'article ne sera donc pas effacé définitivement.
+        |
+        */
+
+        Route::delete(
+            '/articles/{article}',
+            [AdminArticleController::class, 'destroy']
+        )->name('articles.destroy');
     });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Article;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 
 /**
@@ -16,6 +17,8 @@ use Illuminate\Contracts\View\View;
  * Il permet :
  *
  * - d'afficher la liste des articles publiés ;
+ * - de filtrer les articles par catégorie ;
+ * - de trier les articles ;
  * - d'afficher un article individuel ;
  * - d'exclure les brouillons ;
  * - d'exclure les articles supprimés ;
@@ -27,31 +30,158 @@ use Illuminate\Contracts\View\View;
 class BlogController extends Controller
 {
     /**
-     * ===============================================================
-     * LISTE PUBLIQUE DES ARTICLES
-     * ===============================================================
+     * ============================================================
+     * AFFICHER LA LISTE PUBLIQUE DES ARTICLES
+     * ============================================================
      *
-     * URL :
+     * Paramètres disponibles dans l'URL :
      *
-     * /blog
+     * category
+     * Exemple :
      *
-     * Cette méthode récupère uniquement les articles qui peuvent
-     * réellement être visibles publiquement.
-     * ===============================================================
+     * /blog?category=HYROX
+     *
+     *
+     * sort
+     * Valeurs possibles :
+     *
+     * recent
+     * oldest
+     * featured
+     * title
+     *
+     * Exemple :
+     *
+     * /blog?category=HYROX&sort=recent
+     *
+     * ============================================================
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        /**
-         * -----------------------------------------------------------
-         * RÉCUPÉRATION DES ARTICLES PUBLIÉS
-         * -----------------------------------------------------------
-         *
-         * Nous ne récupérons pas les articles supprimés.
-         *
-         * Laravel les exclut automatiquement grâce à SoftDeletes
-         * puisque nous n'utilisons pas withTrashed().
-         */
-        $articles = Article::query()
+        /*
+        |--------------------------------------------------------------------------
+        | CATÉGORIES AUTORISÉES
+        |--------------------------------------------------------------------------
+        |
+        | Ces catégories correspondent aux catégories actuellement utilisées
+        | dans la gestion des articles.
+        |
+        | On utilise une liste contrôlée afin d'éviter d'accepter n'importe
+        | quelle valeur provenant directement de l'URL.
+        |
+        */
+
+        $categories = [
+            'Actualité',
+            'Futsal',
+            'Boxe',
+            'Boxe Femmes',
+            'HYROX',
+            'Association',
+            'Événement',
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI AUTORISÉ
+        |--------------------------------------------------------------------------
+        |
+        | recent   = articles les plus récents
+        | oldest   = articles les plus anciens
+        | featured = articles mis en avant en premier
+        | title    = ordre alphabétique A → Z
+        |
+        */
+
+        $allowedSorts = [
+            'recent',
+            'oldest',
+            'featured',
+            'title',
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉCUPÉRATION DE LA CATÉGORIE
+        |--------------------------------------------------------------------------
+        */
+
+        $selectedCategory = $request->query('category');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VÉRIFICATION DE LA CATÉGORIE
+        |--------------------------------------------------------------------------
+        |
+        | Si la catégorie reçue n'existe pas dans notre liste,
+        | nous revenons simplement sur "Toutes les catégories".
+        |
+        */
+
+        if (
+            $selectedCategory !== null
+            && !in_array(
+                $selectedCategory,
+                $categories,
+                true
+            )
+        ) {
+            $selectedCategory = null;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉCUPÉRATION DU TRI
+        |--------------------------------------------------------------------------
+        |
+        | Par défaut, nous affichons les articles les plus récents.
+        |
+        */
+
+        $selectedSort = $request->query(
+            'sort',
+            'recent'
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VÉRIFICATION DU TRI
+        |--------------------------------------------------------------------------
+        */
+
+        if (!in_array(
+            $selectedSort,
+            $allowedSorts,
+            true
+        )) {
+            $selectedSort = 'recent';
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REQUÊTE DE BASE
+        |--------------------------------------------------------------------------
+        |
+        | Seuls les articles :
+        |
+        | - publiés ;
+        | - ayant une date de publication ;
+        | - dont la date de publication est atteinte ;
+        |
+        | peuvent apparaître dans le blog public.
+        |
+        | Les articles supprimés avec SoftDeletes sont automatiquement
+        | exclus par Eloquent.
+        |
+        */
+
+        $query = Article::query()
             ->with('author')
             ->where(
                 'status',
@@ -64,69 +194,199 @@ class BlogController extends Controller
                 'published_at',
                 '<=',
                 now()
-            )
-            ->orderByDesc(
-                'is_featured'
-            )
-            ->orderByDesc(
-                'published_at'
-            )
-            ->paginate(12);
+            );
 
 
-        /**
-         * -----------------------------------------------------------
-         * AFFICHAGE DE LA PAGE BLOG
-         * -----------------------------------------------------------
-         */
+        /*
+        |--------------------------------------------------------------------------
+        | FILTRE PAR CATÉGORIE
+        |--------------------------------------------------------------------------
+        |
+        | Le filtre n'est appliqué que lorsqu'une catégorie valide
+        | a été sélectionnée.
+        |
+        */
+
+        if ($selectedCategory !== null) {
+
+            $query->where(
+                'category',
+                $selectedCategory
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TRI DES ARTICLES
+        |--------------------------------------------------------------------------
+        */
+
+        switch ($selectedSort) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | PLUS ANCIENS
+            |--------------------------------------------------------------------------
+            */
+
+            case 'oldest':
+
+                $query->orderBy(
+                    'published_at',
+                    'asc'
+                );
+
+                break;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | À LA UNE
+            |--------------------------------------------------------------------------
+            |
+            | Les articles mis en avant apparaissent d'abord.
+            |
+            | À l'intérieur de chaque groupe, les plus récents
+            | apparaissent en premier.
+            |
+            */
+
+            case 'featured':
+
+                $query
+                    ->orderByDesc(
+                        'is_featured'
+                    )
+                    ->orderByDesc(
+                        'published_at'
+                    );
+
+                break;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | TITRE A → Z
+            |--------------------------------------------------------------------------
+            */
+
+            case 'title':
+
+                $query
+                    ->orderBy(
+                        'title',
+                        'asc'
+                    )
+                    ->orderByDesc(
+                        'published_at'
+                    );
+
+                break;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | PLUS RÉCENTS
+            |--------------------------------------------------------------------------
+            |
+            | Tri par défaut.
+            |
+            */
+
+            case 'recent':
+
+            default:
+
+                $query->orderByDesc(
+                    'published_at'
+                );
+
+                break;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATION
+        |--------------------------------------------------------------------------
+        |
+        | Nous affichons 12 articles par page.
+        |
+        | withQueryString() permet de conserver automatiquement
+        | les paramètres :
+        |
+        | ?category=...
+        | ?sort=...
+        |
+        | lorsqu'on clique sur la page suivante.
+        |
+        */
+
+        $articles = $query
+            ->paginate(12)
+            ->withQueryString();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | AFFICHAGE DE LA VUE
+        |--------------------------------------------------------------------------
+        |
+        | Nous transmettons :
+        |
+        | - les articles ;
+        | - les catégories disponibles ;
+        | - la catégorie sélectionnée ;
+        | - le tri sélectionné.
+        |
+        */
+
         return view(
             'blog',
             [
                 'articles' => $articles,
+
+                'categories' => $categories,
+
+                'selectedCategory' => $selectedCategory,
+
+                'selectedSort' => $selectedSort,
             ]
         );
     }
 
 
     /**
-     * ===============================================================
-     * LECTURE D'UN ARTICLE
-     * ===============================================================
+     * ============================================================
+     * AFFICHER UN ARTICLE
+     * ============================================================
      *
-     * URL future :
-     *
-     * /blog/{slug}
+     * L'article est recherché grâce à son slug.
      *
      * Exemple :
      *
-     * /blog/retour-sur-notre-entrainement-boxe
+     * /blog/btt-girls-la-boxe-feminine
      *
-     * Nous utilisons le slug au lieu de l'identifiant numérique
-     * afin d'obtenir une adresse plus propre et plus lisible.
-     * ===============================================================
+     * ============================================================
      */
     public function show(string $slug): View
     {
-        /**
-         * -----------------------------------------------------------
-         * RECHERCHE DE L'ARTICLE
-         * -----------------------------------------------------------
-         *
-         * L'article doit :
-         *
-         * - posséder le slug demandé ;
-         * - être publié ;
-         * - posséder une date de publication ;
-         * - avoir déjà atteint sa date de publication ;
-         * - ne pas être supprimé.
-         *
-         * firstOrFail() provoquera automatiquement une erreur 404
-         * si aucun article public ne correspond.
-         *
-         * Cela empêche notamment un visiteur d'accéder directement
-         * à un brouillon en connaissant son slug.
-         * -----------------------------------------------------------
-         */
+        /*
+        |--------------------------------------------------------------------------
+        | RECHERCHE DE L'ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | L'article doit obligatoirement :
+        |
+        | - correspondre au slug demandé ;
+        | - être publié ;
+        | - avoir une date de publication ;
+        | - être déjà publié à l'heure actuelle.
+        |
+        */
+
         $article = Article::query()
             ->with('author')
             ->where(
@@ -148,15 +408,12 @@ class BlogController extends Controller
             ->firstOrFail();
 
 
-        /**
-         * -----------------------------------------------------------
-         * AFFICHAGE DE L'ARTICLE
-         * -----------------------------------------------------------
-         *
-         * La vue sera créée lors de l'étape suivante :
-         *
-         * resources/views/blog/show.blade.php
-         */
+        /*
+        |--------------------------------------------------------------------------
+        | AFFICHAGE DE L'ARTICLE
+        |--------------------------------------------------------------------------
+        */
+
         return view(
             'blog.show',
             [

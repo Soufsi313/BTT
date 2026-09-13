@@ -1,150 +1,111 @@
 @extends('layouts.app')
 
 
-@section('title', 'Actualités - Brussels Top Team')
+@section('title', 'Blog - Brussels Top Team')
 
 
 @section(
     'meta_description',
-    'Découvrez les dernières actualités du Brussels Top Team : boxe, futsal, HYROX, événements et vie de l’association.'
+    'Découvrez les actualités, événements et informations du Brussels Top Team.'
 )
 
 
 @section('content')
 
     <!-- =========================================================
-         BLOG PUBLIC - BRUSSELS TOP TEAM
+         BLOG PUBLIC BTT
          =========================================================
-         Cette page affiche dynamiquement les articles publiés
-         depuis l'administration.
+         Cette page affiche la bibliothèque publique des articles.
 
-         Les articles sont récupérés par BlogController@index.
-
-         Chaque vignette est maintenant cliquable et renvoie vers
-         la page complète de l'article.
+         Elle permet maintenant :
+         - de filtrer les articles par catégorie ;
+         - de trier les articles ;
+         - de combiner catégorie + tri ;
+         - de conserver les filtres pendant la pagination.
          ========================================================= -->
 
 
     <!-- =========================================================
-         EN-TÊTE DU BLOG
+         HERO DU BLOG
          ========================================================= -->
     <section
         class="
             relative
             overflow-hidden
             border-b
-            border-zinc-800
-            bg-zinc-950
+            border-zinc-900
+            bg-black
+            px-6
+            py-16
+            lg:px-8
+            lg:py-20
         "
     >
 
-        <!-- =====================================================
-             ÉLÉMENTS D'AMBIANCE
-             ===================================================== -->
+        <!-- Élément graphique rouge discret -->
         <div
             class="
                 pointer-events-none
                 absolute
-                -right-24
-                -top-40
-                h-[420px]
-                w-[420px]
+                -right-32
+                top-0
+                h-96
+                w-96
                 rounded-full
                 bg-red-600/10
                 blur-3xl
             "
         ></div>
 
-        <div
-            class="
-                pointer-events-none
-                absolute
-                -bottom-48
-                -left-32
-                h-[400px]
-                w-[400px]
-                rounded-full
-                bg-red-900/10
-                blur-3xl
-            "
-        ></div>
+
+        <div class="relative mx-auto max-w-7xl">
+
+            <p
+                class="
+                    text-xs
+                    font-black
+                    uppercase
+                    tracking-[0.35em]
+                    text-red-500
+                "
+            >
+                Brussels Top Team
+            </p>
 
 
-        <!-- =====================================================
-             CONTENU
-             ===================================================== -->
-        <div
-            class="
-                relative
-                mx-auto
-                max-w-7xl
-                px-6
-                py-16
-                sm:py-20
-                lg:px-8
-                lg:py-24
-            "
-        >
-
-            <div class="max-w-4xl">
-
-                <p
-                    class="
-                        text-xs
-                        font-black
-                        uppercase
-                        tracking-[0.35em]
-                        text-red-500
-                        sm:text-sm
-                    "
-                >
-                    Brussels Top Team
-                </p>
+            <h1
+                class="
+                    mt-4
+                    max-w-5xl
+                    text-5xl
+                    font-black
+                    uppercase
+                    leading-none
+                    tracking-tight
+                    text-white
+                    sm:text-6xl
+                    lg:text-7xl
+                "
+            >
+                Nos
+                <span class="text-red-600">
+                    actualités
+                </span>
+            </h1>
 
 
-                <h1
-                    class="
-                        mt-5
-                        text-4xl
-                        font-black
-                        uppercase
-                        leading-none
-                        tracking-tight
-                        text-white
-                        sm:text-5xl
-                        lg:text-7xl
-                    "
-                >
-                    Nos actualités
-                </h1>
-
-
-                <div
-                    class="
-                        mt-6
-                        h-1
-                        w-20
-                        bg-red-600
-                    "
-                ></div>
-
-
-                <p
-                    class="
-                        mt-7
-                        max-w-2xl
-                        text-base
-                        leading-7
-                        text-zinc-400
-                        sm:text-lg
-                    "
-                >
-                    Retrouvez toute l'actualité du Brussels Top Team :
-                    entraînements, compétitions, événements, vie du club
-                    et projets de l'association.
-                </p>
-
-            </div>
+            <p
+                class="
+                    mt-7
+                    max-w-3xl
+                    text-lg
+                    leading-8
+                    text-zinc-400
+                "
+            >
+                Retrouvez les actualités, événements, projets et informations
+                du Brussels Top Team.
+            </p>
 
         </div>
 
@@ -154,18 +115,19 @@
     <!-- =========================================================
          BIBLIOTHÈQUE DES ARTICLES
          ========================================================= -->
-    <section class="bg-zinc-950">
+    <section
+        class="
+            min-h-[60vh]
+            bg-zinc-950
+            px-4
+            py-12
+            sm:px-6
+            lg:px-8
+            lg:py-16
+        "
+    >
 
-        <div
-            class="
-                mx-auto
-                max-w-7xl
-                px-6
-                py-12
-                lg:px-8
-                lg:py-16
-            "
-        >
+        <div class="mx-auto max-w-7xl">
 
 
             <!-- =================================================
@@ -173,16 +135,15 @@
                  ================================================= -->
             <div
                 class="
-                    mb-8
                     flex
                     flex-col
-                    gap-4
+                    gap-5
                     border-b
                     border-zinc-800
-                    pb-6
-                    sm:flex-row
-                    sm:items-end
-                    sm:justify-between
+                    pb-7
+                    lg:flex-row
+                    lg:items-end
+                    lg:justify-between
                 "
             >
 
@@ -197,43 +158,351 @@
                             text-red-500
                         "
                     >
-                        Le club au quotidien
+                        Bibliothèque
                     </p>
+
 
                     <h2
                         class="
-                            mt-2
-                            text-2xl
+                            mt-3
+                            text-3xl
                             font-black
                             uppercase
                             tracking-tight
                             text-white
-                            sm:text-3xl
+                            sm:text-4xl
                         "
                     >
-                        Toutes les publications
+                        Les articles BTT
                     </h2>
 
                 </div>
 
 
-                <p
-                    class="
-                        text-sm
-                        font-bold
-                        text-zinc-500
-                    "
-                >
+                <!-- =============================================
+                     NOMBRE D'ARTICLES
+                     ============================================= -->
+                <p class="text-sm font-bold text-zinc-500">
 
                     {{ $articles->total() }}
 
                     @if ($articles->total() > 1)
-                        publications
+                        articles
                     @else
-                        publication
+                        article
                     @endif
 
                 </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 FILTRES ET TRI
+                 ================================================= -->
+            <div
+                class="
+                    mt-8
+                    border-y
+                    border-zinc-800
+                    bg-black
+                "
+            >
+
+
+                <!-- =============================================
+                     FILTRE PAR CATÉGORIE
+                     ============================================= -->
+                <div
+                    class="
+                        border-b
+                        border-zinc-800
+                        px-5
+                        py-5
+                        sm:px-6
+                    "
+                >
+
+                    <p
+                        class="
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-[0.25em]
+                            text-zinc-500
+                        "
+                    >
+                        Catégories
+                    </p>
+
+
+                    <div
+                        class="
+                            mt-4
+                            flex
+                            flex-wrap
+                            gap-2
+                        "
+                    >
+
+
+                        <!-- =========================================
+                             TOUTES LES CATÉGORIES
+                             ========================================= -->
+                        <a
+                            href="{{ route('blog', [
+                                'sort' => $selectedSort,
+                            ]) }}"
+                            class="
+                                inline-flex
+                                items-center
+                                justify-center
+                                border
+                                px-4
+                                py-2.5
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-wider
+                                transition
+
+                                {{ $selectedCategory === null
+                                    ? 'border-red-600 bg-red-600 text-white'
+                                    : 'border-zinc-700 bg-zinc-950 text-zinc-400 hover:border-red-600 hover:text-white'
+                                }}
+                            "
+                        >
+                            Tous
+                        </a>
+
+
+                        <!-- =========================================
+                             CATÉGORIES DISPONIBLES
+                             ========================================= -->
+                        @foreach ($categories as $category)
+
+                            <a
+                                href="{{ route('blog', [
+                                    'category' => $category,
+                                    'sort' => $selectedSort,
+                                ]) }}"
+                                class="
+                                    inline-flex
+                                    items-center
+                                    justify-center
+                                    border
+                                    px-4
+                                    py-2.5
+                                    text-xs
+                                    font-black
+                                    uppercase
+                                    tracking-wider
+                                    transition
+
+                                    {{ $selectedCategory === $category
+                                        ? 'border-red-600 bg-red-600 text-white'
+                                        : 'border-zinc-700 bg-zinc-950 text-zinc-400 hover:border-red-600 hover:text-white'
+                                    }}
+                                "
+                            >
+                                {{ $category }}
+                            </a>
+
+                        @endforeach
+
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     TRI
+                     ============================================= -->
+                <div
+                    class="
+                        flex
+                        flex-col
+                        gap-4
+                        px-5
+                        py-5
+                        sm:px-6
+                        md:flex-row
+                        md:items-end
+                        md:justify-between
+                    "
+                >
+
+                    <div>
+
+                        <p
+                            class="
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-[0.25em]
+                                text-zinc-500
+                            "
+                        >
+                            Trier les articles
+                        </p>
+
+
+                        <!-- =========================================
+                             RÉSUMÉ DU FILTRE ACTIF
+                             ========================================= -->
+                        <p
+                            class="
+                                mt-2
+                                text-sm
+                                text-zinc-400
+                            "
+                        >
+
+                            @if ($selectedCategory)
+
+                                Catégorie :
+
+                                <strong class="text-white">
+                                    {{ $selectedCategory }}
+                                </strong>
+
+                            @else
+
+                                Toutes les catégories
+
+                            @endif
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         FORMULAIRE DE TRI
+                         ============================================= -->
+                    <form
+                        action="{{ route('blog') }}"
+                        method="GET"
+                        class="
+                            flex
+                            flex-col
+                            gap-3
+                            sm:flex-row
+                            sm:items-center
+                        "
+                    >
+
+                        <!-- =========================================
+                             CONSERVATION DE LA CATÉGORIE
+                             ========================================= -->
+                        @if ($selectedCategory)
+
+                            <input
+                                type="hidden"
+                                name="category"
+                                value="{{ $selectedCategory }}"
+                            >
+
+                        @endif
+
+
+                        <!-- =========================================
+                             CHOIX DU TRI
+                             ========================================= -->
+                        <label
+                            for="sort"
+                            class="
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-wider
+                                text-zinc-500
+                            "
+                        >
+                            Ordre
+                        </label>
+
+
+                        <select
+                            id="sort"
+                            name="sort"
+                            class="
+                                min-w-[210px]
+                                border
+                                border-zinc-700
+                                bg-zinc-950
+                                px-4
+                                py-3
+                                text-sm
+                                font-bold
+                                text-white
+                                outline-none
+                                transition
+                                focus:border-red-600
+                            "
+                        >
+
+                            <option
+                                value="recent"
+                                {{ $selectedSort === 'recent' ? 'selected' : '' }}
+                            >
+                                Plus récents
+                            </option>
+
+
+                            <option
+                                value="oldest"
+                                {{ $selectedSort === 'oldest' ? 'selected' : '' }}
+                            >
+                                Plus anciens
+                            </option>
+
+
+                            <option
+                                value="featured"
+                                {{ $selectedSort === 'featured' ? 'selected' : '' }}
+                            >
+                                À la une
+                            </option>
+
+
+                            <option
+                                value="title"
+                                {{ $selectedSort === 'title' ? 'selected' : '' }}
+                            >
+                                Titre A → Z
+                            </option>
+
+                        </select>
+
+
+                        <!-- =========================================
+                             APPLIQUER LE TRI
+                             ========================================= -->
+                        <button
+                            type="submit"
+                            class="
+                                inline-flex
+                                items-center
+                                justify-center
+                                bg-red-600
+                                px-5
+                                py-3
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-wider
+                                text-white
+                                transition
+                                hover:bg-red-700
+                            "
+                        >
+                            Trier
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
@@ -245,6 +514,7 @@
 
                 <div
                     class="
+                        mt-10
                         grid
                         grid-cols-1
                         gap-5
@@ -256,49 +526,44 @@
 
                     @foreach ($articles as $article)
 
-                        <!-- =====================================
-                             LIEN VERS L'ARTICLE COMPLET
-                             =====================================
-                             Toute la vignette est maintenant
-                             cliquable.
-                             ===================================== -->
+
+                        <!-- =========================================
+                             CARTE ARTICLE CLIQUABLE
+                             ========================================= -->
                         <a
-                            href="{{ route('blog.show', $article->slug) }}"
+                            href="{{ route(
+                                'blog.show',
+                                $article->slug
+                            ) }}"
                             class="
                                 group
                                 block
                                 focus:outline-none
                                 focus-visible:ring-2
-                                focus-visible:ring-red-500
-                                focus-visible:ring-offset-2
-                                focus-visible:ring-offset-zinc-950
+                                focus-visible:ring-red-600
                             "
                         >
 
-                            <!-- =================================
-                                 CARTE ARTICLE
-                                 ================================= -->
                             <article
                                 class="
-                                    relative
+                                    flex
                                     h-full
+                                    flex-col
                                     overflow-hidden
                                     border
                                     border-zinc-800
-                                    bg-zinc-900
+                                    bg-black
                                     transition
                                     duration-300
                                     group-hover:-translate-y-1
                                     group-hover:border-red-600
-                                    group-hover:shadow-2xl
-                                    group-hover:shadow-black/40
                                 "
                             >
 
 
-                                <!-- =================================
-                                     BANNIÈRE DE L'ARTICLE
-                                     ================================= -->
+                                <!-- =====================================
+                                     BANNIÈRE
+                                     ===================================== -->
                                 <div
                                     class="
                                         relative
@@ -311,7 +576,9 @@
                                     @if ($article->banner_image)
 
                                         <img
-                                            src="{{ asset('storage/' . $article->banner_image) }}"
+                                            src="{{ asset(
+                                                'storage/' . $article->banner_image
+                                            ) }}"
                                             alt="{{ $article->title }}"
                                             loading="lazy"
                                             class="
@@ -326,6 +593,9 @@
 
                                     @else
 
+                                        <!-- =================================
+                                             IMAGE NON DISPONIBLE
+                                             ================================= -->
                                         <div
                                             class="
                                                 flex
@@ -334,8 +604,6 @@
                                                 items-center
                                                 justify-center
                                                 bg-zinc-900
-                                                px-6
-                                                text-center
                                             "
                                         >
 
@@ -356,96 +624,99 @@
                                     @endif
 
 
-                                    <!-- =============================
-                                         CATÉGORIE
-                                         ============================= -->
-                                    <div
-                                        class="
-                                            absolute
-                                            left-3
-                                            top-3
-                                        "
-                                    >
+                                    <!-- =================================
+                                         BADGE À LA UNE
+                                         ================================= -->
+                                    @if ($article->is_featured)
 
                                         <span
                                             class="
-                                                inline-flex
+                                                absolute
+                                                right-3
+                                                top-3
                                                 bg-red-600
-                                                px-2.5
+                                                px-3
                                                 py-1.5
                                                 text-[10px]
                                                 font-black
                                                 uppercase
                                                 tracking-wider
                                                 text-white
-                                                shadow-lg
                                             "
                                         >
-                                            {{ $article->category }}
+                                            À la une
                                         </span>
-
-                                    </div>
-
-
-                                    <!-- =============================
-                                         ARTICLE MIS EN AVANT
-                                         ============================= -->
-                                    @if ($article->is_featured)
-
-                                        <div
-                                            class="
-                                                absolute
-                                                right-3
-                                                top-3
-                                            "
-                                        >
-
-                                            <span
-                                                class="
-                                                    inline-flex
-                                                    bg-black/80
-                                                    px-2
-                                                    py-1.5
-                                                    text-[9px]
-                                                    font-black
-                                                    uppercase
-                                                    tracking-wider
-                                                    text-white
-                                                    backdrop-blur
-                                                "
-                                            >
-                                                À la une
-                                            </span>
-
-                                        </div>
 
                                     @endif
 
                                 </div>
 
 
-                                <!-- =================================
-                                     INFORMATIONS DE L'ARTICLE
-                                     ================================= -->
-                                <div class="p-5">
+                                <!-- =====================================
+                                     CONTENU DE LA CARTE
+                                     ===================================== -->
+                                <div
+                                    class="
+                                        flex
+                                        flex-1
+                                        flex-col
+                                        p-5
+                                    "
+                                >
 
-                                    <p
+
+                                    <!-- =================================
+                                         CATÉGORIE + DATE
+                                         ================================= -->
+                                    <div
                                         class="
-                                            text-[10px]
-                                            font-black
-                                            uppercase
-                                            tracking-[0.2em]
-                                            text-red-500
+                                            flex
+                                            flex-wrap
+                                            items-center
+                                            justify-between
+                                            gap-3
                                         "
                                     >
-                                        {{ $article->published_at->format('d/m/Y') }}
-                                    </p>
+
+                                        <span
+                                            class="
+                                                text-[11px]
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-red-500
+                                            "
+                                        >
+                                            {{ $article->category }}
+                                        </span>
 
 
-                                    <h3
+                                        @if ($article->published_at)
+
+                                            <span
+                                                class="
+                                                    text-xs
+                                                    font-bold
+                                                    text-zinc-600
+                                                "
+                                            >
+                                                {{ $article
+                                                    ->published_at
+                                                    ->format('d/m/Y') }}
+                                            </span>
+
+                                        @endif
+
+                                    </div>
+
+
+                                    <!-- =================================
+                                         TITRE
+                                         ================================= -->
+                                    <h2
                                         class="
-                                            mt-2
-                                            text-lg
+                                            mt-4
+                                            text-xl
                                             font-black
                                             leading-tight
                                             text-white
@@ -454,126 +725,109 @@
                                         "
                                     >
                                         {{ $article->title }}
-                                    </h3>
+                                    </h2>
 
 
+                                    <!-- =================================
+                                         RÉSUMÉ
+                                         ================================= -->
                                     @if ($article->excerpt)
 
                                         <p
                                             class="
-                                                mt-3
+                                                mt-4
                                                 line-clamp-3
                                                 text-sm
                                                 leading-6
-                                                text-zinc-400
+                                                text-zinc-500
                                             "
                                         >
                                             {{ $article->excerpt }}
                                         </p>
 
-                                    @else
-
-                                        <p
-                                            class="
-                                                mt-3
-                                                text-sm
-                                                italic
-                                                leading-6
-                                                text-zinc-600
-                                            "
-                                        >
-                                            Découvrez cette actualité du
-                                            Brussels Top Team.
-                                        </p>
-
                                     @endif
 
 
-                                    <!-- =============================
-                                         AUTEUR + INDICATION DE LECTURE
-                                         ============================= -->
+                                    <!-- =================================
+                                         PIED DE CARTE
+                                         ================================= -->
                                     <div
                                         class="
-                                            mt-5
-                                            flex
-                                            items-center
-                                            justify-between
-                                            gap-3
+                                            mt-auto
                                             border-t
-                                            border-zinc-800
-                                            pt-4
+                                            border-zinc-900
+                                            pt-5
                                         "
                                     >
 
-                                        <div class="min-w-0">
+
+                                        <!-- =============================
+                                             AUTEUR
+                                             ============================= -->
+                                        @if ($article->author)
 
                                             <p
                                                 class="
-                                                    text-[9px]
-                                                    font-black
-                                                    uppercase
-                                                    tracking-[0.2em]
+                                                    text-xs
                                                     text-zinc-600
                                                 "
                                             >
-                                                Publication
-                                            </p>
+                                                Par
 
-
-                                            <p
-                                                class="
-                                                    mt-1
-                                                    truncate
-                                                    text-xs
-                                                    font-bold
-                                                    text-zinc-400
-                                                "
-                                            >
-
-                                                @if ($article->author)
-
-                                                    {{ $article->author->pseudo }}
-
-                                                @else
-
-                                                    Brussels Top Team
-
-                                                @endif
+                                                <span
+                                                    class="
+                                                        font-bold
+                                                        text-zinc-400
+                                                    "
+                                                >
+                                                    {{ $article->author->prenom }}
+                                                    {{ $article->author->nom }}
+                                                </span>
 
                                             </p>
 
-                                        </div>
+                                        @endif
 
 
-                                        <!-- =========================
-                                             INDICATION VISUELLE
-                                             ========================= -->
+                                        <!-- =============================
+                                             LIRE L'ARTICLE
+                                             ============================= -->
                                         <div
                                             class="
+                                                mt-4
                                                 flex
                                                 items-center
-                                                gap-2
-                                                text-xs
-                                                font-black
-                                                uppercase
-                                                tracking-wider
-                                                text-zinc-500
-                                                transition
-                                                group-hover:text-red-500
+                                                justify-between
                                             "
                                         >
-                                            Lire
 
                                             <span
                                                 class="
+                                                    text-xs
+                                                    font-black
+                                                    uppercase
+                                                    tracking-wider
+                                                    text-white
+                                                    transition
+                                                    group-hover:text-red-500
+                                                "
+                                            >
+                                                Lire
+                                            </span>
+
+
+                                            <span
+                                                class="
+                                                    text-lg
+                                                    text-red-500
                                                     transition
                                                     duration-300
                                                     group-hover:translate-x-1
                                                 "
-                                                aria-hidden="true"
                                             >
                                                 →
                                             </span>
+
                                         </div>
 
                                     </div>
@@ -591,17 +845,14 @@
 
                 <!-- =================================================
                      PAGINATION
+                     =================================================
+                     Les paramètres category et sort sont conservés
+                     automatiquement par le BlogController grâce à
+                     withQueryString().
                      ================================================= -->
                 @if ($articles->hasPages())
 
-                    <div
-                        class="
-                            mt-12
-                            border-t
-                            border-zinc-800
-                            pt-8
-                        "
-                    >
+                    <div class="mt-12">
                         {{ $articles->links() }}
                     </div>
 
@@ -611,40 +862,43 @@
             @else
 
                 <!-- =================================================
-                     AUCUN ARTICLE PUBLIÉ
+                     AUCUN ARTICLE POUR LE FILTRE
                      ================================================= -->
                 <div
                     class="
+                        mt-10
                         border
                         border-zinc-800
-                        bg-zinc-900/50
+                        bg-black
                         px-6
-                        py-20
+                        py-16
                         text-center
                     "
                 >
 
-                    <div
+                    <p
                         class="
-                            mx-auto
-                            h-1
-                            w-16
-                            bg-red-600
+                            text-xs
+                            font-black
+                            uppercase
+                            tracking-[0.3em]
+                            text-red-500
                         "
-                    ></div>
+                    >
+                        Blog BTT
+                    </p>
 
 
                     <h2
                         class="
-                            mt-6
+                            mt-4
                             text-2xl
                             font-black
                             uppercase
-                            tracking-tight
                             text-white
                         "
                     >
-                        Aucune actualité publiée
+                        Aucun article trouvé
                     </h2>
 
 
@@ -658,9 +912,54 @@
                             text-zinc-500
                         "
                     >
-                        Les prochaines actualités du Brussels Top Team
-                        apparaîtront ici dès leur publication.
+
+                        @if ($selectedCategory)
+
+                            Aucun article publié n'est actuellement disponible
+                            dans la catégorie
+
+                            <strong class="text-zinc-300">
+                                {{ $selectedCategory }}
+                            </strong>.
+
+                        @else
+
+                            Aucun article publié n'est actuellement disponible.
+
+                        @endif
+
                     </p>
+
+
+                    @if ($selectedCategory)
+
+                        <a
+                            href="{{ route('blog', [
+                                'sort' => $selectedSort,
+                            ]) }}"
+                            class="
+                                mt-7
+                                inline-flex
+                                items-center
+                                justify-center
+                                border
+                                border-red-600
+                                px-5
+                                py-3
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-wider
+                                text-red-500
+                                transition
+                                hover:bg-red-600
+                                hover:text-white
+                            "
+                        >
+                            Voir toutes les catégories
+                        </a>
+
+                    @endif
 
                 </div>
 

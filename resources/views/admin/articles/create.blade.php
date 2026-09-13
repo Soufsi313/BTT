@@ -6,7 +6,7 @@
 
 @section(
     'meta_description',
-    'Création d’un nouvel article pour le blog Brussels Top Team.'
+    'Création d’un nouvel article du blog Brussels Top Team.'
 )
 
 
@@ -156,7 +156,7 @@
 
                         <!-- =====================================
                              ARTICLES
-                             SECTION ACTIVE
+                             PAGE ACTIVE
                              ===================================== -->
                         <a
                             href="{{ route('admin.articles.index') }}"
@@ -178,6 +178,7 @@
 
                         <!-- =====================================
                              PRODUITS
+                             PAS ENCORE DÉVELOPPÉ
                              ===================================== -->
                         <span
                             class="
@@ -345,8 +346,8 @@
                                     text-zinc-500
                                 "
                             >
-                                Rédigez et préparez une nouvelle actualité
-                                pour le blog Brussels Top Team.
+                                Créez une nouvelle actualité pour le blog
+                                Brussels Top Team.
                             </p>
 
                         </div>
@@ -372,7 +373,7 @@
                                 text-zinc-700
                                 transition
                                 hover:border-zinc-400
-                                hover:bg-zinc-100
+                                hover:bg-zinc-50
                             "
                         >
                             ← Retour aux articles
@@ -384,7 +385,7 @@
 
 
                 <!-- =============================================
-                     CONTENU DE LA PAGE
+                     CONTENU
                      ============================================= -->
                 <main class="bg-white px-6 py-8 lg:px-10 lg:py-10">
 
@@ -409,16 +410,12 @@
                             >
 
                                 <p class="font-black text-red-700">
-                                    Impossible d'enregistrer l'article.
-                                </p>
-
-                                <p class="mt-1 text-sm text-red-600">
-                                    Vérifiez les informations indiquées ci-dessous.
+                                    Le formulaire contient une ou plusieurs erreurs.
                                 </p>
 
                                 <ul
                                     class="
-                                        mt-4
+                                        mt-3
                                         list-disc
                                         space-y-1
                                         pl-5
@@ -426,9 +423,15 @@
                                         text-red-700
                                     "
                                 >
+
                                     @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
+
+                                        <li>
+                                            {{ $error }}
+                                        </li>
+
                                     @endforeach
+
                                 </ul>
 
                             </div>
@@ -437,11 +440,15 @@
 
 
                         <!-- =====================================
-                             FORMULAIRE ARTICLE
+                             FORMULAIRE
+                             =====================================
+                             enctype="multipart/form-data" est
+                             indispensable pour envoyer des fichiers.
                              ===================================== -->
                         <form
                             action="{{ route('admin.articles.store') }}"
                             method="POST"
+                            enctype="multipart/form-data"
                             class="space-y-8"
                         >
 
@@ -487,6 +494,11 @@
                                         Informations principales
                                     </h2>
 
+                                    <p class="mt-2 text-sm text-zinc-500">
+                                        Définissez le titre, la catégorie et
+                                        le résumé de l'article.
+                                    </p>
+
                                 </div>
 
 
@@ -508,6 +520,7 @@
                                             "
                                         >
                                             Titre de l'article
+                                            <span class="text-red-600">*</span>
                                         </label>
 
                                         <input
@@ -517,7 +530,6 @@
                                             value="{{ old('title') }}"
                                             maxlength="255"
                                             required
-                                            placeholder="Exemple : Brussels Top Team participe au tournoi de Bruxelles"
                                             class="
                                                 mt-2
                                                 w-full
@@ -527,21 +539,16 @@
                                                 bg-white
                                                 px-4
                                                 py-3
-                                                text-sm
                                                 text-zinc-900
                                                 outline-none
                                                 transition
                                                 placeholder:text-zinc-400
                                                 focus:border-red-600
                                                 focus:ring-2
-                                                focus:ring-red-100
+                                                focus:ring-red-600/20
                                             "
+                                            placeholder="Ex. Brussels Top Team au tournoi de Bruxelles"
                                         >
-
-                                        <p class="mt-2 text-xs text-zinc-500">
-                                            Le slug utilisé dans l'adresse de l'article
-                                            sera généré automatiquement à partir du titre.
-                                        </p>
 
                                     </div>
 
@@ -561,6 +568,7 @@
                                             "
                                         >
                                             Catégorie
+                                            <span class="text-red-600">*</span>
                                         </label>
 
                                         <select
@@ -576,19 +584,22 @@
                                                 bg-white
                                                 px-4
                                                 py-3
-                                                text-sm
                                                 text-zinc-900
                                                 outline-none
                                                 transition
                                                 focus:border-red-600
                                                 focus:ring-2
-                                                focus:ring-red-100
+                                                focus:ring-red-600/20
                                             "
                                         >
 
+                                            <option value="">
+                                                Sélectionner une catégorie
+                                            </option>
+
                                             <option
                                                 value="Actualité"
-                                                @selected(old('category', 'Actualité') === 'Actualité')
+                                                @selected(old('category') === 'Actualité')
                                             >
                                                 Actualité
                                             </option>
@@ -655,7 +666,6 @@
                                             name="excerpt"
                                             rows="4"
                                             maxlength="1000"
-                                            placeholder="Quelques lignes pour présenter rapidement l'article..."
                                             class="
                                                 mt-2
                                                 w-full
@@ -666,22 +676,156 @@
                                                 bg-white
                                                 px-4
                                                 py-3
-                                                text-sm
-                                                leading-6
                                                 text-zinc-900
                                                 outline-none
                                                 transition
                                                 placeholder:text-zinc-400
                                                 focus:border-red-600
                                                 focus:ring-2
-                                                focus:ring-red-100
+                                                focus:ring-red-600/20
                                             "
+                                            placeholder="Présentez brièvement l'article..."
                                         >{{ old('excerpt') }}</textarea>
 
                                         <p class="mt-2 text-xs text-zinc-500">
-                                            Ce texte servira plus tard à présenter
-                                            rapidement l'article sur la page Blog.
+                                            Ce texte servira notamment à présenter
+                                            rapidement l'article dans le Blog.
                                         </p>
+
+                                    </div>
+
+                                </div>
+
+                            </section>
+
+
+                            <!-- =================================
+                                 BANNIÈRE DE L'ARTICLE
+                                 ================================= -->
+                            <section
+                                class="
+                                    rounded-lg
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-6
+                                    sm:p-8
+                                "
+                            >
+
+                                <div class="border-b border-zinc-200 pb-5">
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-[0.25em]
+                                            text-red-600
+                                        "
+                                    >
+                                        Visuel
+                                    </p>
+
+                                    <h2
+                                        class="
+                                            mt-2
+                                            text-xl
+                                            font-black
+                                            text-zinc-900
+                                        "
+                                    >
+                                        Bannière de l'article
+                                    </h2>
+
+                                    <p class="mt-2 text-sm text-zinc-500">
+                                        Cette image servira de couverture à
+                                        l'article dans la bibliothèque du Blog.
+                                    </p>
+
+                                </div>
+
+
+                                <div class="mt-6">
+
+                                    <label
+                                        for="banner_image"
+                                        class="
+                                            block
+                                            text-sm
+                                            font-black
+                                            text-zinc-800
+                                        "
+                                    >
+                                        Image de couverture
+                                        <span class="text-red-600">*</span>
+                                    </label>
+
+
+                                    <!-- =========================
+                                         CHAMP D'ENVOI D'IMAGE
+                                         ========================= -->
+                                    <div
+                                        class="
+                                            mt-2
+                                            rounded-lg
+                                            border
+                                            border-dashed
+                                            border-zinc-300
+                                            bg-zinc-50
+                                            p-6
+                                        "
+                                    >
+
+                                        <input
+                                            type="file"
+                                            id="banner_image"
+                                            name="banner_image"
+                                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                            required
+                                            class="
+                                                block
+                                                w-full
+                                                text-sm
+                                                text-zinc-600
+                                                file:mr-4
+                                                file:rounded-md
+                                                file:border-0
+                                                file:bg-zinc-900
+                                                file:px-4
+                                                file:py-2.5
+                                                file:text-sm
+                                                file:font-black
+                                                file:text-white
+                                                file:transition
+                                                hover:file:bg-red-600
+                                            "
+                                        >
+
+                                        <div
+                                            class="
+                                                mt-4
+                                                space-y-1
+                                                text-xs
+                                                text-zinc-500
+                                            "
+                                        >
+                                            <p>
+                                                Formats acceptés :
+                                                JPG, JPEG, PNG et WEBP.
+                                            </p>
+
+                                            <p>
+                                                Taille maximale :
+                                                5 Mo.
+                                            </p>
+
+                                            <p>
+                                                Pour un meilleur rendu dans le Blog,
+                                                privilégiez une image horizontale
+                                                de bonne qualité.
+                                            </p>
+                                        </div>
 
                                     </div>
 
@@ -729,6 +873,11 @@
                                         Contenu de l'article
                                     </h2>
 
+                                    <p class="mt-2 text-sm text-zinc-500">
+                                        Rédigez le contenu principal de votre
+                                        actualité.
+                                    </p>
+
                                 </div>
 
 
@@ -744,14 +893,14 @@
                                         "
                                     >
                                         Texte de l'article
+                                        <span class="text-red-600">*</span>
                                     </label>
 
                                     <textarea
                                         id="content"
                                         name="content"
-                                        rows="18"
+                                        rows="16"
                                         required
-                                        placeholder="Rédigez votre article ici..."
                                         class="
                                             mt-2
                                             w-full
@@ -761,8 +910,7 @@
                                             border-zinc-300
                                             bg-white
                                             px-4
-                                            py-4
-                                            text-sm
+                                            py-3
                                             leading-7
                                             text-zinc-900
                                             outline-none
@@ -770,14 +918,15 @@
                                             placeholder:text-zinc-400
                                             focus:border-red-600
                                             focus:ring-2
-                                            focus:ring-red-100
+                                            focus:ring-red-600/20
                                         "
+                                        placeholder="Rédigez ici le contenu de votre article..."
                                     >{{ old('content') }}</textarea>
 
-                                    <p class="mt-2 text-xs leading-5 text-zinc-500">
-                                        Le contenu doit comporter au minimum 10 caractères.
-                                        Nous ajouterons ensuite un véritable éditeur
-                                        avec mise en forme et images intégrées.
+                                    <p class="mt-2 text-xs text-zinc-500">
+                                        L'ajout d'images directement dans le
+                                        contenu sera développé lors d'une
+                                        prochaine étape.
                                     </p>
 
                                 </div>
@@ -821,13 +970,20 @@
                                             text-zinc-900
                                         "
                                     >
-                                        Statut de l'article
+                                        Visibilité de l'article
                                     </h2>
 
                                 </div>
 
 
-                                <div class="mt-6 grid gap-6 md:grid-cols-2">
+                                <div
+                                    class="
+                                        mt-6
+                                        grid
+                                        gap-6
+                                        lg:grid-cols-2
+                                    "
+                                >
 
 
                                     <!-- =========================
@@ -845,6 +1001,7 @@
                                             "
                                         >
                                             Statut
+                                            <span class="text-red-600">*</span>
                                         </label>
 
                                         <select
@@ -860,13 +1017,12 @@
                                                 bg-white
                                                 px-4
                                                 py-3
-                                                text-sm
                                                 text-zinc-900
                                                 outline-none
                                                 transition
                                                 focus:border-red-600
                                                 focus:ring-2
-                                                focus:ring-red-100
+                                                focus:ring-red-600/20
                                             "
                                         >
 
@@ -886,16 +1042,16 @@
 
                                         </select>
 
-                                        <p class="mt-2 text-xs leading-5 text-zinc-500">
-                                            Un brouillon reste uniquement visible
-                                            dans l'administration.
+                                        <p class="mt-2 text-xs text-zinc-500">
+                                            Un brouillon n'apparaîtra pas dans
+                                            le Blog public.
                                         </p>
 
                                     </div>
 
 
                                     <!-- =========================
-                                         ARTICLE MIS EN AVANT
+                                         MISE EN AVANT
                                          ========================= -->
                                     <div>
 
@@ -911,131 +1067,67 @@
                                         </p>
 
                                         <label
-                                            for="is_featured"
                                             class="
                                                 mt-2
                                                 flex
-                                                min-h-[48px]
                                                 cursor-pointer
-                                                items-center
+                                                items-start
                                                 gap-3
                                                 rounded-md
                                                 border
                                                 border-zinc-300
+                                                bg-zinc-50
                                                 px-4
-                                                py-3
-                                                transition
-                                                hover:bg-zinc-50
+                                                py-4
                                             "
                                         >
 
                                             <input
                                                 type="checkbox"
-                                                id="is_featured"
                                                 name="is_featured"
                                                 value="1"
                                                 @checked(old('is_featured'))
                                                 class="
+                                                    mt-1
                                                     h-4
                                                     w-4
-                                                    accent-red-600
+                                                    rounded
+                                                    border-zinc-300
+                                                    text-red-600
+                                                    focus:ring-red-600
                                                 "
                                             >
 
-                                            <span class="text-sm font-bold text-zinc-700">
-                                                Mettre cet article en avant
+                                            <span>
+
+                                                <span
+                                                    class="
+                                                        block
+                                                        text-sm
+                                                        font-bold
+                                                        text-zinc-800
+                                                    "
+                                                >
+                                                    Mettre cet article en avant
+                                                </span>
+
+                                                <span
+                                                    class="
+                                                        mt-1
+                                                        block
+                                                        text-xs
+                                                        leading-5
+                                                        text-zinc-500
+                                                    "
+                                                >
+                                                    Cette option permettra plus
+                                                    tard d'accorder une place plus
+                                                    importante à l'article sur le Blog.
+                                                </span>
+
                                             </span>
 
                                         </label>
-
-                                        <p class="mt-2 text-xs leading-5 text-zinc-500">
-                                            Cette option servira plus tard à donner
-                                            davantage de visibilité à certains articles.
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </section>
-
-
-                            <!-- =================================
-                                 BANNIÈRE
-                                 ================================= -->
-                            <section
-                                class="
-                                    rounded-lg
-                                    border
-                                    border-zinc-200
-                                    bg-white
-                                    p-6
-                                    sm:p-8
-                                "
-                            >
-
-                                <div class="border-b border-zinc-200 pb-5">
-
-                                    <p
-                                        class="
-                                            text-xs
-                                            font-black
-                                            uppercase
-                                            tracking-[0.25em]
-                                            text-red-600
-                                        "
-                                    >
-                                        Visuel
-                                    </p>
-
-                                    <h2
-                                        class="
-                                            mt-2
-                                            text-xl
-                                            font-black
-                                            text-zinc-900
-                                        "
-                                    >
-                                        Bannière de l'article
-                                    </h2>
-
-                                </div>
-
-
-                                <div class="mt-6">
-
-                                    <div
-                                        class="
-                                            rounded-lg
-                                            border
-                                            border-dashed
-                                            border-zinc-300
-                                            bg-zinc-50
-                                            px-6
-                                            py-10
-                                            text-center
-                                        "
-                                    >
-
-                                        <p class="font-black text-zinc-800">
-                                            Bannière non activée pour le moment
-                                        </p>
-
-                                        <p
-                                            class="
-                                                mx-auto
-                                                mt-2
-                                                max-w-xl
-                                                text-sm
-                                                leading-6
-                                                text-zinc-500
-                                            "
-                                        >
-                                            Nous vérifierons d'abord que la création
-                                            des articles fonctionne correctement.
-                                            Ensuite nous ajouterons l'envoi et
-                                            l'affichage de la bannière.
-                                        </p>
 
                                     </div>
 
@@ -1060,6 +1152,7 @@
                                 "
                             >
 
+                                <!-- ANNULER -->
                                 <a
                                     href="{{ route('admin.articles.index') }}"
                                     class="
@@ -1070,19 +1163,20 @@
                                         border
                                         border-zinc-300
                                         bg-white
-                                        px-5
+                                        px-6
                                         py-3
                                         text-sm
                                         font-black
                                         text-zinc-700
                                         transition
-                                        hover:bg-zinc-100
+                                        hover:bg-zinc-50
                                     "
                                 >
                                     Annuler
                                 </a>
 
 
+                                <!-- ENREGISTRER -->
                                 <button
                                     type="submit"
                                     class="

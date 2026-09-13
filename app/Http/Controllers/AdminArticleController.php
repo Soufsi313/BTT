@@ -17,22 +17,22 @@ use Illuminate\Support\Str;
  * Ce contrôleur gère les articles du blog Brussels Top Team
  * depuis l'espace d'administration.
  *
- * À ce stade, il permet :
+ * Il permet actuellement :
  *
  * - d'afficher la liste des articles ;
  * - d'afficher les articles supprimés ;
  * - de trier les articles ;
  * - d'afficher le formulaire de création ;
- * - d'enregistrer un nouvel article.
+ * - d'enregistrer un nouvel article ;
+ * - d'enregistrer une bannière pour l'article.
  *
  * Les prochaines étapes ajouteront :
  *
- * - la modification ;
+ * - la modification d'un article ;
  * - la suppression ;
  * - la restauration ;
- * - la bannière ;
  * - les images intégrées dans le contenu ;
- * - la publication publique du blog.
+ * - la publication sur le Blog public.
  *
  * ================================================================
  */
@@ -136,8 +136,6 @@ class AdminArticleController extends Controller
      * ===============================================================
      * FORMULAIRE DE CRÉATION
      * ===============================================================
-     *
-     * Affiche la page permettant de créer un nouvel article.
      */
     public function create(): View
     {
@@ -152,18 +150,32 @@ class AdminArticleController extends Controller
      *
      * Cette méthode :
      *
-     * 1. vérifie les données du formulaire ;
-     * 2. génère automatiquement un slug ;
-     * 3. associe l'article à l'administrateur connecté ;
-     * 4. définit la date de publication si nécessaire ;
-     * 5. crée l'article dans la base de données.
+     * 1. vérifie les informations du formulaire ;
+     * 2. vérifie la bannière ;
+     * 3. enregistre la bannière dans le stockage public ;
+     * 4. génère automatiquement un slug unique ;
+     * 5. associe l'article à l'administrateur connecté ;
+     * 6. détermine la date de publication ;
+     * 7. crée l'article dans la base de données.
      */
     public function store(Request $request): RedirectResponse
     {
         /**
          * -----------------------------------------------------------
-         * VALIDATION
+         * VALIDATION DU FORMULAIRE
          * -----------------------------------------------------------
+         *
+         * La bannière est maintenant obligatoire.
+         *
+         * Formats autorisés :
+         *
+         * - JPG / JPEG
+         * - PNG
+         * - WEBP
+         *
+         * Taille maximale :
+         *
+         * 5 Mo
          */
         $validated = $request->validate([
             'title' => [
@@ -200,6 +212,13 @@ class AdminArticleController extends Controller
                 'nullable',
                 'boolean',
             ],
+
+            'banner_image' => [
+                'required',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
         ]);
 
 
@@ -210,7 +229,7 @@ class AdminArticleController extends Controller
          *
          * Exemple :
          *
-         * "Brussels Top Team au tournoi"
+         * Brussels Top Team au tournoi
          *
          * devient :
          *
@@ -227,18 +246,16 @@ class AdminArticleController extends Controller
 
         /**
          * -----------------------------------------------------------
-         * SLUG UNIQUE
+         * CRÉATION D'UN SLUG UNIQUE
          * -----------------------------------------------------------
          *
-         * Si un article possède déjà le même slug :
+         * Exemple :
          *
-         * article
-         * article-2
-         * article-3
-         * etc.
+         * mon-article
+         * mon-article-2
+         * mon-article-3
          *
-         * Nous vérifions également les articles supprimés afin
-         * d'éviter une collision avec leur slug.
+         * Les articles supprimés sont également vérifiés.
          */
         while (
             Article::withTrashed()
@@ -253,12 +270,42 @@ class AdminArticleController extends Controller
 
         /**
          * -----------------------------------------------------------
+         * ENREGISTREMENT DE LA BANNIÈRE
+         * -----------------------------------------------------------
+         *
+         * Laravel crée automatiquement un nom de fichier unique.
+         *
+         * L'image sera stockée dans :
+         *
+         * storage/app/public/articles/banners
+         *
+         * Grâce à "php artisan storage:link", elle sera ensuite
+         * accessible publiquement via :
+         *
+         * public/storage/articles/banners
+         */
+        $bannerPath = $request
+            ->file('banner_image')
+            ->store(
+                'articles/banners',
+                'public'
+            );
+
+
+        /**
+         * -----------------------------------------------------------
          * CRÉATION DE L'ARTICLE
          * -----------------------------------------------------------
          */
         Article::create([
+            /**
+             * Administrateur ayant créé l'article.
+             */
             'author_id' => auth()->id(),
 
+            /**
+             * Informations principales.
+             */
             'title' => $validated['title'],
 
             'slug' => $slug,
@@ -270,14 +317,25 @@ class AdminArticleController extends Controller
             'content' => $validated['content'],
 
             /**
-             * La bannière sera ajoutée plus tard.
+             * Chemin de la bannière.
+             *
+             * Exemple :
+             *
+             * articles/banners/abc123.webp
              */
-            'banner_image' => null,
+            'banner_image' => $bannerPath,
 
+            /**
+             * Brouillon ou publié.
+             */
             'status' => $validated['status'],
 
             /**
-             * Une case non cochée n'est pas envoyée par HTML.
+             * Une case HTML non cochée n'est pas envoyée.
+             *
+             * boolean() permet donc d'obtenir proprement :
+             *
+             * true ou false.
              */
             'is_featured' => $request->boolean(
                 'is_featured'
@@ -285,9 +343,9 @@ class AdminArticleController extends Controller
 
             /**
              * Si l'article est publié immédiatement,
-             * nous enregistrons la date actuelle.
+             * la date actuelle devient sa date de publication.
              *
-             * Un brouillon n'a pas encore de date de publication.
+             * Un brouillon garde une valeur NULL.
              */
             'published_at' => $validated['status'] === 'published'
                 ? now()

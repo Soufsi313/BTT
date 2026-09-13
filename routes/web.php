@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminArticleImageController;
+use App\Http\Controllers\AdminCommentController;
 use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\AdminMessageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MemberCourseController;
 use App\Http\Controllers\MemberMessageController;
@@ -58,7 +60,7 @@ Route::get('/coachs', function () {
 | BLOG
 |--------------------------------------------------------------------------
 |
-| Le blog public fonctionne maintenant avec BlogController.
+| Le blog public fonctionne avec BlogController.
 |
 | La première route affiche la bibliothèque des articles.
 |
@@ -93,14 +95,32 @@ Route::get(
 | Le paramètre {slug} correspond à l'URL propre générée lors de
 | la création ou de la modification de l'article.
 |
-| Cette route doit rester APRÈS /blog.
-|
 */
 
 Route::get(
     '/blog/{slug}',
     [BlogController::class, 'show']
 )->name('blog.show');
+
+
+/*
+|--------------------------------------------------------------------------
+| PUBLIER UN COMMENTAIRE
+|--------------------------------------------------------------------------
+|
+| Seuls les utilisateurs connectés peuvent publier un commentaire.
+|
+| Les visiteurs non connectés peuvent lire les commentaires,
+| mais ils ne peuvent pas utiliser cette route.
+|
+*/
+
+Route::post(
+    '/blog/{slug}/commentaires',
+    [CommentController::class, 'store']
+)
+    ->middleware('auth')
+    ->name('comments.store');
 
 
 /*
@@ -549,6 +569,86 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
+        | MODÉRATION DES COMMENTAIRES
+        |--------------------------------------------------------------------------
+        |
+        | L'administration peut :
+        |
+        | - consulter tous les commentaires ;
+        | - masquer un commentaire ;
+        | - republier un commentaire ;
+        | - supprimer logiquement un commentaire ;
+        | - restaurer un commentaire supprimé.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTE DES COMMENTAIRES
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/commentaires',
+            [AdminCommentController::class, 'index']
+        )->name('comments.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RESTAURER UN COMMENTAIRE SUPPRIMÉ
+        |--------------------------------------------------------------------------
+        |
+        | Cette route utilise directement l'identifiant afin de pouvoir
+        | retrouver un commentaire supprimé avec onlyTrashed().
+        |
+        */
+
+        Route::patch(
+            '/commentaires/{id}/restaurer',
+            [AdminCommentController::class, 'restore']
+        )->name('comments.restore');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MASQUER UN COMMENTAIRE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::patch(
+            '/commentaires/{comment}/masquer',
+            [AdminCommentController::class, 'hide']
+        )->name('comments.hide');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉAFFICHER UN COMMENTAIRE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::patch(
+            '/commentaires/{comment}/publier',
+            [AdminCommentController::class, 'publish']
+        )->name('comments.publish');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUPPRIMER UN COMMENTAIRE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::delete(
+            '/commentaires/{comment}',
+            [AdminCommentController::class, 'destroy']
+        )->name('comments.destroy');
+
+
+        /*
+        |--------------------------------------------------------------------------
         | ARTICLES DU BLOG
         |--------------------------------------------------------------------------
         */
@@ -589,19 +689,11 @@ Route::middleware([
         | UPLOAD D'UNE IMAGE DANS LE CONTENU D'UN ARTICLE
         |--------------------------------------------------------------------------
         |
-        | Cette route est utilisée par l'éditeur Quill.
+        | Cette route est utilisée par Quill lorsqu'un administrateur
+        | insère directement une image dans le corps de l'article.
         |
-        | Elle permet à un administrateur d'envoyer une image directement
-        | depuis l'éditeur de texte.
-        |
-        | L'image sera enregistrée dans :
-        |
-        | storage/app/public/articles/content/
-        |
-        | Cette route reste protégée par les middlewares :
-        |
-        | - auth
-        | - admin
+        | Elle doit rester avant les routes dynamiques utilisant
+        | {article}.
         |
         */
 

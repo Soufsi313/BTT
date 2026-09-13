@@ -3,27 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 
 /**
  * ================================================================
- * CONTRÔLEUR PUBLIC DU BLOG BTT
+ * CONTRÔLEUR PUBLIC DU BLOG
  * ================================================================
  *
  * Ce contrôleur gère la partie publique du blog Brussels Top Team.
  *
  * Il permet :
  *
- * - d'afficher la liste des articles publiés ;
+ * - d'afficher les articles publiés ;
  * - de filtrer les articles par catégorie ;
  * - de trier les articles ;
  * - d'afficher un article individuel ;
- * - d'exclure les brouillons ;
- * - d'exclure les articles supprimés ;
- * - d'exclure les articles dont la date de publication
- *   n'est pas encore atteinte.
+ * - d'afficher les commentaires publics de cet article.
  *
  * ================================================================
  */
@@ -31,28 +28,19 @@ class BlogController extends Controller
 {
     /**
      * ============================================================
-     * AFFICHER LA LISTE PUBLIQUE DES ARTICLES
+     * LISTE PUBLIQUE DES ARTICLES
      * ============================================================
      *
-     * Paramètres disponibles dans l'URL :
+     * Cette méthode affiche uniquement les articles :
      *
-     * category
-     * Exemple :
+     * - publiés ;
+     * - possédant une date de publication ;
+     * - dont la date de publication est passée ou actuelle.
      *
-     * /blog?category=HYROX
+     * Elle gère également :
      *
-     *
-     * sort
-     * Valeurs possibles :
-     *
-     * recent
-     * oldest
-     * featured
-     * title
-     *
-     * Exemple :
-     *
-     * /blog?category=HYROX&sort=recent
+     * - le filtrage par catégorie ;
+     * - le tri des articles.
      *
      * ============================================================
      */
@@ -60,14 +48,11 @@ class BlogController extends Controller
     {
         /*
         |--------------------------------------------------------------------------
-        | CATÉGORIES AUTORISÉES
+        | CATÉGORIES DISPONIBLES
         |--------------------------------------------------------------------------
         |
-        | Ces catégories correspondent aux catégories actuellement utilisées
-        | dans la gestion des articles.
-        |
-        | On utilise une liste contrôlée afin d'éviter d'accepter n'importe
-        | quelle valeur provenant directement de l'URL.
+        | Cette liste correspond aux catégories actuellement utilisées
+        | pour les articles du blog Brussels Top Team.
         |
         */
 
@@ -84,13 +69,13 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | TRI AUTORISÉ
+        | TRIS AUTORISÉS
         |--------------------------------------------------------------------------
         |
-        | recent   = articles les plus récents
-        | oldest   = articles les plus anciens
-        | featured = articles mis en avant en premier
-        | title    = ordre alphabétique A → Z
+        | On n'accepte que les valeurs définies ici.
+        |
+        | Cela évite qu'une valeur arbitraire provenant de l'URL
+        | puisse modifier directement la requête SQL.
         |
         */
 
@@ -104,11 +89,13 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | RÉCUPÉRATION DE LA CATÉGORIE
+        | CATÉGORIE SÉLECTIONNÉE
         |--------------------------------------------------------------------------
         */
 
-        $selectedCategory = $request->query('category');
+        $selectedCategory = $request->query(
+            'category'
+        );
 
 
         /*
@@ -116,14 +103,14 @@ class BlogController extends Controller
         | VÉRIFICATION DE LA CATÉGORIE
         |--------------------------------------------------------------------------
         |
-        | Si la catégorie reçue n'existe pas dans notre liste,
-        | nous revenons simplement sur "Toutes les catégories".
+        | Si une catégorie inconnue est passée dans l'URL,
+        | on l'ignore simplement.
         |
         */
 
         if (
             $selectedCategory !== null
-            && !in_array(
+            && ! in_array(
                 $selectedCategory,
                 $categories,
                 true
@@ -135,10 +122,12 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | RÉCUPÉRATION DU TRI
+        | TRI SÉLECTIONNÉ
         |--------------------------------------------------------------------------
         |
-        | Par défaut, nous affichons les articles les plus récents.
+        | Par défaut :
+        |
+        | les articles les plus récents apparaissent en premier.
         |
         */
 
@@ -154,11 +143,13 @@ class BlogController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (!in_array(
-            $selectedSort,
-            $allowedSorts,
-            true
-        )) {
+        if (
+            ! in_array(
+                $selectedSort,
+                $allowedSorts,
+                true
+            )
+        ) {
             $selectedSort = 'recent';
         }
 
@@ -168,20 +159,15 @@ class BlogController extends Controller
         | REQUÊTE DE BASE
         |--------------------------------------------------------------------------
         |
-        | Seuls les articles :
+        | On récupère uniquement les articles réellement visibles
+        | publiquement.
         |
-        | - publiés ;
-        | - ayant une date de publication ;
-        | - dont la date de publication est atteinte ;
-        |
-        | peuvent apparaître dans le blog public.
-        |
-        | Les articles supprimés avec SoftDeletes sont automatiquement
-        | exclus par Eloquent.
+        | L'auteur est chargé immédiatement afin d'éviter des requêtes
+        | supplémentaires lors de l'affichage de la liste.
         |
         */
 
-        $query = Article::query()
+        $articlesQuery = Article::query()
             ->with('author')
             ->where(
                 'status',
@@ -201,19 +187,13 @@ class BlogController extends Controller
         |--------------------------------------------------------------------------
         | FILTRE PAR CATÉGORIE
         |--------------------------------------------------------------------------
-        |
-        | Le filtre n'est appliqué que lorsqu'une catégorie valide
-        | a été sélectionnée.
-        |
         */
 
         if ($selectedCategory !== null) {
-
-            $query->where(
+            $articlesQuery->where(
                 'category',
                 $selectedCategory
             );
-
         }
 
 
@@ -230,37 +210,37 @@ class BlogController extends Controller
             | PLUS ANCIENS
             |--------------------------------------------------------------------------
             */
-
             case 'oldest':
 
-                $query->orderBy(
-                    'published_at',
-                    'asc'
-                );
+                $articlesQuery
+                    ->orderBy(
+                        'published_at',
+                        'asc'
+                    );
 
                 break;
 
 
             /*
             |--------------------------------------------------------------------------
-            | À LA UNE
+            | ARTICLES À LA UNE
             |--------------------------------------------------------------------------
             |
             | Les articles mis en avant apparaissent d'abord.
-            |
-            | À l'intérieur de chaque groupe, les plus récents
-            | apparaissent en premier.
+            | À l'intérieur de chaque groupe, les plus récents restent
+            | affichés en premier.
             |
             */
-
             case 'featured':
 
-                $query
-                    ->orderByDesc(
-                        'is_featured'
+                $articlesQuery
+                    ->orderBy(
+                        'is_featured',
+                        'desc'
                     )
-                    ->orderByDesc(
-                        'published_at'
+                    ->orderBy(
+                        'published_at',
+                        'desc'
                     );
 
                 break;
@@ -271,16 +251,16 @@ class BlogController extends Controller
             | TITRE A → Z
             |--------------------------------------------------------------------------
             */
-
             case 'title':
 
-                $query
+                $articlesQuery
                     ->orderBy(
                         'title',
                         'asc'
                     )
-                    ->orderByDesc(
-                        'published_at'
+                    ->orderBy(
+                        'published_at',
+                        'desc'
                     );
 
                 break;
@@ -294,14 +274,14 @@ class BlogController extends Controller
             | Tri par défaut.
             |
             */
-
             case 'recent':
-
             default:
 
-                $query->orderByDesc(
-                    'published_at'
-                );
+                $articlesQuery
+                    ->orderBy(
+                        'published_at',
+                        'desc'
+                    );
 
                 break;
         }
@@ -312,46 +292,34 @@ class BlogController extends Controller
         | PAGINATION
         |--------------------------------------------------------------------------
         |
-        | Nous affichons 12 articles par page.
+        | 12 articles par page.
         |
-        | withQueryString() permet de conserver automatiquement
-        | les paramètres :
+        | withQueryString() conserve les paramètres :
         |
         | ?category=...
         | ?sort=...
         |
-        | lorsqu'on clique sur la page suivante.
+        | lorsque l'utilisateur change de page.
         |
         */
 
-        $articles = $query
+        $articles = $articlesQuery
             ->paginate(12)
             ->withQueryString();
 
 
         /*
         |--------------------------------------------------------------------------
-        | AFFICHAGE DE LA VUE
+        | AFFICHAGE DE LA PAGE
         |--------------------------------------------------------------------------
-        |
-        | Nous transmettons :
-        |
-        | - les articles ;
-        | - les catégories disponibles ;
-        | - la catégorie sélectionnée ;
-        | - le tri sélectionné.
-        |
         */
 
         return view(
             'blog',
             [
                 'articles' => $articles,
-
                 'categories' => $categories,
-
                 'selectedCategory' => $selectedCategory,
-
                 'selectedSort' => $selectedSort,
             ]
         );
@@ -363,11 +331,16 @@ class BlogController extends Controller
      * AFFICHER UN ARTICLE
      * ============================================================
      *
-     * L'article est recherché grâce à son slug.
+     * Cette méthode affiche un article individuel grâce à son slug.
      *
-     * Exemple :
+     * Elle récupère également :
      *
-     * /blog/btt-girls-la-boxe-feminine
+     * - l'auteur de l'article ;
+     * - les commentaires publiés ;
+     * - l'auteur de chaque commentaire.
+     *
+     * Les commentaires masqués ou supprimés ne sont jamais envoyés
+     * à la page publique.
      *
      * ============================================================
      */
@@ -375,36 +348,100 @@ class BlogController extends Controller
     {
         /*
         |--------------------------------------------------------------------------
-        | RECHERCHE DE L'ARTICLE
+        | RÉCUPÉRATION DE L'ARTICLE
         |--------------------------------------------------------------------------
-        |
-        | L'article doit obligatoirement :
-        |
-        | - correspondre au slug demandé ;
-        | - être publié ;
-        | - avoir une date de publication ;
-        | - être déjà publié à l'heure actuelle.
-        |
         */
 
         $article = Article::query()
-            ->with('author')
+
+            /*
+            |--------------------------------------------------------------------------
+            | CHARGEMENT DES RELATIONS
+            |--------------------------------------------------------------------------
+            |
+            | author :
+            | auteur de l'article.
+            |
+            | comments :
+            | uniquement les commentaires ayant le statut "published".
+            |
+            | comments.user :
+            | utilisateur ayant publié chaque commentaire.
+            |
+            */
+
+            ->with([
+                'author',
+
+                'comments' => function ($query) {
+                    $query
+                        ->where(
+                            'status',
+                            'published'
+                        )
+                        ->with('user')
+                        ->orderBy(
+                            'created_at',
+                            'asc'
+                        );
+                },
+            ])
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | RECHERCHE PAR SLUG
+            |--------------------------------------------------------------------------
+            */
+
             ->where(
                 'slug',
                 $slug
             )
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | ARTICLE PUBLIÉ UNIQUEMENT
+            |--------------------------------------------------------------------------
+            */
+
             ->where(
                 'status',
                 'published'
             )
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DATE DE PUBLICATION OBLIGATOIRE
+            |--------------------------------------------------------------------------
+            */
+
             ->whereNotNull(
                 'published_at'
             )
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | PAS DE PUBLICATION FUTURE
+            |--------------------------------------------------------------------------
+            */
+
             ->where(
                 'published_at',
                 '<=',
                 now()
             )
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | ARTICLE INTROUVABLE = ERREUR 404
+            |--------------------------------------------------------------------------
+            */
+
             ->firstOrFail();
 
 

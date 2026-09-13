@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
@@ -13,23 +14,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * MODÈLE ARTICLE
  * ================================================================
  *
- * Représente un article publié sur le blog Brussels Top Team.
+ * Représente un article du blog Brussels Top Team.
  *
- * Un article pourra contenir :
+ * Un article :
  *
- * - un titre ;
- * - une URL propre grâce au slug ;
- * - une catégorie ;
- * - un résumé ;
- * - un contenu complet ;
- * - une bannière principale ;
- * - un auteur ;
- * - un statut brouillon / publié ;
- * - une date de publication ;
- * - une mise en avant éventuelle.
- *
- * Les likes, commentaires et images intégrées au contenu seront
- * gérés plus tard avec leurs propres tables.
+ * - appartient à un auteur ;
+ * - possède un titre et un slug ;
+ * - appartient à une catégorie ;
+ * - peut être un brouillon ou être publié ;
+ * - peut être mis en avant ;
+ * - peut posséder une bannière ;
+ * - peut contenir du contenu HTML généré par Quill ;
+ * - peut recevoir plusieurs commentaires ;
+ * - utilise la suppression logique.
  *
  * ================================================================
  */
@@ -40,12 +37,9 @@ class Article extends Model
 
 
     /**
-     * ---------------------------------------------------------------
-     * CHAMPS MODIFIABLES
-     * ---------------------------------------------------------------
-     *
-     * Ces champs pourront être remplis avec Article::create()
-     * ou avec la méthode update().
+     * ============================================================
+     * CHAMPS AUTORISÉS À L'ATTRIBUTION DE MASSE
+     * ============================================================
      */
     protected $fillable = [
         'author_id',
@@ -62,14 +56,16 @@ class Article extends Model
 
 
     /**
-     * ---------------------------------------------------------------
+     * ============================================================
      * CONVERSIONS AUTOMATIQUES
-     * ---------------------------------------------------------------
+     * ============================================================
      *
-     * Laravel transformera automatiquement :
+     * Laravel convertit automatiquement :
      *
-     * - is_featured en vrai booléen ;
-     * - published_at en objet de date Carbon.
+     * - is_featured en booléen ;
+     * - published_at en objet date/heure.
+     *
+     * ============================================================
      */
     protected function casts(): array
     {
@@ -81,14 +77,17 @@ class Article extends Model
 
 
     /**
-     * ---------------------------------------------------------------
-     * AUTEUR DE L'ARTICLE
-     * ---------------------------------------------------------------
+     * ============================================================
+     * RELATION : AUTEUR
+     * ============================================================
      *
-     * Un article appartient à un utilisateur.
+     * Chaque article appartient à un utilisateur.
      *
-     * En pratique, cet utilisateur sera normalement un administrateur
-     * ou le Super Admin ayant créé l'article.
+     * Exemple :
+     *
+     * $article->author
+     *
+     * ============================================================
      */
     public function author(): BelongsTo
     {
@@ -100,9 +99,42 @@ class Article extends Model
 
 
     /**
-     * ---------------------------------------------------------------
+     * ============================================================
+     * RELATION : COMMENTAIRES
+     * ============================================================
+     *
+     * Un article peut posséder plusieurs commentaires.
+     *
+     * Exemple :
+     *
+     * $article->comments
+     *
+     * Cette relation retourne tous les commentaires non supprimés,
+     * quel que soit leur statut.
+     *
+     * Le filtrage "published" sera volontairement effectué dans
+     * les contrôleurs selon le contexte :
+     *
+     * - côté public :
+     *   uniquement les commentaires publiés ;
+     *
+     * - côté administration :
+     *   commentaires publiés + masqués.
+     *
+     * ============================================================
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(
+            Comment::class
+        );
+    }
+
+
+    /**
+     * ============================================================
      * ARTICLE PUBLIÉ ?
-     * ---------------------------------------------------------------
+     * ============================================================
      */
     public function isPublished(): bool
     {
@@ -111,9 +143,9 @@ class Article extends Model
 
 
     /**
-     * ---------------------------------------------------------------
+     * ============================================================
      * ARTICLE EN BROUILLON ?
-     * ---------------------------------------------------------------
+     * ============================================================
      */
     public function isDraft(): bool
     {
@@ -122,12 +154,9 @@ class Article extends Model
 
 
     /**
-     * ---------------------------------------------------------------
+     * ============================================================
      * ARTICLE MIS EN AVANT ?
-     * ---------------------------------------------------------------
-     *
-     * Ce champ nous servira plus tard pour afficher certains articles
-     * en priorité sur la page Blog.
+     * ============================================================
      */
     public function isFeatured(): bool
     {

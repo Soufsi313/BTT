@@ -85,9 +85,7 @@
                     <div class="space-y-1">
 
 
-                        <!-- =====================================
-                             TABLEAU DE BORD
-                             ===================================== -->
+                        <!-- TABLEAU DE BORD -->
                         <a
                             href="{{ route('admin.dashboard') }}"
                             class="
@@ -108,9 +106,7 @@
                         </a>
 
 
-                        <!-- =====================================
-                             ADHÉRENTS
-                             ===================================== -->
+                        <!-- ADHÉRENTS -->
                         <a
                             href="{{ route('admin.members.index') }}"
                             class="
@@ -131,9 +127,7 @@
                         </a>
 
 
-                        <!-- =====================================
-                             CALENDRIER
-                             ===================================== -->
+                        <!-- CALENDRIER -->
                         <a
                             href="{{ route('admin.courses.index') }}"
                             class="
@@ -176,10 +170,7 @@
                         </a>
 
 
-                        <!-- =====================================
-                             PRODUITS
-                             PAS ENCORE DÉVELOPPÉ
-                             ===================================== -->
+                        <!-- PRODUITS -->
                         <span
                             class="
                                 block
@@ -195,9 +186,7 @@
                         </span>
 
 
-                        <!-- =====================================
-                             MESSAGES
-                             ===================================== -->
+                        <!-- MESSAGES -->
                         <a
                             href="{{ route('admin.messages.index') }}"
                             class="
@@ -218,10 +207,7 @@
                         </a>
 
 
-                        <!-- =====================================
-                             ADMINISTRATEURS
-                             SUPER ADMIN UNIQUEMENT
-                             ===================================== -->
+                        <!-- ADMINISTRATEURS -->
                         @if (auth()->user()->isSuperAdmin())
 
                             <a
@@ -354,7 +340,7 @@
 
 
                         <!-- =====================================
-                             CRÉER UN NOUVEL ARTICLE
+                             NOUVEL ARTICLE
                              ===================================== -->
                         <a
                             href="{{ route('admin.articles.create') }}"
@@ -491,20 +477,18 @@
 
                         <div class="overflow-x-auto">
 
-                            <table class="w-full min-w-[1100px]">
+                            <table class="w-full min-w-[1250px]">
 
 
                                 <!-- =============================
-                                     EN-TÊTES DU TABLEAU
+                                     EN-TÊTES
                                      ============================= -->
                                 <thead class="bg-zinc-50">
 
                                     <tr class="border-b border-zinc-200">
 
 
-                                        <!-- =====================
-                                             BANNIÈRE
-                                             ===================== -->
+                                        <!-- BANNIÈRE -->
                                         <th
                                             class="
                                                 px-5
@@ -521,9 +505,7 @@
                                         </th>
 
 
-                                        <!-- =====================
-                                             TITRE
-                                             ===================== -->
+                                        <!-- TITRE -->
                                         <th
                                             class="
                                                 px-5
@@ -564,9 +546,7 @@
                                         </th>
 
 
-                                        <!-- =====================
-                                             CATÉGORIE
-                                             ===================== -->
+                                        <!-- CATÉGORIE -->
                                         <th
                                             class="
                                                 px-5
@@ -607,9 +587,7 @@
                                         </th>
 
 
-                                        <!-- =====================
-                                             AUTEUR
-                                             ===================== -->
+                                        <!-- AUTEUR -->
                                         <th
                                             class="
                                                 px-5
@@ -626,9 +604,7 @@
                                         </th>
 
 
-                                        <!-- =====================
-                                             STATUT
-                                             ===================== -->
+                                        <!-- STATUT -->
                                         <th
                                             class="
                                                 px-5
@@ -669,9 +645,7 @@
                                         </th>
 
 
-                                        <!-- =====================
-                                             PUBLICATION
-                                             ===================== -->
+                                        <!-- PUBLICATION -->
                                         <th
                                             class="
                                                 px-5
@@ -712,9 +686,7 @@
                                         </th>
 
 
-                                        <!-- =====================
-                                             CRÉATION
-                                             ===================== -->
+                                        <!-- CRÉATION -->
                                         <th
                                             class="
                                                 px-5
@@ -754,6 +726,25 @@
 
                                         </th>
 
+
+                                        <!-- =====================
+                                             ACTIONS
+                                             ===================== -->
+                                        <th
+                                            class="
+                                                px-5
+                                                py-4
+                                                text-right
+                                                text-xs
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-zinc-500
+                                            "
+                                        >
+                                            Actions
+                                        </th>
+
                                     </tr>
 
                                 </thead>
@@ -782,15 +773,6 @@
 
                                                 @if ($article->banner_image)
 
-                                                    <!--
-                                                        L'image est enregistrée
-                                                        dans storage/app/public.
-
-                                                        Le lien symbolique créé avec
-                                                        "php artisan storage:link"
-                                                        permet d'y accéder via
-                                                        /storage/...
-                                                    -->
                                                     <div
                                                         class="
                                                             h-20
@@ -817,12 +799,6 @@
 
                                                 @else
 
-                                                    <!--
-                                                        Les anciens articles créés
-                                                        avant l'ajout des bannières
-                                                        peuvent encore avoir une
-                                                        valeur NULL.
-                                                    -->
                                                     <div
                                                         class="
                                                             flex
@@ -1060,6 +1036,67 @@
                                                 {{ $article->created_at->format('d/m/Y H:i') }}
                                             </td>
 
+
+                                            <!-- =================
+                                                 ACTIONS
+                                                 ================= -->
+                                            <td class="px-5 py-5 text-right">
+
+                                                @if (! $article->deleted_at)
+
+                                                    <!--
+                                                        Un article actif peut être
+                                                        modifié normalement.
+                                                    -->
+                                                    <a
+                                                        href="{{ route(
+                                                            'admin.articles.edit',
+                                                            $article
+                                                        ) }}"
+                                                        class="
+                                                            inline-flex
+                                                            items-center
+                                                            justify-center
+                                                            rounded-md
+                                                            border
+                                                            border-zinc-300
+                                                            bg-white
+                                                            px-4
+                                                            py-2
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            text-zinc-700
+                                                            transition
+                                                            hover:border-red-600
+                                                            hover:text-red-600
+                                                        "
+                                                    >
+                                                        Modifier
+                                                    </a>
+
+                                                @else
+
+                                                    <!--
+                                                        Les articles supprimés
+                                                        seront gérés plus tard
+                                                        par la restauration.
+                                                    -->
+                                                    <span
+                                                        class="
+                                                            text-xs
+                                                            font-bold
+                                                            text-zinc-400
+                                                        "
+                                                    >
+                                                        Indisponible
+                                                    </span>
+
+                                                @endif
+
+                                            </td>
+
                                         </tr>
 
                                     @empty
@@ -1071,7 +1108,7 @@
                                         <tr>
 
                                             <td
-                                                colspan="7"
+                                                colspan="8"
                                                 class="
                                                     px-6
                                                     py-16
@@ -1105,9 +1142,6 @@
                                                     </p>
 
 
-                                                    <!-- =================
-                                                         PREMIER ARTICLE
-                                                         ================= -->
                                                     <a
                                                         href="{{ route('admin.articles.create') }}"
                                                         class="

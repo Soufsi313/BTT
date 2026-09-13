@@ -6,6 +6,7 @@ use App\Models\Article;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -24,15 +25,10 @@ use Illuminate\Support\Str;
  * - de trier les articles ;
  * - d'afficher le formulaire de création ;
  * - d'enregistrer un nouvel article ;
- * - d'enregistrer une bannière pour l'article.
- *
- * Les prochaines étapes ajouteront :
- *
- * - la modification d'un article ;
- * - la suppression ;
- * - la restauration ;
- * - les images intégrées dans le contenu ;
- * - la publication sur le Blog public.
+ * - d'enregistrer une bannière ;
+ * - d'afficher le formulaire de modification ;
+ * - de modifier un article existant ;
+ * - de remplacer sa bannière.
  *
  * ================================================================
  */
@@ -100,6 +96,9 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * RÉCUPÉRATION DES ARTICLES
          * -----------------------------------------------------------
+         *
+         * withTrashed() permet également d'afficher les articles
+         * supprimés grâce à SoftDeletes.
          */
         $articles = Article::query()
             ->withTrashed()
@@ -147,35 +146,13 @@ class AdminArticleController extends Controller
      * ===============================================================
      * ENREGISTREMENT D'UN NOUVEL ARTICLE
      * ===============================================================
-     *
-     * Cette méthode :
-     *
-     * 1. vérifie les informations du formulaire ;
-     * 2. vérifie la bannière ;
-     * 3. enregistre la bannière dans le stockage public ;
-     * 4. génère automatiquement un slug unique ;
-     * 5. associe l'article à l'administrateur connecté ;
-     * 6. détermine la date de publication ;
-     * 7. crée l'article dans la base de données.
      */
     public function store(Request $request): RedirectResponse
     {
         /**
          * -----------------------------------------------------------
-         * VALIDATION DU FORMULAIRE
+         * VALIDATION
          * -----------------------------------------------------------
-         *
-         * La bannière est maintenant obligatoire.
-         *
-         * Formats autorisés :
-         *
-         * - JPG / JPEG
-         * - PNG
-         * - WEBP
-         *
-         * Taille maximale :
-         *
-         * 5 Mo
          */
         $validated = $request->validate([
             'title' => [
@@ -226,18 +203,22 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * GÉNÉRATION DU SLUG
          * -----------------------------------------------------------
-         *
-         * Exemple :
-         *
-         * Brussels Top Team au tournoi
-         *
-         * devient :
-         *
-         * brussels-top-team-au-tournoi
          */
         $baseSlug = Str::slug(
             $validated['title']
         );
+
+
+        /**
+         * Sécurité supplémentaire :
+         *
+         * si un titre ne génère exceptionnellement aucun slug,
+         * on utilise "article".
+         */
+        if ($baseSlug === '') {
+            $baseSlug = 'article';
+        }
+
 
         $slug = $baseSlug;
 
@@ -246,16 +227,8 @@ class AdminArticleController extends Controller
 
         /**
          * -----------------------------------------------------------
-         * CRÉATION D'UN SLUG UNIQUE
+         * SLUG UNIQUE
          * -----------------------------------------------------------
-         *
-         * Exemple :
-         *
-         * mon-article
-         * mon-article-2
-         * mon-article-3
-         *
-         * Les articles supprimés sont également vérifiés.
          */
         while (
             Article::withTrashed()
@@ -272,17 +245,6 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          * ENREGISTREMENT DE LA BANNIÈRE
          * -----------------------------------------------------------
-         *
-         * Laravel crée automatiquement un nom de fichier unique.
-         *
-         * L'image sera stockée dans :
-         *
-         * storage/app/public/articles/banners
-         *
-         * Grâce à "php artisan storage:link", elle sera ensuite
-         * accessible publiquement via :
-         *
-         * public/storage/articles/banners
          */
         $bannerPath = $request
             ->file('banner_image')
@@ -298,14 +260,8 @@ class AdminArticleController extends Controller
          * -----------------------------------------------------------
          */
         Article::create([
-            /**
-             * Administrateur ayant créé l'article.
-             */
             'author_id' => auth()->id(),
 
-            /**
-             * Informations principales.
-             */
             'title' => $validated['title'],
 
             'slug' => $slug,
@@ -316,36 +272,18 @@ class AdminArticleController extends Controller
 
             'content' => $validated['content'],
 
-            /**
-             * Chemin de la bannière.
-             *
-             * Exemple :
-             *
-             * articles/banners/abc123.webp
-             */
             'banner_image' => $bannerPath,
 
-            /**
-             * Brouillon ou publié.
-             */
             'status' => $validated['status'],
 
-            /**
-             * Une case HTML non cochée n'est pas envoyée.
-             *
-             * boolean() permet donc d'obtenir proprement :
-             *
-             * true ou false.
-             */
             'is_featured' => $request->boolean(
                 'is_featured'
             ),
 
             /**
-             * Si l'article est publié immédiatement,
-             * la date actuelle devient sa date de publication.
+             * Un article publié immédiatement reçoit la date actuelle.
              *
-             * Un brouillon garde une valeur NULL.
+             * Un brouillon n'a pas encore de date de publication.
              */
             'published_at' => $validated['status'] === 'published'
                 ? now()
@@ -363,6 +301,274 @@ class AdminArticleController extends Controller
             ->with(
                 'success',
                 'L’article a été créé avec succès.'
+            );
+    }
+
+
+    /**
+     * ===============================================================
+     * FORMULAIRE DE MODIFICATION
+     * ===============================================================
+     *
+     * Laravel récupère automatiquement l'article correspondant
+     * au paramètre {article} présent dans l'URL.
+     *
+     * Exemple :
+     *
+     * /admin/articles/4/modifier
+     *
+     * Laravel injectera automatiquement l'article ayant l'ID 4.
+     */
+    public function edit(Article $article): View
+    {
+        return view(
+            'admin.articles.edit',
+            [
+                'article' => $article,
+            ]
+        );
+    }
+
+
+    /**
+     * ===============================================================
+     * MODIFICATION D'UN ARTICLE
+     * ===============================================================
+     *
+     * Cette méthode permet de modifier :
+     *
+     * - le titre ;
+     * - le slug ;
+     * - la catégorie ;
+     * - le résumé ;
+     * - le contenu ;
+     * - la bannière ;
+     * - le statut ;
+     * - la mise en avant ;
+     * - la date de publication.
+     */
+    public function update(
+        Request $request,
+        Article $article
+    ): RedirectResponse {
+        /**
+         * -----------------------------------------------------------
+         * VALIDATION
+         * -----------------------------------------------------------
+         *
+         * Contrairement à la création, la bannière n'est pas
+         * obligatoire.
+         *
+         * Si aucune nouvelle image n'est envoyée, l'ancienne bannière
+         * est simplement conservée.
+         */
+        $validated = $request->validate([
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'category' => [
+                'required',
+                'string',
+                'max:100',
+                'in:Actualité,Futsal,Boxe,HYROX,Association,Événement',
+            ],
+
+            'excerpt' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+
+            'content' => [
+                'required',
+                'string',
+                'min:10',
+            ],
+
+            'status' => [
+                'required',
+                'in:draft,published',
+            ],
+
+            'is_featured' => [
+                'nullable',
+                'boolean',
+            ],
+
+            'banner_image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
+        ]);
+
+
+        /**
+         * -----------------------------------------------------------
+         * NOUVEAU SLUG
+         * -----------------------------------------------------------
+         *
+         * Le slug est recalculé à partir du titre.
+         *
+         * Exemple :
+         *
+         * "Tournoi BTT Bruxelles"
+         *
+         * devient :
+         *
+         * tournoi-btt-bruxelles
+         */
+        $baseSlug = Str::slug(
+            $validated['title']
+        );
+
+
+        if ($baseSlug === '') {
+            $baseSlug = 'article';
+        }
+
+
+        $slug = $baseSlug;
+
+        $counter = 2;
+
+
+        /**
+         * -----------------------------------------------------------
+         * VÉRIFICATION DE L'UNICITÉ DU SLUG
+         * -----------------------------------------------------------
+         *
+         * On vérifie également les articles supprimés.
+         *
+         * En revanche, on ignore l'article actuellement modifié,
+         * puisqu'il peut évidemment conserver son propre slug.
+         */
+        while (
+            Article::withTrashed()
+                ->where('slug', $slug)
+                ->where('id', '!=', $article->id)
+                ->exists()
+        ) {
+            $slug = $baseSlug . '-' . $counter;
+
+            $counter++;
+        }
+
+
+        /**
+         * -----------------------------------------------------------
+         * BANNIÈRE ACTUELLE
+         * -----------------------------------------------------------
+         *
+         * Par défaut, nous conservons l'image déjà enregistrée.
+         */
+        $bannerPath = $article->banner_image;
+
+
+        /**
+         * -----------------------------------------------------------
+         * NOUVELLE BANNIÈRE
+         * -----------------------------------------------------------
+         */
+        if ($request->hasFile('banner_image')) {
+            /**
+             * On conserve temporairement le chemin de l'ancienne image.
+             *
+             * Elle sera supprimée seulement après l'enregistrement
+             * de la nouvelle bannière.
+             */
+            $oldBannerPath = $article->banner_image;
+
+
+            /**
+             * Enregistrement de la nouvelle bannière.
+             */
+            $bannerPath = $request
+                ->file('banner_image')
+                ->store(
+                    'articles/banners',
+                    'public'
+                );
+
+
+            /**
+             * Suppression de l'ancienne bannière.
+             *
+             * On vérifie d'abord qu'elle existe réellement.
+             */
+            if (
+                $oldBannerPath
+                && Storage::disk('public')->exists($oldBannerPath)
+            ) {
+                Storage::disk('public')->delete(
+                    $oldBannerPath
+                );
+            }
+        }
+
+
+        /**
+         * -----------------------------------------------------------
+         * DATE DE PUBLICATION
+         * -----------------------------------------------------------
+         */
+        $publishedAt = null;
+
+
+        if ($validated['status'] === 'published') {
+            /**
+             * Si l'article était déjà publié, on conserve sa première
+             * date de publication.
+             *
+             * S'il passe de brouillon à publié, on utilise la date
+             * actuelle.
+             */
+            $publishedAt = $article->published_at ?? now();
+        }
+
+
+        /**
+         * -----------------------------------------------------------
+         * MISE À JOUR DE L'ARTICLE
+         * -----------------------------------------------------------
+         */
+        $article->update([
+            'title' => $validated['title'],
+
+            'slug' => $slug,
+
+            'category' => $validated['category'],
+
+            'excerpt' => $validated['excerpt'] ?? null,
+
+            'content' => $validated['content'],
+
+            'banner_image' => $bannerPath,
+
+            'status' => $validated['status'],
+
+            'is_featured' => $request->boolean(
+                'is_featured'
+            ),
+
+            'published_at' => $publishedAt,
+        ]);
+
+
+        /**
+         * -----------------------------------------------------------
+         * RETOUR À LA LISTE
+         * -----------------------------------------------------------
+         */
+        return redirect()
+            ->route('admin.articles.index')
+            ->with(
+                'success',
+                'L’article a été modifié avec succès.'
             );
     }
 }

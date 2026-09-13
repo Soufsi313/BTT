@@ -55,12 +55,6 @@ Route::get('/coachs', function () {
 |--------------------------------------------------------------------------
 | BLOG
 |--------------------------------------------------------------------------
-|
-| Pour le moment, cette route affiche encore la page temporaire
-| du Blog.
-|
-| Elle sera plus tard reliée aux articles publiés.
-|
 */
 
 Route::get('/blog', function () {
@@ -100,6 +94,12 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
+
+/*
+|--------------------------------------------------------------------------
+| ENVOI DU FORMULAIRE DE CONTACT
+|--------------------------------------------------------------------------
+*/
 
 Route::post(
     '/contact',
@@ -207,21 +207,17 @@ Route::middleware('auth')
 
         /*
         |--------------------------------------------------------------------------
-        | MESSAGERIE PRIVÉE
+        | MESSAGERIE ADHÉRENT
         |--------------------------------------------------------------------------
         |
         | IMPORTANT :
         |
-        | La route /messages/nouveau doit rester placée avant
+        | La route /messages/nouveau doit rester placée AVANT
         | /messages/{conversation}.
         |
-        */
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | LISTE DES CONVERSATIONS
-        |--------------------------------------------------------------------------
+        | Sinon Laravel pourrait interpréter "nouveau" comme
+        | l'identifiant d'une conversation.
+        |
         */
 
         Route::get(
@@ -229,12 +225,6 @@ Route::middleware('auth')
             [MemberMessageController::class, 'index']
         )->name('messages.index');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | NOUVELLE CONVERSATION
-        |--------------------------------------------------------------------------
-        */
 
         Route::get(
             '/messages/nouveau',
@@ -248,23 +238,11 @@ Route::middleware('auth')
         )->name('messages.store');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | CONSULTER UNE CONVERSATION
-        |--------------------------------------------------------------------------
-        */
-
         Route::get(
             '/messages/{conversation}',
             [MemberMessageController::class, 'show']
         )->name('messages.show');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | RÉPONDRE À UNE CONVERSATION
-        |--------------------------------------------------------------------------
-        */
 
         Route::post(
             '/messages/{conversation}/repondre',
@@ -345,10 +323,6 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 | CONFIRMATION APRÈS SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
-|
-| Cette page reste en dehors du middleware auth car l'utilisateur
-| est automatiquement déconnecté lorsque son compte est supprimé.
-|
 */
 
 Route::get('/compte-supprime', function () {
@@ -360,12 +334,6 @@ Route::get('/compte-supprime', function () {
 |--------------------------------------------------------------------------
 | ESPACE ADMINISTRATION
 |--------------------------------------------------------------------------
-|
-| Toutes les routes ci-dessous nécessitent :
-|
-| - une connexion ;
-| - les droits administrateur.
-|
 */
 
 Route::middleware([
@@ -379,7 +347,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | TABLEAU DE BORD
+        | TABLEAU DE BORD ADMIN
         |--------------------------------------------------------------------------
         */
 
@@ -400,23 +368,11 @@ Route::middleware([
         )->name('members.index');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | RESTAURER UN ADHÉRENT
-        |--------------------------------------------------------------------------
-        */
-
         Route::patch(
             '/adherents/{id}/reactiver',
             [AdminMemberController::class, 'restore']
         )->name('members.restore');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | PROMOUVOIR UN ADHÉRENT
-        |--------------------------------------------------------------------------
-        */
 
         Route::patch(
             '/adherents/{id}/promouvoir-admin',
@@ -426,7 +382,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | ADMINISTRATEURS
+        | GESTION DES ADMINISTRATEURS
         |--------------------------------------------------------------------------
         */
 
@@ -435,12 +391,6 @@ Route::middleware([
             [AdminMemberController::class, 'administrators']
         )->name('administrators.index');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | RÉTROGRADER UN ADMINISTRATEUR
-        |--------------------------------------------------------------------------
-        */
 
         Route::patch(
             '/administrateurs/{id}/retrograder',
@@ -487,7 +437,7 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | RESTAURER UN COURS
+        | RÉACTIVER UN COURS SUPPRIMÉ
         |--------------------------------------------------------------------------
         */
 
@@ -533,24 +483,11 @@ Route::middleware([
         |--------------------------------------------------------------------------
         */
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | LISTE DES CONVERSATIONS
-        |--------------------------------------------------------------------------
-        */
-
         Route::get(
             '/messages',
             [AdminMessageController::class, 'index']
         )->name('messages.index');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | CONSULTER UNE CONVERSATION
-        |--------------------------------------------------------------------------
-        */
 
         Route::get(
             '/messages/{conversation}',
@@ -558,35 +495,17 @@ Route::middleware([
         )->name('messages.show');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | RÉPONDRE À UNE CONVERSATION
-        |--------------------------------------------------------------------------
-        */
-
         Route::post(
             '/messages/{conversation}/repondre',
             [AdminMessageController::class, 'reply']
         )->name('messages.reply');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | FERMER UNE CONVERSATION
-        |--------------------------------------------------------------------------
-        */
-
         Route::patch(
             '/messages/{conversation}/fermer',
             [AdminMessageController::class, 'close']
         )->name('messages.close');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | ROUVRIR UNE CONVERSATION
-        |--------------------------------------------------------------------------
-        */
 
         Route::patch(
             '/messages/{conversation}/rouvrir',
@@ -596,12 +515,8 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | GESTION DES ARTICLES
+        | ARTICLES DU BLOG
         |--------------------------------------------------------------------------
-        |
-        | Cette partie gère progressivement le Blog BTT depuis
-        | l'administration.
-        |
         */
 
 
@@ -619,15 +534,11 @@ Route::middleware([
 
         /*
         |--------------------------------------------------------------------------
-        | NOUVEL ARTICLE
+        | CRÉER UN ARTICLE
         |--------------------------------------------------------------------------
         |
-        | Cette route affiche le formulaire permettant de rédiger
-        | un nouvel article.
-        |
-        | Elle doit rester AVANT les futures routes du type :
-        |
-        | /articles/{article}
+        | Cette route doit rester avant toute route dynamique
+        | du type /articles/{article}.
         |
         */
 
@@ -637,18 +548,44 @@ Route::middleware([
         )->name('articles.create');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | ENREGISTRER UN ARTICLE
-        |--------------------------------------------------------------------------
-        |
-        | Cette route reçoit les informations envoyées par le
-        | formulaire puis appelle la méthode store() du contrôleur.
-        |
-        */
-
         Route::post(
             '/articles',
             [AdminArticleController::class, 'store']
         )->name('articles.store');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MODIFIER UN ARTICLE
+        |--------------------------------------------------------------------------
+        |
+        | Exemple :
+        |
+        | /admin/articles/3/modifier
+        |
+        | Laravel récupère automatiquement l'article correspondant
+        | grâce au Route Model Binding.
+        |
+        */
+
+        Route::get(
+            '/articles/{article}/modifier',
+            [AdminArticleController::class, 'edit']
+        )->name('articles.edit');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ENREGISTRER LES MODIFICATIONS
+        |--------------------------------------------------------------------------
+        |
+        | La méthode PATCH indique que l'on modifie une ressource
+        | déjà existante.
+        |
+        */
+
+        Route::patch(
+            '/articles/{article}',
+            [AdminArticleController::class, 'update']
+        )->name('articles.update');
     });

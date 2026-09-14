@@ -199,7 +199,7 @@
 
 
         <!-- =====================================================
-             BANNIÈRE DE L'ARTICLE
+             BANNIÈRE
              ===================================================== -->
         @if ($article->banner_image)
 
@@ -235,7 +235,7 @@
 
 
         <!-- =====================================================
-             CONTENU DE L'ARTICLE
+             CONTENU
              ===================================================== -->
         <section
             class="
@@ -251,7 +251,7 @@
 
 
                 <!-- =============================================
-                     CONTENU HTML GÉNÉRÉ PAR QUILL
+                     CONTENU HTML QUILL
                      ============================================= -->
                 <div class="article-content">
                     {!! $article->content !!}
@@ -259,7 +259,7 @@
 
 
                 <!-- =============================================
-                     LIKES DE L'ARTICLE
+                     LIKES
                      ============================================= -->
                 <div
                     class="
@@ -281,9 +281,7 @@
                         "
                     >
 
-                        <!-- =====================================
-                             COMPTEUR
-                             ===================================== -->
+                        <!-- COMPTEUR -->
                         <div>
 
                             <p
@@ -299,16 +297,8 @@
                             </p>
 
 
-                            <div
-                                class="
-                                    mt-2
-                                    flex
-                                    items-center
-                                    gap-3
-                                "
-                            >
+                            <div class="mt-2 flex items-center gap-3">
 
-                                <!-- CŒUR -->
                                 <span
                                     class="
                                         text-2xl
@@ -322,14 +312,7 @@
                                 </span>
 
 
-                                <!-- NOMBRE DE LIKES -->
-                                <p
-                                    class="
-                                        text-sm
-                                        font-bold
-                                        text-zinc-300
-                                    "
-                                >
+                                <p class="text-sm font-bold text-zinc-300">
 
                                     <span
                                         class="
@@ -362,9 +345,7 @@
                         </div>
 
 
-                        <!-- =====================================
-                             UTILISATEUR CONNECTÉ
-                             ===================================== -->
+                        <!-- UTILISATEUR CONNECTÉ -->
                         @auth
 
                             <form
@@ -377,9 +358,6 @@
 
                                 @if ($hasLiked)
 
-                                    <!-- =============================
-                                         RETIRER SON LIKE
-                                         ============================= -->
                                     <button
                                         type="submit"
                                         class="
@@ -409,9 +387,6 @@
 
                                 @else
 
-                                    <!-- =============================
-                                         AJOUTER UN LIKE
-                                         ============================= -->
                                     <button
                                         type="submit"
                                         class="
@@ -449,9 +424,7 @@
                         @endauth
 
 
-                        <!-- =====================================
-                             VISITEUR NON CONNECTÉ
-                             ===================================== -->
+                        <!-- VISITEUR -->
                         @guest
 
                             <a
@@ -489,6 +462,319 @@
 
                 </div>
 
+
+                <!-- =================================================
+                     PARTAGE DE L'ARTICLE
+                     ================================================= -->
+                <section
+                    class="
+                        border-b
+                        border-zinc-800
+                        py-10
+                    "
+                >
+
+                    <!-- =============================================
+                         TITRE
+                         ============================================= -->
+                    <div>
+
+                        <p
+                            class="
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-[0.25em]
+                                text-red-500
+                            "
+                        >
+                            Partager
+                        </p>
+
+
+                        <h2
+                            class="
+                                mt-2
+                                text-xl
+                                font-black
+                                uppercase
+                                text-white
+                            "
+                        >
+                            Partagez cet article
+                        </h2>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         ICÔNES DE PARTAGE
+                         ============================================= -->
+                    <div
+                        class="
+                            mt-6
+                            flex
+                            flex-wrap
+                            items-center
+                            gap-3
+                        "
+                    >
+
+
+                        <!-- =========================================
+                             FACEBOOK
+                             Couleur de marque : #1877F2
+                             ========================================= -->
+                        <a
+                            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Partager sur Facebook"
+                            title="Partager sur Facebook"
+                            class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-white
+                                shadow-sm
+                                transition
+                                duration-200
+                                hover:scale-110
+                                hover:brightness-110
+                            "
+                            style="background-color: #1877F2;"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                class="h-6 w-6"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.72V4.33a23.2 23.2 0 0 0-2.5-.13c-2.47 0-4.16 1.5-4.16 4.28v2.32H7.37V14h2.79v8h3.34Z"
+                                />
+                            </svg>
+
+                        </a>
+
+
+                        <!-- =========================================
+                             X
+                             Identité noire et blanche
+                             ========================================= -->
+                        <a
+                            href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode(url()->current()) }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Partager sur X"
+                            title="Partager sur X"
+                            class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-full
+                                border
+                                border-zinc-700
+                                bg-black
+                                text-white
+                                shadow-sm
+                                transition
+                                duration-200
+                                hover:scale-110
+                                hover:border-zinc-500
+                                hover:bg-zinc-900
+                            "
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                class="h-5 w-5"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.214-6.817-5.965 6.817H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"
+                                />
+                            </svg>
+
+                        </a>
+
+
+                        <!-- =========================================
+                             WHATSAPP
+                             Couleur de marque : #25D366
+                             ========================================= -->
+                        <a
+                            href="https://wa.me/?text={{ urlencode($article->title . ' - ' . url()->current()) }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Partager sur WhatsApp"
+                            title="Partager sur WhatsApp"
+                            class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-full
+                                text-white
+                                shadow-sm
+                                transition
+                                duration-200
+                                hover:scale-110
+                                hover:brightness-110
+                            "
+                            style="background-color: #25D366;"
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                class="h-6 w-6"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M12.04 2a9.84 9.84 0 0 0-8.4 14.96L2 22l5.2-1.62A9.96 9.96 0 1 0 12.04 2Zm0 17.98a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.08.96 1-3-.2-.3A8.03 8.03 0 1 1 12.04 19.98Zm4.42-6.02c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"
+                                />
+                            </svg>
+
+                        </a>
+
+
+                        <!-- =========================================
+                             PARTAGE NATIF
+                             Rouge BTT car il ne représente
+                             aucun réseau social particulier.
+                             ========================================= -->
+                        <button
+                            type="button"
+                            id="native-share-button"
+                            aria-label="Partager avec une application"
+                            title="Partager avec une application"
+                            class="
+                                hidden
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-red-600
+                                text-white
+                                shadow-sm
+                                transition
+                                duration-200
+                                hover:scale-110
+                                hover:bg-red-700
+                            "
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="h-5 w-5"
+                                aria-hidden="true"
+                            >
+                                <circle cx="18" cy="5" r="3" />
+                                <circle cx="6" cy="12" r="3" />
+                                <circle cx="18" cy="19" r="3" />
+                                <path d="m8.59 13.51 6.83 3.98" />
+                                <path d="m15.41 6.51-6.82 3.98" />
+                            </svg>
+
+                        </button>
+
+
+                        <!-- =========================================
+                             COPIER LE LIEN
+                             ========================================= -->
+                        <button
+                            type="button"
+                            id="copy-link-button"
+                            data-url="{{ url()->current() }}"
+                            aria-label="Copier le lien de l'article"
+                            title="Copier le lien"
+                            class="
+                                flex
+                                h-12
+                                w-12
+                                items-center
+                                justify-center
+                                rounded-full
+                                border
+                                border-zinc-700
+                                bg-zinc-900
+                                text-zinc-300
+                                shadow-sm
+                                transition
+                                duration-200
+                                hover:scale-110
+                                hover:border-red-600
+                                hover:text-white
+                            "
+                        >
+
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="h-5 w-5"
+                                aria-hidden="true"
+                            >
+                                <rect
+                                    width="14"
+                                    height="14"
+                                    x="8"
+                                    y="8"
+                                    rx="2"
+                                    ry="2"
+                                />
+
+                                <path
+                                    d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                                />
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- =============================================
+                         CONFIRMATION DE COPIE
+                         ============================================= -->
+                    <p
+                        id="copy-link-message"
+                        class="
+                            mt-4
+                            hidden
+                            text-sm
+                            font-bold
+                            text-green-500
+                        "
+                    >
+                        Lien copié dans le presse-papiers.
+                    </p>
+
+                </section>
+
             </div>
 
         </section>
@@ -516,7 +802,7 @@
 
 
             <!-- =================================================
-                 EN-TÊTE DES COMMENTAIRES
+                 EN-TÊTE
                  ================================================= -->
             <div
                 class="
@@ -563,16 +849,7 @@
                 </div>
 
 
-                <!-- =============================================
-                     NOMBRE DE COMMENTAIRES
-                     ============================================= -->
-                <p
-                    class="
-                        text-sm
-                        font-bold
-                        text-zinc-500
-                    "
-                >
+                <p class="text-sm font-bold text-zinc-500">
 
                     {{ $article->comments->count() }}
 
@@ -616,7 +893,7 @@
 
 
             <!-- =================================================
-                 ERREURS DE VALIDATION
+                 ERREURS
                  ================================================= -->
             @if ($errors->any())
 
@@ -631,13 +908,7 @@
                     "
                 >
 
-                    <p
-                        class="
-                            text-sm
-                            font-black
-                            text-red-400
-                        "
-                    >
+                    <p class="text-sm font-black text-red-400">
                         Votre commentaire n'a pas pu être publié.
                     </p>
 
@@ -669,7 +940,7 @@
 
 
             <!-- =================================================
-                 FORMULAIRE MEMBRE CONNECTÉ
+                 FORMULAIRE MEMBRE
                  ================================================= -->
             @auth
 
@@ -684,15 +955,8 @@
                     "
                 >
 
-                    <div
-                        class="
-                            flex
-                            items-center
-                            gap-3
-                        "
-                    >
+                    <div class="flex items-center gap-3">
 
-                        <!-- AVATAR -->
                         <div
                             class="
                                 flex
@@ -715,16 +979,9 @@
 
                         <div>
 
-                            <p
-                                class="
-                                    text-sm
-                                    font-black
-                                    text-white
-                                "
-                            >
+                            <p class="text-sm font-black text-white">
                                 {{ auth()->user()->pseudo }}
                             </p>
-
 
                             <p class="text-xs text-zinc-500">
                                 Publier un commentaire
@@ -735,9 +992,6 @@
                     </div>
 
 
-                    <!-- =============================================
-                         FORMULAIRE
-                         ============================================= -->
                     <form
                         action="{{ route('comments.store', $article->slug) }}"
                         method="POST"
@@ -794,12 +1048,7 @@
                             "
                         >
 
-                            <p
-                                class="
-                                    text-xs
-                                    text-zinc-600
-                                "
-                            >
+                            <p class="text-xs text-zinc-600">
                                 Maximum 2 000 caractères.
                             </p>
 
@@ -836,7 +1085,7 @@
 
 
             <!-- =================================================
-                 VISITEUR NON CONNECTÉ
+                 VISITEUR
                  ================================================= -->
             @guest
 
@@ -851,13 +1100,7 @@
                     "
                 >
 
-                    <p
-                        class="
-                            text-lg
-                            font-black
-                            text-white
-                        "
-                    >
+                    <p class="text-lg font-black text-white">
                         Participez à la discussion
                     </p>
 
@@ -876,14 +1119,7 @@
                     </p>
 
 
-                    <div
-                        class="
-                            mt-6
-                            flex
-                            flex-wrap
-                            gap-3
-                        "
-                    >
+                    <div class="mt-6 flex flex-wrap gap-3">
 
                         <a
                             href="{{ route('login') }}"
@@ -956,17 +1192,9 @@
                         "
                     >
 
-                        <div
-                            class="
-                                flex
-                                items-start
-                                gap-4
-                            "
-                        >
+                        <div class="flex items-start gap-4">
 
-                            <!-- =====================================
-                                 AVATAR
-                                 ===================================== -->
+                            <!-- AVATAR -->
                             <div
                                 class="
                                     flex
@@ -997,15 +1225,9 @@
                             </div>
 
 
-                            <!-- =====================================
-                                 COMMENTAIRE
-                                 ===================================== -->
+                            <!-- COMMENTAIRE -->
                             <div class="min-w-0 flex-1">
 
-
-                                <!-- =================================
-                                     AUTEUR ET DATE
-                                     ================================= -->
                                 <div
                                     class="
                                         flex
@@ -1017,12 +1239,7 @@
                                     "
                                 >
 
-                                    <p
-                                        class="
-                                            font-black
-                                            text-white
-                                        "
-                                    >
+                                    <p class="font-black text-white">
 
                                         @if ($comment->user)
 
@@ -1039,10 +1256,7 @@
 
                                     <time
                                         datetime="{{ $comment->created_at->toIso8601String() }}"
-                                        class="
-                                            text-xs
-                                            text-zinc-600
-                                        "
+                                        class="text-xs text-zinc-600"
                                     >
                                         {{ $comment->created_at->format('d/m/Y à H:i') }}
                                     </time>
@@ -1050,9 +1264,6 @@
                                 </div>
 
 
-                                <!-- =================================
-                                     TEXTE
-                                     ================================= -->
                                 <div
                                     class="
                                         mt-4
@@ -1072,9 +1283,6 @@
 
                 @empty
 
-                    <!-- =============================================
-                         AUCUN COMMENTAIRE
-                         ============================================= -->
                     <div
                         class="
                             border-t
@@ -1084,23 +1292,11 @@
                         "
                     >
 
-                        <p
-                            class="
-                                font-black
-                                text-white
-                            "
-                        >
+                        <p class="font-black text-white">
                             Aucun commentaire pour le moment
                         </p>
 
-
-                        <p
-                            class="
-                                mt-2
-                                text-sm
-                                text-zinc-500
-                            "
-                        >
+                        <p class="mt-2 text-sm text-zinc-500">
                             Soyez le premier à réagir à cet article.
                         </p>
 
@@ -1150,26 +1346,9 @@
 
     <!-- =========================================================
          STYLES DU CONTENU QUILL
-         =========================================================
-         Le contenu des articles est enregistré sous forme de HTML.
-
-         Ces styles permettent de restituer publiquement :
-         - les paragraphes ;
-         - les titres ;
-         - les listes ;
-         - les alignements ;
-         - les citations ;
-         - les tailles de texte ;
-         - les polices ;
-         - les images insérées dans l'article.
          ========================================================= -->
     <style>
 
-        /*
-        |--------------------------------------------------------------------------
-        | CONTENEUR PRINCIPAL
-        |--------------------------------------------------------------------------
-        */
         .article-content {
             color: #d4d4d8;
             font-size: 1.05rem;
@@ -1177,12 +1356,6 @@
             overflow-wrap: anywhere;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | PARAGRAPHES
-        |--------------------------------------------------------------------------
-        */
         .article-content p {
             margin-top: 1.5rem;
             margin-bottom: 1.5rem;
@@ -1196,12 +1369,6 @@
             margin-bottom: 0;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | TITRES
-        |--------------------------------------------------------------------------
-        */
         .article-content h1 {
             margin-top: 3rem;
             margin-bottom: 1.25rem;
@@ -1229,12 +1396,6 @@
             line-height: 1.3;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | STYLE DU TEXTE
-        |--------------------------------------------------------------------------
-        */
         .article-content strong {
             color: #ffffff;
             font-weight: 800;
@@ -1252,12 +1413,6 @@
             text-decoration: line-through;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | LIENS
-        |--------------------------------------------------------------------------
-        */
         .article-content a {
             color: #ef4444;
             font-weight: 700;
@@ -1269,12 +1424,6 @@
             color: #dc2626;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | LISTES
-        |--------------------------------------------------------------------------
-        */
         .article-content ul,
         .article-content ol {
             margin-top: 1.5rem;
@@ -1296,12 +1445,6 @@
             padding-left: 0.3rem;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | CITATIONS
-        |--------------------------------------------------------------------------
-        */
         .article-content blockquote {
             margin-top: 2rem;
             margin-bottom: 2rem;
@@ -1312,12 +1455,6 @@
             font-style: italic;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | IMAGES INSÉRÉES AVEC QUILL
-        |--------------------------------------------------------------------------
-        */
         .article-content img {
             display: block;
             max-width: 100%;
@@ -1326,12 +1463,6 @@
             object-fit: contain;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | ALIGNEMENTS QUILL
-        |--------------------------------------------------------------------------
-        */
         .article-content .ql-align-center {
             text-align: center;
         }
@@ -1344,12 +1475,6 @@
             text-align: justify;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | INDENTATIONS QUILL
-        |--------------------------------------------------------------------------
-        */
         .article-content .ql-indent-1 {
             padding-left: 3em;
         }
@@ -1382,12 +1507,6 @@
             padding-left: 24em;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | TAILLES DE TEXTE QUILL
-        |--------------------------------------------------------------------------
-        */
         .article-content .ql-size-small {
             font-size: 0.75em;
         }
@@ -1401,12 +1520,6 @@
             line-height: 1.2;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | POLICES QUILL
-        |--------------------------------------------------------------------------
-        */
         .article-content .ql-font-serif {
             font-family: Georgia, "Times New Roman", serif;
         }
@@ -1418,12 +1531,6 @@
                 monospace;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | RESPONSIVE
-        |--------------------------------------------------------------------------
-        */
         @media (max-width: 640px) {
 
             .article-content {
@@ -1457,5 +1564,137 @@
         }
 
     </style>
+
+
+    <!-- =========================================================
+         JAVASCRIPT DU PARTAGE
+         ========================================================= -->
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            /*
+            |--------------------------------------------------------------------------
+            | ÉLÉMENTS
+            |--------------------------------------------------------------------------
+            */
+
+            const nativeShareButton =
+                document.getElementById('native-share-button');
+
+            const copyLinkButton =
+                document.getElementById('copy-link-button');
+
+            const copyLinkMessage =
+                document.getElementById('copy-link-message');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | PARTAGE NATIF
+            |--------------------------------------------------------------------------
+            |
+            | Si le navigateur et l'appareil permettent le partage natif,
+            | nous affichons automatiquement le bouton rouge.
+            |
+            */
+
+            if (
+                nativeShareButton
+                && navigator.share
+            ) {
+
+                nativeShareButton.classList.remove('hidden');
+                nativeShareButton.classList.add('flex');
+
+
+                nativeShareButton.addEventListener(
+                    'click',
+                    async function () {
+
+                        try {
+
+                            await navigator.share({
+                                title: @json($article->title),
+                                text: @json($article->excerpt ?? $article->title),
+                                url: @json(url()->current()),
+                            });
+
+                        } catch (error) {
+
+                            /*
+                             * Aucune action nécessaire si l'utilisateur
+                             * ferme simplement la fenêtre de partage.
+                             */
+
+                        }
+
+                    }
+                );
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | COPIER LE LIEN
+            |--------------------------------------------------------------------------
+            */
+
+            if (copyLinkButton) {
+
+                copyLinkButton.addEventListener(
+                    'click',
+                    async function () {
+
+                        const articleUrl =
+                            copyLinkButton.dataset.url;
+
+
+                        try {
+
+                            await navigator.clipboard.writeText(
+                                articleUrl
+                            );
+
+
+                            if (copyLinkMessage) {
+
+                                copyLinkMessage.classList.remove(
+                                    'hidden'
+                                );
+
+
+                                window.setTimeout(
+                                    function () {
+
+                                        copyLinkMessage.classList.add(
+                                            'hidden'
+                                        );
+
+                                    },
+                                    3000
+                                );
+                            }
+
+                        } catch (error) {
+
+                            /*
+                             * Solution de secours pour les navigateurs
+                             * qui bloquent l'accès au presse-papiers.
+                             */
+
+                            window.prompt(
+                                'Copiez le lien de cet article :',
+                                articleUrl
+                            );
+                        }
+
+                    }
+                );
+            }
+
+        });
+
+    </script>
 
 @endsection

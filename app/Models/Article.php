@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * - peut posséder une bannière ;
  * - peut contenir du contenu HTML généré par Quill ;
  * - peut recevoir plusieurs commentaires ;
+ * - peut recevoir plusieurs likes ;
  * - utilise la suppression logique.
  *
  * ================================================================
@@ -38,7 +39,7 @@ class Article extends Model
 
     /**
      * ============================================================
-     * CHAMPS AUTORISÉS À L'ATTRIBUTION DE MASSE
+     * CHAMPS AUTORISÉS À L'ENREGISTREMENT
      * ============================================================
      */
     protected $fillable = [
@@ -59,13 +60,6 @@ class Article extends Model
      * ============================================================
      * CONVERSIONS AUTOMATIQUES
      * ============================================================
-     *
-     * Laravel convertit automatiquement :
-     *
-     * - is_featured en booléen ;
-     * - published_at en objet date/heure.
-     *
-     * ============================================================
      */
     protected function casts(): array
     {
@@ -78,15 +72,7 @@ class Article extends Model
 
     /**
      * ============================================================
-     * RELATION : AUTEUR
-     * ============================================================
-     *
-     * Chaque article appartient à un utilisateur.
-     *
-     * Exemple :
-     *
-     * $article->author
-     *
+     * AUTEUR DE L'ARTICLE
      * ============================================================
      */
     public function author(): BelongsTo
@@ -100,26 +86,10 @@ class Article extends Model
 
     /**
      * ============================================================
-     * RELATION : COMMENTAIRES
+     * COMMENTAIRES DE L'ARTICLE
      * ============================================================
      *
-     * Un article peut posséder plusieurs commentaires.
-     *
-     * Exemple :
-     *
-     * $article->comments
-     *
-     * Cette relation retourne tous les commentaires non supprimés,
-     * quel que soit leur statut.
-     *
-     * Le filtrage "published" sera volontairement effectué dans
-     * les contrôleurs selon le contexte :
-     *
-     * - côté public :
-     *   uniquement les commentaires publiés ;
-     *
-     * - côté administration :
-     *   commentaires publiés + masqués.
+     * Un article peut recevoir plusieurs commentaires.
      *
      * ============================================================
      */
@@ -127,6 +97,43 @@ class Article extends Model
     {
         return $this->hasMany(
             Comment::class
+        );
+    }
+
+
+    /**
+     * ============================================================
+     * LIKES DE L'ARTICLE
+     * ============================================================
+     *
+     * Un article peut recevoir plusieurs likes.
+     *
+     * Chaque like correspond à une ligne dans la table :
+     *
+     * article_likes
+     *
+     * Exemples :
+     *
+     * $article->likes
+     *
+     * récupère les likes.
+     *
+     * $article->likes()->count()
+     *
+     * permet de compter les likes.
+     *
+     * Cette relation est également utilisée par :
+     *
+     * withCount('likes')
+     *
+     * dans BlogController.
+     *
+     * ============================================================
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(
+            ArticleLike::class
         );
     }
 

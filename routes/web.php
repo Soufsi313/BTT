@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminCommentController;
 use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\AdminMessageController;
+use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
@@ -121,6 +122,34 @@ Route::post(
 )
     ->middleware('auth')
     ->name('comments.store');
+
+
+/*
+|--------------------------------------------------------------------------
+| LIKER OU RETIRER SON LIKE
+|--------------------------------------------------------------------------
+|
+| Seuls les utilisateurs connectés peuvent utiliser cette route.
+|
+| Le fonctionnement est de type "toggle" :
+|
+| - si l'utilisateur n'a pas encore liké l'article :
+|   le like est créé ;
+|
+| - s'il a déjà liké l'article :
+|   son like est supprimé.
+|
+| Les visiteurs non connectés pourront voir le nombre de likes,
+| mais ne pourront pas en ajouter.
+|
+*/
+
+Route::post(
+    '/blog/{slug}/like',
+    [ArticleLikeController::class, 'toggle']
+)
+    ->middleware('auth')
+    ->name('article.likes.toggle');
 
 
 /*

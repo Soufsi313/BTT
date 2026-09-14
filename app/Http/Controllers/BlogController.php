@@ -12,15 +12,16 @@ use Illuminate\View\View;
  * CONTRÔLEUR PUBLIC DU BLOG
  * ================================================================
  *
- * Ce contrôleur gère la partie publique du blog Brussels Top Team.
+ * Ce contrôleur gère :
  *
- * Il permet :
- *
- * - d'afficher les articles publiés ;
- * - de filtrer les articles par catégorie ;
- * - de trier les articles ;
- * - d'afficher un article individuel ;
- * - d'afficher les commentaires publics de cet article.
+ * - la liste publique des articles ;
+ * - le filtrage par catégorie ;
+ * - le tri des articles ;
+ * - le nombre de likes affiché sur chaque vignette ;
+ * - l'affichage d'un article individuel ;
+ * - les commentaires visibles publiquement ;
+ * - le nombre de likes d'un article ;
+ * - l'état du like pour l'utilisateur connecté.
  *
  * ================================================================
  */
@@ -31,16 +32,12 @@ class BlogController extends Controller
      * LISTE PUBLIQUE DES ARTICLES
      * ============================================================
      *
-     * Cette méthode affiche uniquement les articles :
+     * Cette méthode affiche la page :
      *
-     * - publiés ;
-     * - possédant une date de publication ;
-     * - dont la date de publication est passée ou actuelle.
+     * /blog
      *
-     * Elle gère également :
-     *
-     * - le filtrage par catégorie ;
-     * - le tri des articles.
+     * Elle récupère uniquement les articles publics et charge
+     * également le nombre de likes de chaque article.
      *
      * ============================================================
      */
@@ -51,8 +48,8 @@ class BlogController extends Controller
         | CATÉGORIES DISPONIBLES
         |--------------------------------------------------------------------------
         |
-        | Cette liste correspond aux catégories actuellement utilisées
-        | pour les articles du blog Brussels Top Team.
+        | Ces catégories correspondent aux catégories utilisées
+        | dans les articles du blog BTT.
         |
         */
 
@@ -69,42 +66,20 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | TRIS AUTORISÉS
-        |--------------------------------------------------------------------------
-        |
-        | On n'accepte que les valeurs définies ici.
-        |
-        | Cela évite qu'une valeur arbitraire provenant de l'URL
-        | puisse modifier directement la requête SQL.
-        |
-        */
-
-        $allowedSorts = [
-            'recent',
-            'oldest',
-            'featured',
-            'title',
-        ];
-
-
-        /*
-        |--------------------------------------------------------------------------
         | CATÉGORIE SÉLECTIONNÉE
         |--------------------------------------------------------------------------
         */
 
-        $selectedCategory = $request->query(
-            'category'
-        );
+        $selectedCategory = $request->query('category');
 
 
         /*
         |--------------------------------------------------------------------------
-        | VÉRIFICATION DE LA CATÉGORIE
+        | SÉCURISATION DE LA CATÉGORIE
         |--------------------------------------------------------------------------
         |
-        | Si une catégorie inconnue est passée dans l'URL,
-        | on l'ignore simplement.
+        | Si une catégorie inconnue est passée manuellement dans l'URL,
+        | nous l'ignorons.
         |
         */
 
@@ -122,13 +97,22 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | TRIS DISPONIBLES
+        |--------------------------------------------------------------------------
+        */
+
+        $allowedSorts = [
+            'recent',
+            'oldest',
+            'featured',
+            'title',
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
         | TRI SÉLECTIONNÉ
         |--------------------------------------------------------------------------
-        |
-        | Par défaut :
-        |
-        | les articles les plus récents apparaissent en premier.
-        |
         */
 
         $selectedSort = $request->query(
@@ -139,7 +123,7 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | VÉRIFICATION DU TRI
+        | SÉCURISATION DU TRI
         |--------------------------------------------------------------------------
         */
 
@@ -159,16 +143,31 @@ class BlogController extends Controller
         | REQUÊTE DE BASE
         |--------------------------------------------------------------------------
         |
-        | On récupère uniquement les articles réellement visibles
-        | publiquement.
+        | Nous récupérons uniquement les articles :
         |
-        | L'auteur est chargé immédiatement afin d'éviter des requêtes
-        | supplémentaires lors de l'affichage de la liste.
+        | - publiés ;
+        | - possédant une date de publication ;
+        | - dont la date de publication est déjà passée.
+        |
+        | with('author')
+        | ----------------
+        | Charge l'auteur de l'article.
+        |
+        | withCount('likes')
+        | ------------------
+        | Compte automatiquement les likes de chaque article.
+        |
+        | Laravel ajoute alors une propriété :
+        |
+        | $article->likes_count
+        |
+        | que nous pourrons afficher directement sur les vignettes.
         |
         */
 
-        $articlesQuery = Article::query()
+        $query = Article::query()
             ->with('author')
+            ->withCount('likes')
             ->where(
                 'status',
                 'published'
@@ -185,12 +184,12 @@ class BlogController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | FILTRE PAR CATÉGORIE
+        | FILTRAGE PAR CATÉGORIE
         |--------------------------------------------------------------------------
         */
 
         if ($selectedCategory !== null) {
-            $articlesQuery->where(
+            $query->where(
                 'category',
                 $selectedCategory
             );
@@ -210,13 +209,13 @@ class BlogController extends Controller
             | PLUS ANCIENS
             |--------------------------------------------------------------------------
             */
+
             case 'oldest':
 
-                $articlesQuery
-                    ->orderBy(
-                        'published_at',
-                        'asc'
-                    );
+                $query->orderBy(
+                    'published_at',
+                    'asc'
+                );
 
                 break;
 
@@ -227,13 +226,14 @@ class BlogController extends Controller
             |--------------------------------------------------------------------------
             |
             | Les articles mis en avant apparaissent d'abord.
-            | À l'intérieur de chaque groupe, les plus récents restent
-            | affichés en premier.
+            |
+            | À égalité, les plus récents apparaissent en premier.
             |
             */
+
             case 'featured':
 
-                $articlesQuery
+                $query
                     ->orderBy(
                         'is_featured',
                         'desc'
@@ -251,9 +251,10 @@ class BlogController extends Controller
             | TITRE A → Z
             |--------------------------------------------------------------------------
             */
+
             case 'title':
 
-                $articlesQuery
+                $query
                     ->orderBy(
                         'title',
                         'asc'
@@ -270,18 +271,15 @@ class BlogController extends Controller
             |--------------------------------------------------------------------------
             | PLUS RÉCENTS
             |--------------------------------------------------------------------------
-            |
-            | Tri par défaut.
-            |
             */
+
             case 'recent':
             default:
 
-                $articlesQuery
-                    ->orderBy(
-                        'published_at',
-                        'desc'
-                    );
+                $query->orderBy(
+                    'published_at',
+                    'desc'
+                );
 
                 break;
         }
@@ -292,25 +290,21 @@ class BlogController extends Controller
         | PAGINATION
         |--------------------------------------------------------------------------
         |
-        | 12 articles par page.
+        | Nous affichons au maximum 12 articles par page.
         |
-        | withQueryString() conserve les paramètres :
-        |
-        | ?category=...
-        | ?sort=...
-        |
-        | lorsque l'utilisateur change de page.
+        | withQueryString() conserve les filtres et le tri lors du
+        | passage d'une page à l'autre.
         |
         */
 
-        $articles = $articlesQuery
+        $articles = $query
             ->paginate(12)
             ->withQueryString();
 
 
         /*
         |--------------------------------------------------------------------------
-        | AFFICHAGE DE LA PAGE
+        | AFFICHAGE DE LA PAGE BLOG
         |--------------------------------------------------------------------------
         */
 
@@ -328,48 +322,44 @@ class BlogController extends Controller
 
     /**
      * ============================================================
-     * AFFICHER UN ARTICLE
+     * AFFICHAGE D'UN ARTICLE
      * ============================================================
      *
-     * Cette méthode affiche un article individuel grâce à son slug.
+     * Cette méthode affiche :
      *
-     * Elle récupère également :
+     * /blog/{slug}
      *
-     * - l'auteur de l'article ;
-     * - les commentaires publiés ;
-     * - l'auteur de chaque commentaire.
+     * Elle récupère :
      *
-     * Les commentaires masqués ou supprimés ne sont jamais envoyés
-     * à la page publique.
+     * - l'article ;
+     * - son auteur ;
+     * - ses commentaires publics ;
+     * - son nombre de likes ;
+     * - l'état du like du membre connecté.
      *
      * ============================================================
      */
-    public function show(string $slug): View
-    {
+    public function show(
+        Request $request,
+        string $slug
+    ): View {
+
         /*
         |--------------------------------------------------------------------------
         | RÉCUPÉRATION DE L'ARTICLE
         |--------------------------------------------------------------------------
+        |
+        | Nous chargeons :
+        |
+        | - l'auteur ;
+        | - les commentaires publiés ;
+        | - l'utilisateur de chaque commentaire ;
+        | - le nombre total de likes.
+        |
         */
 
         $article = Article::query()
-
-            /*
-            |--------------------------------------------------------------------------
-            | CHARGEMENT DES RELATIONS
-            |--------------------------------------------------------------------------
-            |
-            | author :
-            | auteur de l'article.
-            |
-            | comments :
-            | uniquement les commentaires ayant le statut "published".
-            |
-            | comments.user :
-            | utilisateur ayant publié chaque commentaire.
-            |
-            */
-
+            ->withCount('likes')
             ->with([
                 'author',
 
@@ -386,63 +376,61 @@ class BlogController extends Controller
                         );
                 },
             ])
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | RECHERCHE PAR SLUG
-            |--------------------------------------------------------------------------
-            */
-
             ->where(
                 'slug',
                 $slug
             )
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | ARTICLE PUBLIÉ UNIQUEMENT
-            |--------------------------------------------------------------------------
-            */
-
             ->where(
                 'status',
                 'published'
             )
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | DATE DE PUBLICATION OBLIGATOIRE
-            |--------------------------------------------------------------------------
-            */
-
             ->whereNotNull(
                 'published_at'
             )
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | PAS DE PUBLICATION FUTURE
-            |--------------------------------------------------------------------------
-            */
-
             ->where(
                 'published_at',
                 '<=',
                 now()
             )
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | ARTICLE INTROUVABLE = ERREUR 404
-            |--------------------------------------------------------------------------
-            */
-
             ->firstOrFail();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | L'UTILISATEUR CONNECTÉ A-T-IL DÉJÀ LIKÉ ?
+        |--------------------------------------------------------------------------
+        |
+        | Par défaut :
+        |
+        | false = aucun like de cet utilisateur.
+        |
+        | Pour un visiteur non connecté, cette valeur reste false.
+        |
+        */
+
+        $hasLiked = false;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | UTILISATEUR CONNECTÉ
+        |--------------------------------------------------------------------------
+        |
+        | Si un utilisateur est connecté, nous recherchons un like
+        | appartenant à cet utilisateur sur cet article.
+        |
+        */
+
+        if ($request->user()) {
+
+            $hasLiked = $article
+                ->likes()
+                ->where(
+                    'user_id',
+                    $request->user()->id
+                )
+                ->exists();
+        }
 
 
         /*
@@ -455,6 +443,7 @@ class BlogController extends Controller
             'blog.show',
             [
                 'article' => $article,
+                'hasLiked' => $hasLiked,
             ]
         );
     }

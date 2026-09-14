@@ -13,69 +13,78 @@
 @section('content')
 
     <!-- =========================================================
-         ARTICLE DU BLOG
+         ARTICLE PUBLIC DU BLOG
+         =========================================================
+         Cette page reprend une présentation éditoriale de type
+         "article de presse", tout en conservant l'identité BTT.
+
+         Toute la logique métier existante est conservée :
+         - catégorie ;
+         - auteur ;
+         - date ;
+         - bannière ;
+         - contenu Quill ;
+         - images intégrées au contenu ;
+         - likes ;
+         - partage ;
+         - commentaires.
          ========================================================= -->
-    <article class="bg-zinc-950">
+    <article class="min-h-screen bg-zinc-950 text-white">
 
 
         <!-- =====================================================
-             EN-TÊTE DE L'ARTICLE
+             EN-TÊTE ÉDITORIAL
              ===================================================== -->
         <section
             class="
                 border-b
                 border-zinc-900
                 bg-black
-                px-6
-                py-16
+                px-5
+                pb-10
+                pt-10
+                sm:px-6
                 lg:px-8
-                lg:py-20
+                lg:pb-14
+                lg:pt-14
             "
         >
 
-            <div class="mx-auto max-w-5xl">
+            <div class="mx-auto max-w-6xl">
 
 
                 <!-- =============================================
-                     RETOUR AU BLOG
+                     FIL D'ARIANE / RETOUR AU BLOG
                      ============================================= -->
-                <a
-                    href="{{ route('blog') }}"
+                <div
                     class="
-                        inline-flex
+                        flex
+                        flex-wrap
                         items-center
                         gap-2
-                        text-sm
+                        text-xs
                         font-black
                         uppercase
-                        tracking-wider
-                        text-zinc-400
-                        transition
-                        hover:text-red-500
+                        tracking-[0.18em]
                     "
                 >
-                    ← Retour aux actualités
-                </a>
 
-
-                <!-- =============================================
-                     CATÉGORIE
-                     ============================================= -->
-                <div class="mt-10">
-
-                    <span
+                    <a
+                        href="{{ route('blog') }}"
                         class="
-                            inline-flex
-                            bg-red-600
-                            px-4
-                            py-2
-                            text-xs
-                            font-black
-                            uppercase
-                            tracking-wider
-                            text-white
+                            text-zinc-500
+                            transition
+                            hover:text-white
                         "
                     >
+                        Actualités
+                    </a>
+
+                    <span class="text-red-600">
+                        /
+                    </span>
+
+                    <span class="text-red-500">
                         {{ $article->category }}
                     </span>
 
@@ -83,20 +92,20 @@
 
 
                 <!-- =============================================
-                     TITRE
+                     TITRE PRINCIPAL
                      ============================================= -->
                 <h1
                     class="
-                        mt-6
+                        mt-5
                         max-w-5xl
                         text-4xl
                         font-black
-                        uppercase
-                        leading-tight
-                        tracking-tight
+                        leading-[0.98]
+                        tracking-[-0.04em]
                         text-white
                         sm:text-5xl
-                        lg:text-6xl
+                        md:text-6xl
+                        lg:text-7xl
                     "
                 >
                     {{ $article->title }}
@@ -112,9 +121,12 @@
                         class="
                             mt-7
                             max-w-4xl
-                            text-lg
-                            leading-8
+                            text-base
+                            font-medium
+                            leading-7
                             text-zinc-400
+                            sm:text-lg
+                            sm:leading-8
                         "
                     >
                         {{ $article->excerpt }}
@@ -122,110 +134,48 @@
 
                 @endif
 
-
-                <!-- =============================================
-                     INFORMATIONS DE PUBLICATION
-                     ============================================= -->
-                <div
-                    class="
-                        mt-10
-                        flex
-                        flex-wrap
-                        items-center
-                        gap-x-6
-                        gap-y-3
-                        border-t
-                        border-zinc-800
-                        pt-6
-                        text-sm
-                        text-zinc-500
-                    "
-                >
-
-                    <!-- AUTEUR -->
-                    <span>
-
-                        Par
-
-                        <strong class="text-zinc-300">
-
-                            @if ($article->author)
-
-                                {{ $article->author->prenom }}
-                                {{ $article->author->nom }}
-
-                            @else
-
-                                Brussels Top Team
-
-                            @endif
-
-                        </strong>
-
-                    </span>
-
-
-                    <!-- DATE -->
-                    @if ($article->published_at)
-
-                        <span>
-                            {{ $article->published_at->format('d/m/Y à H:i') }}
-                        </span>
-
-                    @endif
-
-
-                    <!-- ARTICLE À LA UNE -->
-                    @if ($article->is_featured)
-
-                        <span
-                            class="
-                                font-black
-                                uppercase
-                                tracking-wider
-                                text-red-500
-                            "
-                        >
-                            À la une
-                        </span>
-
-                    @endif
-
-                </div>
-
             </div>
 
         </section>
 
 
         <!-- =====================================================
-             BANNIÈRE
+             GRANDE BANNIÈRE DE L'ARTICLE
              ===================================================== -->
         @if ($article->banner_image)
 
             <section
                 class="
-                    border-b
-                    border-zinc-900
-                    bg-black
-                    px-6
-                    py-8
+                    bg-zinc-950
+                    px-0
+                    sm:px-6
                     lg:px-8
                 "
             >
 
                 <div class="mx-auto max-w-6xl">
 
-                    <img
-                        src="{{ asset('storage/' . $article->banner_image) }}"
-                        alt="{{ $article->title }}"
+                    <div
                         class="
-                            mx-auto
-                            max-h-[700px]
-                            w-full
-                            object-contain
+                            overflow-hidden
+                            bg-black
+                            sm:mt-8
+                            sm:rounded-sm
                         "
                     >
+
+                        <img
+                            src="{{ asset('storage/' . $article->banner_image) }}"
+                            alt="{{ $article->title }}"
+                            class="
+                                block
+                                max-h-[780px]
+                                w-full
+                                object-cover
+                            "
+                        >
+
+                    </div>
 
                 </div>
 
@@ -235,53 +185,68 @@
 
 
         <!-- =====================================================
-             CONTENU
+             INFORMATIONS DE PUBLICATION
              ===================================================== -->
         <section
             class="
                 bg-zinc-950
-                px-6
-                py-16
+                px-5
+                sm:px-6
                 lg:px-8
-                lg:py-20
             "
         >
 
-            <div class="mx-auto max-w-4xl">
+            <div class="mx-auto max-w-6xl">
 
-
-                <!-- =============================================
-                     CONTENU HTML QUILL
-                     ============================================= -->
-                <div class="article-content">
-                    {!! $article->content !!}
-                </div>
-
-
-                <!-- =============================================
-                     LIKES
-                     ============================================= -->
                 <div
                     class="
-                        mt-16
-                        border-y
+                        flex
+                        flex-col
+                        gap-5
+                        border-b
                         border-zinc-800
-                        py-8
+                        py-7
+                        sm:flex-row
+                        sm:items-center
+                        sm:justify-between
                     "
                 >
 
-                    <div
-                        class="
-                            flex
-                            flex-col
-                            gap-5
-                            sm:flex-row
-                            sm:items-center
-                            sm:justify-between
-                        "
-                    >
+                    <!-- =========================================
+                         AUTEUR
+                         ========================================= -->
+                    <div class="flex items-center gap-4">
 
-                        <!-- COMPTEUR -->
+                        <div
+                            class="
+                                flex
+                                h-11
+                                w-11
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-red-600
+                                text-sm
+                                font-black
+                                uppercase
+                                text-white
+                            "
+                        >
+
+                            @if ($article->author)
+
+                                {{ mb_substr($article->author->prenom ?? $article->author->pseudo, 0, 1) }}
+
+                            @else
+
+                                B
+
+                            @endif
+
+                        </div>
+
+
                         <div>
 
                             <p
@@ -289,491 +254,944 @@
                                     text-xs
                                     font-black
                                     uppercase
-                                    tracking-[0.25em]
-                                    text-zinc-500
+                                    tracking-[0.16em]
+                                    text-red-500
                                 "
                             >
-                                Vous avez aimé cet article ?
+                                Article publié par
                             </p>
 
 
-                            <div class="mt-2 flex items-center gap-3">
-
-                                <span
-                                    class="
-                                        text-2xl
-                                        {{ $article->likes_count > 0
-                                            ? 'text-red-500'
-                                            : 'text-zinc-600'
-                                        }}
-                                    "
-                                >
-                                    ♥
-                                </span>
-
-
-                                <p class="text-sm font-bold text-zinc-300">
-
-                                    <span
-                                        class="
-                                            text-lg
-                                            font-black
-                                            text-white
-                                        "
-                                    >
-                                        {{ $article->likes_count }}
-                                    </span>
-
-                                    @if ($article->likes_count > 1)
-
-                                        personnes aiment cet article
-
-                                    @elseif ($article->likes_count === 1)
-
-                                        personne aime cet article
-
-                                    @else
-
-                                        Aucun like pour le moment
-
-                                    @endif
-
-                                </p>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- UTILISATEUR CONNECTÉ -->
-                        @auth
-
-                            <form
-                                action="{{ route('article.likes.toggle', $article->slug) }}"
-                                method="POST"
+                            <p
+                                class="
+                                    mt-1
+                                    text-sm
+                                    font-black
+                                    text-white
+                                "
                             >
 
-                                @csrf
+                                @if ($article->author)
 
-
-                                @if ($hasLiked)
-
-                                    <button
-                                        type="submit"
-                                        class="
-                                            inline-flex
-                                            items-center
-                                            justify-center
-                                            gap-2
-                                            rounded-md
-                                            bg-red-600
-                                            px-6
-                                            py-3
-                                            text-sm
-                                            font-black
-                                            uppercase
-                                            tracking-wider
-                                            text-white
-                                            transition
-                                            hover:bg-red-700
-                                        "
-                                    >
-                                        <span class="text-lg">
-                                            ♥
-                                        </span>
-
-                                        J'aime
-                                    </button>
+                                    {{ $article->author->prenom }}
+                                    {{ $article->author->nom }}
 
                                 @else
 
-                                    <button
-                                        type="submit"
-                                        class="
-                                            inline-flex
-                                            items-center
-                                            justify-center
-                                            gap-2
-                                            rounded-md
-                                            border
-                                            border-zinc-700
-                                            bg-zinc-900
-                                            px-6
-                                            py-3
-                                            text-sm
-                                            font-black
-                                            uppercase
-                                            tracking-wider
-                                            text-white
-                                            transition
-                                            hover:border-red-600
-                                            hover:bg-red-600
-                                        "
-                                    >
-                                        <span class="text-lg">
-                                            ♡
-                                        </span>
-
-                                        J'aime
-                                    </button>
+                                    Brussels Top Team
 
                                 @endif
 
-                            </form>
+                            </p>
 
-                        @endauth
+                        </div>
+
+                    </div>
 
 
-                        <!-- VISITEUR -->
-                        @guest
+                    <!-- =========================================
+                         DATE + STATUT
+                         ========================================= -->
+                    <div
+                        class="
+                            flex
+                            flex-wrap
+                            items-center
+                            gap-x-5
+                            gap-y-2
+                            text-xs
+                            font-bold
+                            text-zinc-500
+                        "
+                    >
 
-                            <a
-                                href="{{ route('login') }}"
+                        @if ($article->published_at)
+
+                            <time
+                                datetime="{{ $article->published_at->toIso8601String() }}"
+                            >
+                                Publié le
+                                {{ $article->published_at->format('d/m/Y à H:i') }}
+                            </time>
+
+                        @endif
+
+
+                        @if ($article->is_featured)
+
+                            <span
                                 class="
-                                    inline-flex
-                                    items-center
-                                    justify-center
-                                    gap-2
-                                    rounded-md
-                                    border
-                                    border-zinc-700
-                                    px-6
-                                    py-3
-                                    text-sm
+                                    rounded-full
+                                    bg-red-600
+                                    px-3
+                                    py-1
                                     font-black
                                     uppercase
                                     tracking-wider
-                                    text-zinc-300
-                                    transition
-                                    hover:border-red-600
-                                    hover:text-red-500
+                                    text-white
                                 "
                             >
-                                <span class="text-lg">
-                                    ♡
-                                </span>
+                                À la une
+                            </span>
 
-                                Connectez-vous pour aimer
-                            </a>
-
-                        @endguest
+                        @endif
 
                     </div>
 
                 </div>
 
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CORPS PRINCIPAL DE L'ARTICLE
+             ===================================================== -->
+        <section
+            class="
+                bg-zinc-950
+                px-5
+                py-12
+                sm:px-6
+                lg:px-8
+                lg:py-16
+            "
+        >
+
+            <div
+                class="
+                    mx-auto
+                    max-w-6xl
+                    lg:grid
+                    lg:grid-cols-[90px_minmax(0,760px)]
+                    lg:justify-center
+                    lg:gap-10
+                    xl:grid-cols-[110px_minmax(0,820px)]
+                    xl:gap-12
+                "
+            >
+
 
                 <!-- =================================================
-                     PARTAGE DE L'ARTICLE
+                     PARTAGE DESKTOP
+                     =================================================
+                     Sur grand écran, les réseaux sociaux restent
+                     visibles à gauche du contenu, comme sur un article
+                     de presse moderne.
                      ================================================= -->
-                <section
+                <aside
                     class="
-                        border-b
-                        border-zinc-800
-                        py-10
+                        hidden
+                        lg:block
                     "
                 >
 
-                    <!-- =============================================
-                         TITRE
-                         ============================================= -->
-                    <div>
+                    <div
+                        class="
+                            sticky
+                            top-28
+                        "
+                    >
 
                         <p
                             class="
-                                text-xs
+                                mb-4
+                                text-center
+                                text-[10px]
                                 font-black
                                 uppercase
-                                tracking-[0.25em]
-                                text-red-500
+                                tracking-[0.2em]
+                                text-zinc-500
                             "
                         >
-                            Partager
+                            Partage
                         </p>
 
 
-                        <h2
+                        <div
                             class="
-                                mt-2
-                                text-xl
-                                font-black
-                                uppercase
-                                text-white
+                                flex
+                                flex-col
+                                items-center
+                                gap-3
                             "
                         >
-                            Partagez cet article
-                        </h2>
+
+                            <!-- FACEBOOK -->
+                            <a
+                                href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Partager sur Facebook"
+                                title="Partager sur Facebook"
+                                class="
+                                    flex
+                                    h-11
+                                    w-11
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    text-white
+                                    shadow-sm
+                                    transition
+                                    duration-200
+                                    hover:scale-110
+                                    hover:brightness-110
+                                "
+                                style="background-color: #1877F2;"
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="h-6 w-6"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.72V4.33a23.2 23.2 0 0 0-2.5-.13c-2.47 0-4.16 1.5-4.16 4.28v2.32H7.37V14h2.79v8h3.34Z"
+                                    />
+                                </svg>
+
+                            </a>
+
+
+                            <!-- X -->
+                            <a
+                                href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode(url()->current()) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Partager sur X"
+                                title="Partager sur X"
+                                class="
+                                    flex
+                                    h-11
+                                    w-11
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    border
+                                    border-zinc-700
+                                    bg-black
+                                    text-white
+                                    shadow-sm
+                                    transition
+                                    duration-200
+                                    hover:scale-110
+                                    hover:border-zinc-500
+                                    hover:bg-zinc-900
+                                "
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.214-6.817-5.965 6.817H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"
+                                    />
+                                </svg>
+
+                            </a>
+
+
+                            <!-- WHATSAPP -->
+                            <a
+                                href="https://wa.me/?text={{ urlencode($article->title . ' - ' . url()->current()) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Partager sur WhatsApp"
+                                title="Partager sur WhatsApp"
+                                class="
+                                    flex
+                                    h-11
+                                    w-11
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    text-white
+                                    shadow-sm
+                                    transition
+                                    duration-200
+                                    hover:scale-110
+                                    hover:brightness-110
+                                "
+                                style="background-color: #25D366;"
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="h-6 w-6"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M12.04 2a9.84 9.84 0 0 0-8.4 14.96L2 22l5.2-1.62A9.96 9.96 0 1 0 12.04 2Zm0 17.98a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.08.96 1-3-.2-.3A8.03 8.03 0 1 1 12.04 19.98Zm4.42-6.02c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"
+                                    />
+                                </svg>
+
+                            </a>
+
+
+                            <!-- PARTAGE NATIF -->
+                            <button
+                                type="button"
+                                id="native-share-button-desktop"
+                                aria-label="Partager avec une application"
+                                title="Partager avec une application"
+                                class="
+                                    hidden
+                                    h-11
+                                    w-11
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-red-600
+                                    text-white
+                                    shadow-sm
+                                    transition
+                                    duration-200
+                                    hover:scale-110
+                                    hover:bg-red-700
+                                "
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <circle cx="18" cy="5" r="3" />
+                                    <circle cx="6" cy="12" r="3" />
+                                    <circle cx="18" cy="19" r="3" />
+                                    <path d="m8.59 13.51 6.83 3.98" />
+                                    <path d="m15.41 6.51-6.82 3.98" />
+                                </svg>
+
+                            </button>
+
+
+                            <!-- COPIER LE LIEN -->
+                            <button
+                                type="button"
+                                class="
+                                    article-copy-link-button
+                                    flex
+                                    h-11
+                                    w-11
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    border
+                                    border-zinc-700
+                                    bg-zinc-900
+                                    text-zinc-300
+                                    shadow-sm
+                                    transition
+                                    duration-200
+                                    hover:scale-110
+                                    hover:border-red-600
+                                    hover:text-white
+                                "
+                                data-url="{{ url()->current() }}"
+                                aria-label="Copier le lien de l'article"
+                                title="Copier le lien"
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <rect
+                                        width="14"
+                                        height="14"
+                                        x="8"
+                                        y="8"
+                                        rx="2"
+                                        ry="2"
+                                    />
+
+                                    <path
+                                        d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                                    />
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- MESSAGE APRÈS COPIE -->
+                        <p
+                            class="
+                                article-copy-message
+                                mt-4
+                                hidden
+                                text-center
+                                text-[10px]
+                                font-bold
+                                leading-4
+                                text-green-500
+                            "
+                        >
+                            Lien copié
+                        </p>
 
                     </div>
 
+                </aside>
+
+
+                <!-- =================================================
+                     CONTENU PRINCIPAL
+                     ================================================= -->
+                <div class="min-w-0">
+
 
                     <!-- =============================================
-                         ICÔNES DE PARTAGE
+                         PARTAGE MOBILE / TABLETTE
                          ============================================= -->
                     <div
                         class="
-                            mt-6
-                            flex
-                            flex-wrap
-                            items-center
-                            gap-3
+                            mb-10
+                            border-y
+                            border-zinc-800
+                            py-5
+                            lg:hidden
                         "
                     >
 
-
-                        <!-- =========================================
-                             FACEBOOK
-                             Couleur de marque : #1877F2
-                             ========================================= -->
-                        <a
-                            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Partager sur Facebook"
-                            title="Partager sur Facebook"
+                        <div
                             class="
                                 flex
-                                h-12
-                                w-12
+                                flex-wrap
                                 items-center
-                                justify-center
-                                rounded-full
-                                text-white
-                                shadow-sm
-                                transition
-                                duration-200
-                                hover:scale-110
-                                hover:brightness-110
-                            "
-                            style="background-color: #1877F2;"
-                        >
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                class="h-6 w-6"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.72V4.33a23.2 23.2 0 0 0-2.5-.13c-2.47 0-4.16 1.5-4.16 4.28v2.32H7.37V14h2.79v8h3.34Z"
-                                />
-                            </svg>
-
-                        </a>
-
-
-                        <!-- =========================================
-                             X
-                             Identité noire et blanche
-                             ========================================= -->
-                        <a
-                            href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode(url()->current()) }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Partager sur X"
-                            title="Partager sur X"
-                            class="
-                                flex
-                                h-12
-                                w-12
-                                items-center
-                                justify-center
-                                rounded-full
-                                border
-                                border-zinc-700
-                                bg-black
-                                text-white
-                                shadow-sm
-                                transition
-                                duration-200
-                                hover:scale-110
-                                hover:border-zinc-500
-                                hover:bg-zinc-900
+                                gap-3
                             "
                         >
 
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                class="h-5 w-5"
-                                aria-hidden="true"
+                            <span
+                                class="
+                                    mr-1
+                                    text-[10px]
+                                    font-black
+                                    uppercase
+                                    tracking-[0.2em]
+                                    text-zinc-500
+                                "
                             >
-                                <path
-                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.214-6.817-5.965 6.817H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"
-                                />
-                            </svg>
-
-                        </a>
+                                Partager
+                            </span>
 
 
-                        <!-- =========================================
-                             WHATSAPP
-                             Couleur de marque : #25D366
-                             ========================================= -->
-                        <a
-                            href="https://wa.me/?text={{ urlencode($article->title . ' - ' . url()->current()) }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Partager sur WhatsApp"
-                            title="Partager sur WhatsApp"
-                            class="
-                                flex
-                                h-12
-                                w-12
-                                items-center
-                                justify-center
-                                rounded-full
-                                text-white
-                                shadow-sm
-                                transition
-                                duration-200
-                                hover:scale-110
-                                hover:brightness-110
-                            "
-                            style="background-color: #25D366;"
-                        >
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                                class="h-6 w-6"
-                                aria-hidden="true"
+                            <!-- FACEBOOK -->
+                            <a
+                                href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Partager sur Facebook"
+                                title="Partager sur Facebook"
+                                class="
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    text-white
+                                    transition
+                                    hover:scale-105
+                                "
+                                style="background-color: #1877F2;"
                             >
-                                <path
-                                    d="M12.04 2a9.84 9.84 0 0 0-8.4 14.96L2 22l5.2-1.62A9.96 9.96 0 1 0 12.04 2Zm0 17.98a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.08.96 1-3-.2-.3A8.03 8.03 0 1 1 12.04 19.98Zm4.42-6.02c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"
-                                />
-                            </svg>
 
-                        </a>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.72V4.33a23.2 23.2 0 0 0-2.5-.13c-2.47 0-4.16 1.5-4.16 4.28v2.32H7.37V14h2.79v8h3.34Z"
+                                    />
+                                </svg>
+
+                            </a>
 
 
-                        <!-- =========================================
-                             PARTAGE NATIF
-                             Rouge BTT car il ne représente
-                             aucun réseau social particulier.
-                             ========================================= -->
-                        <button
-                            type="button"
-                            id="native-share-button"
-                            aria-label="Partager avec une application"
-                            title="Partager avec une application"
+                            <!-- X -->
+                            <a
+                                href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode(url()->current()) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Partager sur X"
+                                title="Partager sur X"
+                                class="
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    border
+                                    border-zinc-700
+                                    bg-black
+                                    text-white
+                                    transition
+                                    hover:scale-105
+                                "
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="h-4 w-4"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.214-6.817-5.965 6.817H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"
+                                    />
+                                </svg>
+
+                            </a>
+
+
+                            <!-- WHATSAPP -->
+                            <a
+                                href="https://wa.me/?text={{ urlencode($article->title . ' - ' . url()->current()) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Partager sur WhatsApp"
+                                title="Partager sur WhatsApp"
+                                class="
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    text-white
+                                    transition
+                                    hover:scale-105
+                                "
+                                style="background-color: #25D366;"
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    class="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M12.04 2a9.84 9.84 0 0 0-8.4 14.96L2 22l5.2-1.62A9.96 9.96 0 1 0 12.04 2Zm0 17.98a8.1 8.1 0 0 1-4.13-1.13l-.3-.18-3.08.96 1-3-.2-.3A8.03 8.03 0 1 1 12.04 19.98Zm4.42-6.02c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.19-1.42-1.33-1.66-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.4-.54-.41h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"
+                                    />
+                                </svg>
+
+                            </a>
+
+
+                            <!-- PARTAGE NATIF MOBILE -->
+                            <button
+                                type="button"
+                                id="native-share-button-mobile"
+                                aria-label="Partager avec une application"
+                                title="Partager avec une application"
+                                class="
+                                    hidden
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    bg-red-600
+                                    text-white
+                                    transition
+                                    hover:bg-red-700
+                                "
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <circle cx="18" cy="5" r="3" />
+                                    <circle cx="6" cy="12" r="3" />
+                                    <circle cx="18" cy="19" r="3" />
+                                    <path d="m8.59 13.51 6.83 3.98" />
+                                    <path d="m15.41 6.51-6.82 3.98" />
+                                </svg>
+
+                            </button>
+
+
+                            <!-- COPIE DU LIEN -->
+                            <button
+                                type="button"
+                                class="
+                                    article-copy-link-button
+                                    flex
+                                    h-10
+                                    w-10
+                                    items-center
+                                    justify-center
+                                    rounded-full
+                                    border
+                                    border-zinc-700
+                                    bg-zinc-900
+                                    text-zinc-300
+                                    transition
+                                    hover:border-red-600
+                                    hover:text-white
+                                "
+                                data-url="{{ url()->current() }}"
+                                aria-label="Copier le lien de l'article"
+                                title="Copier le lien"
+                            >
+
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="h-5 w-5"
+                                    aria-hidden="true"
+                                >
+                                    <rect
+                                        width="14"
+                                        height="14"
+                                        x="8"
+                                        y="8"
+                                        rx="2"
+                                        ry="2"
+                                    />
+
+                                    <path
+                                        d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                                    />
+                                </svg>
+
+                            </button>
+
+                        </div>
+
+
+                        <p
                             class="
+                                article-copy-message
+                                mt-3
                                 hidden
-                                h-12
-                                w-12
-                                items-center
-                                justify-center
-                                rounded-full
-                                bg-red-600
-                                text-white
-                                shadow-sm
-                                transition
-                                duration-200
-                                hover:scale-110
-                                hover:bg-red-700
+                                text-xs
+                                font-bold
+                                text-green-500
                             "
                         >
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="h-5 w-5"
-                                aria-hidden="true"
-                            >
-                                <circle cx="18" cy="5" r="3" />
-                                <circle cx="6" cy="12" r="3" />
-                                <circle cx="18" cy="19" r="3" />
-                                <path d="m8.59 13.51 6.83 3.98" />
-                                <path d="m15.41 6.51-6.82 3.98" />
-                            </svg>
-
-                        </button>
-
-
-                        <!-- =========================================
-                             COPIER LE LIEN
-                             ========================================= -->
-                        <button
-                            type="button"
-                            id="copy-link-button"
-                            data-url="{{ url()->current() }}"
-                            aria-label="Copier le lien de l'article"
-                            title="Copier le lien"
-                            class="
-                                flex
-                                h-12
-                                w-12
-                                items-center
-                                justify-center
-                                rounded-full
-                                border
-                                border-zinc-700
-                                bg-zinc-900
-                                text-zinc-300
-                                shadow-sm
-                                transition
-                                duration-200
-                                hover:scale-110
-                                hover:border-red-600
-                                hover:text-white
-                            "
-                        >
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="h-5 w-5"
-                                aria-hidden="true"
-                            >
-                                <rect
-                                    width="14"
-                                    height="14"
-                                    x="8"
-                                    y="8"
-                                    rx="2"
-                                    ry="2"
-                                />
-
-                                <path
-                                    d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-                                />
-                            </svg>
-
-                        </button>
+                            Lien copié dans le presse-papiers.
+                        </p>
 
                     </div>
 
 
                     <!-- =============================================
-                         CONFIRMATION DE COPIE
+                         TEXTE DE L'ARTICLE
                          ============================================= -->
-                    <p
-                        id="copy-link-message"
+                    <div class="article-content">
+                        {!! $article->content !!}
+                    </div>
+
+
+                    <!-- =================================================
+                         LIKES
+                         =================================================
+                         Le lecteur arrive maintenant au bouton J'aime
+                         après avoir lu le contenu principal.
+                         ================================================= -->
+                    <section
                         class="
-                            mt-4
-                            hidden
-                            text-sm
-                            font-bold
-                            text-green-500
+                            mt-14
+                            border-y
+                            border-zinc-800
+                            py-7
                         "
                     >
-                        Lien copié dans le presse-papiers.
-                    </p>
 
-                </section>
+                        <div
+                            class="
+                                flex
+                                flex-col
+                                gap-5
+                                sm:flex-row
+                                sm:items-center
+                                sm:justify-between
+                            "
+                        >
+
+                            <!-- COMPTEUR -->
+                            <div>
+
+                                <p
+                                    class="
+                                        text-[10px]
+                                        font-black
+                                        uppercase
+                                        tracking-[0.2em]
+                                        text-zinc-500
+                                    "
+                                >
+                                    Votre réaction
+                                </p>
+
+
+                                <div
+                                    class="
+                                        mt-2
+                                        flex
+                                        items-center
+                                        gap-3
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            text-2xl
+                                            {{ $article->likes_count > 0
+                                                ? 'text-red-500'
+                                                : 'text-zinc-600'
+                                            }}
+                                        "
+                                    >
+                                        ♥
+                                    </span>
+
+
+                                    <p
+                                        class="
+                                            text-sm
+                                            font-bold
+                                            text-zinc-400
+                                        "
+                                    >
+
+                                        <span
+                                            class="
+                                                mr-1
+                                                text-lg
+                                                font-black
+                                                text-white
+                                            "
+                                        >
+                                            {{ $article->likes_count }}
+                                        </span>
+
+
+                                        @if ($article->likes_count > 1)
+
+                                            personnes aiment cet article
+
+                                        @elseif ($article->likes_count === 1)
+
+                                            personne aime cet article
+
+                                        @else
+
+                                            Aucun like pour le moment
+
+                                        @endif
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- MEMBRE CONNECTÉ -->
+                            @auth
+
+                                <form
+                                    action="{{ route('article.likes.toggle', $article->slug) }}"
+                                    method="POST"
+                                >
+
+                                    @csrf
+
+
+                                    @if ($hasLiked)
+
+                                        <button
+                                            type="submit"
+                                            class="
+                                                inline-flex
+                                                items-center
+                                                justify-center
+                                                gap-2
+                                                rounded-md
+                                                bg-red-600
+                                                px-6
+                                                py-3
+                                                text-sm
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-white
+                                                transition
+                                                hover:bg-red-700
+                                            "
+                                        >
+
+                                            <span class="text-lg">
+                                                ♥
+                                            </span>
+
+                                            J'aime
+
+                                        </button>
+
+                                    @else
+
+                                        <button
+                                            type="submit"
+                                            class="
+                                                inline-flex
+                                                items-center
+                                                justify-center
+                                                gap-2
+                                                rounded-md
+                                                border
+                                                border-zinc-700
+                                                bg-zinc-900
+                                                px-6
+                                                py-3
+                                                text-sm
+                                                font-black
+                                                uppercase
+                                                tracking-wider
+                                                text-white
+                                                transition
+                                                hover:border-red-600
+                                                hover:bg-red-600
+                                            "
+                                        >
+
+                                            <span class="text-lg">
+                                                ♡
+                                            </span>
+
+                                            J'aime
+
+                                        </button>
+
+                                    @endif
+
+                                </form>
+
+                            @endauth
+
+
+                            <!-- VISITEUR -->
+                            @guest
+
+                                <a
+                                    href="{{ route('login') }}"
+                                    class="
+                                        inline-flex
+                                        items-center
+                                        justify-center
+                                        gap-2
+                                        rounded-md
+                                        border
+                                        border-zinc-700
+                                        px-5
+                                        py-3
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-300
+                                        transition
+                                        hover:border-red-600
+                                        hover:text-red-500
+                                    "
+                                >
+
+                                    <span class="text-lg">
+                                        ♡
+                                    </span>
+
+                                    Connectez-vous pour aimer
+
+                                </a>
+
+                            @endguest
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =============================================
+                         RETOUR AUX ACTUALITÉS
+                         ============================================= -->
+                    <div
+                        class="
+                            mt-8
+                            flex
+                            justify-end
+                        "
+                    >
+
+                        <a
+                            href="{{ route('blog') }}"
+                            class="
+                                inline-flex
+                                items-center
+                                gap-2
+                                text-xs
+                                font-black
+                                uppercase
+                                tracking-[0.16em]
+                                text-zinc-500
+                                transition
+                                hover:text-red-500
+                            "
+                        >
+                            ← Retour aux actualités
+                        </a>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -789,12 +1207,13 @@
         id="commentaires"
         class="
             border-t
-            border-zinc-900
+            border-zinc-800
             bg-black
-            px-6
-            py-16
+            px-5
+            py-14
+            sm:px-6
             lg:px-8
-            lg:py-20
+            lg:py-16
         "
     >
 
@@ -802,7 +1221,7 @@
 
 
             <!-- =================================================
-                 EN-TÊTE
+                 TITRE DE LA ZONE COMMENTAIRES
                  ================================================= -->
             <div
                 class="
@@ -811,7 +1230,7 @@
                     gap-4
                     border-b
                     border-zinc-800
-                    pb-8
+                    pb-7
                     sm:flex-row
                     sm:items-end
                     sm:justify-between
@@ -822,10 +1241,10 @@
 
                     <p
                         class="
-                            text-xs
+                            text-[10px]
                             font-black
                             uppercase
-                            tracking-[0.3em]
+                            tracking-[0.25em]
                             text-red-500
                         "
                     >
@@ -835,7 +1254,7 @@
 
                     <h2
                         class="
-                            mt-3
+                            mt-2
                             text-3xl
                             font-black
                             uppercase
@@ -849,7 +1268,13 @@
                 </div>
 
 
-                <p class="text-sm font-bold text-zinc-500">
+                <p
+                    class="
+                        text-sm
+                        font-bold
+                        text-zinc-500
+                    "
+                >
 
                     {{ $article->comments->count() }}
 
@@ -893,7 +1318,7 @@
 
 
             <!-- =================================================
-                 ERREURS
+                 ERREURS DE VALIDATION
                  ================================================= -->
             @if ($errors->any())
 
@@ -908,7 +1333,13 @@
                     "
                 >
 
-                    <p class="text-sm font-black text-red-400">
+                    <p
+                        class="
+                            text-sm
+                            font-black
+                            text-red-400
+                        "
+                    >
                         Votre commentaire n'a pas pu être publié.
                     </p>
 
@@ -940,7 +1371,7 @@
 
 
             <!-- =================================================
-                 FORMULAIRE MEMBRE
+                 FORMULAIRE POUR UN MEMBRE CONNECTÉ
                  ================================================= -->
             @auth
 
@@ -955,7 +1386,13 @@
                     "
                 >
 
-                    <div class="flex items-center gap-3">
+                    <div
+                        class="
+                            flex
+                            items-center
+                            gap-3
+                        "
+                    >
 
                         <div
                             class="
@@ -979,11 +1416,23 @@
 
                         <div>
 
-                            <p class="text-sm font-black text-white">
+                            <p
+                                class="
+                                    text-sm
+                                    font-black
+                                    text-white
+                                "
+                            >
                                 {{ auth()->user()->pseudo }}
                             </p>
 
-                            <p class="text-xs text-zinc-500">
+
+                            <p
+                                class="
+                                    text-xs
+                                    text-zinc-500
+                                "
+                            >
                                 Publier un commentaire
                             </p>
 
@@ -1048,7 +1497,12 @@
                             "
                         >
 
-                            <p class="text-xs text-zinc-600">
+                            <p
+                                class="
+                                    text-xs
+                                    text-zinc-600
+                                "
+                            >
                                 Maximum 2 000 caractères.
                             </p>
 
@@ -1085,7 +1539,7 @@
 
 
             <!-- =================================================
-                 VISITEUR
+                 VISITEUR NON CONNECTÉ
                  ================================================= -->
             @guest
 
@@ -1100,7 +1554,13 @@
                     "
                 >
 
-                    <p class="text-lg font-black text-white">
+                    <p
+                        class="
+                            text-lg
+                            font-black
+                            text-white
+                        "
+                    >
                         Participez à la discussion
                     </p>
 
@@ -1119,7 +1579,14 @@
                     </p>
 
 
-                    <div class="mt-6 flex flex-wrap gap-3">
+                    <div
+                        class="
+                            mt-6
+                            flex
+                            flex-wrap
+                            gap-3
+                        "
+                    >
 
                         <a
                             href="{{ route('login') }}"
@@ -1192,7 +1659,13 @@
                         "
                     >
 
-                        <div class="flex items-start gap-4">
+                        <div
+                            class="
+                                flex
+                                items-start
+                                gap-4
+                            "
+                        >
 
                             <!-- AVATAR -->
                             <div
@@ -1225,8 +1698,13 @@
                             </div>
 
 
-                            <!-- COMMENTAIRE -->
-                            <div class="min-w-0 flex-1">
+                            <!-- CONTENU DU COMMENTAIRE -->
+                            <div
+                                class="
+                                    min-w-0
+                                    flex-1
+                                "
+                            >
 
                                 <div
                                     class="
@@ -1239,7 +1717,12 @@
                                     "
                                 >
 
-                                    <p class="font-black text-white">
+                                    <p
+                                        class="
+                                            font-black
+                                            text-white
+                                        "
+                                    >
 
                                         @if ($comment->user)
 
@@ -1256,7 +1739,10 @@
 
                                     <time
                                         datetime="{{ $comment->created_at->toIso8601String() }}"
-                                        class="text-xs text-zinc-600"
+                                        class="
+                                            text-xs
+                                            text-zinc-600
+                                        "
                                     >
                                         {{ $comment->created_at->format('d/m/Y à H:i') }}
                                     </time>
@@ -1292,50 +1778,29 @@
                         "
                     >
 
-                        <p class="font-black text-white">
+                        <p
+                            class="
+                                font-black
+                                text-white
+                            "
+                        >
                             Aucun commentaire pour le moment
                         </p>
 
-                        <p class="mt-2 text-sm text-zinc-500">
+
+                        <p
+                            class="
+                                mt-2
+                                text-sm
+                                text-zinc-500
+                            "
+                        >
                             Soyez le premier à réagir à cet article.
                         </p>
 
                     </div>
 
                 @endforelse
-
-            </div>
-
-
-            <!-- =================================================
-                 RETOUR AU BLOG
-                 ================================================= -->
-            <div
-                class="
-                    mt-12
-                    border-t
-                    border-zinc-800
-                    pt-8
-                "
-            >
-
-                <a
-                    href="{{ route('blog') }}"
-                    class="
-                        inline-flex
-                        items-center
-                        gap-2
-                        text-sm
-                        font-black
-                        uppercase
-                        tracking-wider
-                        text-zinc-400
-                        transition
-                        hover:text-red-500
-                    "
-                >
-                    ← Retour aux actualités
-                </a>
 
             </div>
 
@@ -1346,13 +1811,24 @@
 
     <!-- =========================================================
          STYLES DU CONTENU QUILL
+         =========================================================
+         Ces règles permettent de conserver correctement :
+         - paragraphes ;
+         - titres ;
+         - listes ;
+         - citations ;
+         - images ;
+         - alignements ;
+         - retraits ;
+         - tailles ;
+         - polices.
          ========================================================= -->
     <style>
 
         .article-content {
             color: #d4d4d8;
-            font-size: 1.05rem;
-            line-height: 1.9;
+            font-size: 1.075rem;
+            line-height: 1.95;
             overflow-wrap: anywhere;
         }
 
@@ -1370,25 +1846,27 @@
         }
 
         .article-content h1 {
-            margin-top: 3rem;
+            margin-top: 3.5rem;
             margin-bottom: 1.25rem;
             color: #ffffff;
-            font-size: 2.25rem;
+            font-size: 2.4rem;
             font-weight: 900;
             line-height: 1.15;
+            letter-spacing: -0.025em;
         }
 
         .article-content h2 {
-            margin-top: 2.75rem;
+            margin-top: 3.25rem;
             margin-bottom: 1.25rem;
             color: #ffffff;
-            font-size: 1.875rem;
+            font-size: 2rem;
             font-weight: 900;
             line-height: 1.2;
+            letter-spacing: -0.02em;
         }
 
         .article-content h3 {
-            margin-top: 2.25rem;
+            margin-top: 2.75rem;
             margin-bottom: 1rem;
             color: #ffffff;
             font-size: 1.5rem;
@@ -1407,6 +1885,7 @@
 
         .article-content u {
             text-decoration: underline;
+            text-underline-offset: 3px;
         }
 
         .article-content s {
@@ -1417,6 +1896,7 @@
             color: #ef4444;
             font-weight: 700;
             text-decoration: underline;
+            text-decoration-thickness: 1px;
             text-underline-offset: 4px;
         }
 
@@ -1426,8 +1906,8 @@
 
         .article-content ul,
         .article-content ol {
-            margin-top: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-top: 1.75rem;
+            margin-bottom: 1.75rem;
             padding-left: 2rem;
         }
 
@@ -1440,26 +1920,28 @@
         }
 
         .article-content li {
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
+            margin-top: 0.6rem;
+            margin-bottom: 0.6rem;
             padding-left: 0.3rem;
         }
 
         .article-content blockquote {
-            margin-top: 2rem;
-            margin-bottom: 2rem;
+            margin-top: 2.5rem;
+            margin-bottom: 2.5rem;
             border-left: 4px solid #dc2626;
             background: #09090b;
             padding: 1.5rem 1.75rem;
             color: #a1a1aa;
+            font-size: 1.05em;
             font-style: italic;
         }
 
         .article-content img {
             display: block;
+            width: auto;
             max-width: 100%;
-            max-height: 750px;
-            margin: 2.5rem auto;
+            max-height: 780px;
+            margin: 2.75rem auto;
             object-fit: contain;
         }
 
@@ -1521,7 +2003,10 @@
         }
 
         .article-content .ql-font-serif {
-            font-family: Georgia, "Times New Roman", serif;
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
         }
 
         .article-content .ql-font-monospace {
@@ -1531,23 +2016,32 @@
                 monospace;
         }
 
+
+        /* ========================================================
+           RESPONSIVE MOBILE
+           ======================================================== */
         @media (max-width: 640px) {
 
             .article-content {
                 font-size: 1rem;
-                line-height: 1.8;
+                line-height: 1.85;
             }
 
             .article-content h1 {
-                font-size: 1.875rem;
+                font-size: 1.9rem;
             }
 
             .article-content h2 {
-                font-size: 1.625rem;
+                font-size: 1.65rem;
             }
 
             .article-content h3 {
-                font-size: 1.375rem;
+                font-size: 1.4rem;
+            }
+
+            .article-content img {
+                margin-top: 2rem;
+                margin-bottom: 2rem;
             }
 
             .article-content .ql-indent-1,
@@ -1575,18 +2069,18 @@
 
             /*
             |--------------------------------------------------------------------------
-            | ÉLÉMENTS
+            | URL ET INFORMATIONS DE L'ARTICLE
             |--------------------------------------------------------------------------
             */
 
-            const nativeShareButton =
-                document.getElementById('native-share-button');
+            const articleUrl =
+                @json(url()->current());
 
-            const copyLinkButton =
-                document.getElementById('copy-link-button');
+            const articleTitle =
+                @json($article->title);
 
-            const copyLinkMessage =
-                document.getElementById('copy-link-message');
+            const articleText =
+                @json($article->excerpt ?? $article->title);
 
 
             /*
@@ -1594,43 +2088,66 @@
             | PARTAGE NATIF
             |--------------------------------------------------------------------------
             |
-            | Si le navigateur et l'appareil permettent le partage natif,
-            | nous affichons automatiquement le bouton rouge.
+            | Deux boutons existent :
             |
+            | - un dans la colonne desktop ;
+            | - un dans la barre mobile.
+            |
+            | Ils utilisent la même Web Share API.
+            |--------------------------------------------------------------------------
             */
 
-            if (
-                nativeShareButton
-                && navigator.share
-            ) {
-
-                nativeShareButton.classList.remove('hidden');
-                nativeShareButton.classList.add('flex');
+            const nativeShareButtons = [
+                document.getElementById('native-share-button-desktop'),
+                document.getElementById('native-share-button-mobile')
+            ];
 
 
-                nativeShareButton.addEventListener(
-                    'click',
-                    async function () {
+            if (navigator.share) {
 
-                        try {
+                nativeShareButtons.forEach(function (button) {
 
-                            await navigator.share({
-                                title: @json($article->title),
-                                text: @json($article->excerpt ?? $article->title),
-                                url: @json(url()->current()),
-                            });
+                    if (!button) {
+                        return;
+                    }
 
-                        } catch (error) {
 
-                            /*
-                             * Aucune action nécessaire si l'utilisateur
-                             * ferme simplement la fenêtre de partage.
-                             */
+                    /*
+                     * Le bouton était masqué par défaut.
+                     * On l'affiche uniquement si le navigateur sait
+                     * réellement gérer le partage natif.
+                     */
+                    button.classList.remove('hidden');
+                    button.classList.add('flex');
+
+
+                    button.addEventListener(
+                        'click',
+                        async function () {
+
+                            try {
+
+                                await navigator.share({
+                                    title: articleTitle,
+                                    text: articleText,
+                                    url: articleUrl,
+                                });
+
+                            } catch (error) {
+
+                                /*
+                                 * Si l'utilisateur ferme simplement
+                                 * la fenêtre de partage, aucune erreur
+                                 * visible n'est nécessaire.
+                                 */
+
+                            }
 
                         }
+                    );
 
-                    }
-                );
+                });
+
             }
 
 
@@ -1638,28 +2155,57 @@
             |--------------------------------------------------------------------------
             | COPIER LE LIEN
             |--------------------------------------------------------------------------
+            |
+            | Plusieurs boutons "copier le lien" existent selon
+            | la taille de l'écran.
+            |
+            | Nous utilisons donc une classe commune.
+            |--------------------------------------------------------------------------
             */
 
-            if (copyLinkButton) {
+            const copyButtons =
+                document.querySelectorAll(
+                    '.article-copy-link-button'
+                );
 
-                copyLinkButton.addEventListener(
+
+            copyButtons.forEach(function (button) {
+
+                button.addEventListener(
                     'click',
                     async function () {
 
-                        const articleUrl =
-                            copyLinkButton.dataset.url;
+                        const url =
+                            button.dataset.url;
+
+
+                        /*
+                         * On recherche le message de confirmation situé
+                         * dans la même zone que le bouton utilisé.
+                         */
+                        const container =
+                            button.closest('aside')
+                            || button.closest('.lg\\:hidden')
+                            || button.parentElement.parentElement;
+
+                        const message =
+                            container
+                                ? container.querySelector(
+                                    '.article-copy-message'
+                                )
+                                : null;
 
 
                         try {
 
                             await navigator.clipboard.writeText(
-                                articleUrl
+                                url
                             );
 
 
-                            if (copyLinkMessage) {
+                            if (message) {
 
-                                copyLinkMessage.classList.remove(
+                                message.classList.remove(
                                     'hidden'
                                 );
 
@@ -1667,31 +2213,33 @@
                                 window.setTimeout(
                                     function () {
 
-                                        copyLinkMessage.classList.add(
+                                        message.classList.add(
                                             'hidden'
                                         );
 
                                     },
                                     3000
                                 );
+
                             }
 
                         } catch (error) {
 
                             /*
                              * Solution de secours pour les navigateurs
-                             * qui bloquent l'accès au presse-papiers.
+                             * qui ne permettent pas Clipboard API.
                              */
-
                             window.prompt(
                                 'Copiez le lien de cet article :',
-                                articleUrl
+                                url
                             );
+
                         }
 
                     }
                 );
-            }
+
+            });
 
         });
 

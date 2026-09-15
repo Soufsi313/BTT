@@ -29,252 +29,30 @@
 
         <div class="flex min-h-screen">
 
+
             {{--
             |--------------------------------------------------------------------------
-            | BARRE LATÉRALE ADMINISTRATION
+            | BARRE LATÉRALE ADMIN COMMUNE
+            |--------------------------------------------------------------------------
+            |
+            | La navigation de l'administration est maintenant centralisée dans :
+            |
+            | resources/views/admin/partials/sidebar.blade.php
+            |
+            | Cela garantit que le menu reste exactement identique sur toutes
+            | les pages de l'administration.
+            |
+            | Le partial détecte automatiquement la route active grâce à :
+            |
+            | request()->routeIs('admin.comment-reports.*')
+            |
+            | La rubrique "Signalements" reste donc affichée en rouge sur
+            | toutes les pages liées à la modération des signalements.
+            |
             |--------------------------------------------------------------------------
             --}}
 
-            <aside
-                class="
-                    hidden
-                    w-64
-                    shrink-0
-                    border-r
-                    border-zinc-200
-                    bg-zinc-50
-                    lg:flex
-                    lg:flex-col
-                "
-            >
-
-                <div class="border-b border-zinc-200 px-6 py-6">
-
-                    <p
-                        class="
-                            text-xs
-                            font-black
-                            uppercase
-                            tracking-[0.25em]
-                            text-red-600
-                        "
-                    >
-                        Brussels Top Team
-                    </p>
-
-                    <h2
-                        class="
-                            mt-2
-                            text-xl
-                            font-black
-                            text-zinc-950
-                        "
-                    >
-                        Administration
-                    </h2>
-
-                </div>
-
-
-                {{--
-                |--------------------------------------------------------------------------
-                | NAVIGATION ADMIN
-                |--------------------------------------------------------------------------
-                --}}
-
-                <nav class="flex-1 space-y-2 p-4">
-
-                    <a
-                        href="{{ route('admin.dashboard') }}"
-                        class="
-                            block
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-white
-                            hover:text-red-600
-                        "
-                    >
-                        Tableau de bord
-                    </a>
-
-
-                    <a
-                        href="{{ route('admin.members.index') }}"
-                        class="
-                            block
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-white
-                            hover:text-red-600
-                        "
-                    >
-                        Adhérents
-                    </a>
-
-
-                    <a
-                        href="{{ route('admin.administrators.index') }}"
-                        class="
-                            block
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-white
-                            hover:text-red-600
-                        "
-                    >
-                        Administrateurs
-                    </a>
-
-
-                    <a
-                        href="{{ route('admin.courses.index') }}"
-                        class="
-                            block
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-white
-                            hover:text-red-600
-                        "
-                    >
-                        Calendrier
-                    </a>
-
-
-                    <a
-                        href="{{ route('admin.messages.index') }}"
-                        class="
-                            block
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-white
-                            hover:text-red-600
-                        "
-                    >
-                        Messages
-                    </a>
-
-
-                    <a
-                        href="{{ route('admin.articles.index') }}"
-                        class="
-                            block
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-white
-                            hover:text-red-600
-                        "
-                    >
-                        Articles
-                    </a>
-
-
-                    <a
-                        href="{{ route('admin.comments.index') }}"
-                        class="
-                            block
-                            rounded-lg
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-white
-                            hover:text-red-600
-                        "
-                    >
-                        Commentaires
-                    </a>
-
-
-                    {{--
-                    |--------------------------------------------------------------------------
-                    | PAGE ACTIVE : SIGNALEMENTS
-                    |--------------------------------------------------------------------------
-                    --}}
-
-                    <a
-                        href="{{ route('admin.comment-reports.index') }}"
-                        class="
-                            block
-                            rounded-lg
-                            bg-red-600
-                            px-4
-                            py-3
-                            text-sm
-                            font-black
-                            text-white
-                        "
-                    >
-                        Signalements
-                    </a>
-
-                </nav>
-
-
-                {{--
-                |--------------------------------------------------------------------------
-                | RETOUR AU SITE
-                |--------------------------------------------------------------------------
-                --}}
-
-                <div class="border-t border-zinc-200 p-4">
-
-                    <a
-                        href="{{ route('home') }}"
-                        class="
-                            block
-                            rounded-lg
-                            border
-                            border-zinc-300
-                            bg-white
-                            px-4
-                            py-3
-                            text-center
-                            text-sm
-                            font-bold
-                            text-zinc-700
-                            transition
-                            hover:border-red-600
-                            hover:text-red-600
-                        "
-                    >
-                        Retour au site
-                    </a>
-
-                </div>
-
-            </aside>
+            @include('admin.partials.sidebar')
 
 
             {{--

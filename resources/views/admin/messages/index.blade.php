@@ -20,240 +20,29 @@
         <div class="flex min-h-screen">
 
 
-            <!-- =================================================
-                 BARRE LATÉRALE ADMINISTRATION
-                 ================================================= -->
-            <aside
-                class="
-                    hidden
-                    w-64
-                    shrink-0
-                    border-r
-                    border-zinc-200
-                    bg-zinc-50
-                    lg:flex
-                    lg:flex-col
-                "
-            >
+            {{--
+            |--------------------------------------------------------------------------
+            | BARRE LATÉRALE ADMIN COMMUNE
+            |--------------------------------------------------------------------------
+            |
+            | Toute la navigation de l'administration est centralisée dans :
+            |
+            | resources/views/admin/partials/sidebar.blade.php
+            |
+            | Cela permet de conserver exactement le même menu sur toutes
+            | les pages de l'administration.
+            |
+            | Le partial détecte automatiquement la route active grâce à :
+            |
+            | request()->routeIs('admin.messages.*')
+            |
+            | "Messages" restera donc actif en rouge sur l'index ainsi que
+            | sur les différentes pages liées à la messagerie.
+            |
+            |--------------------------------------------------------------------------
+            --}}
 
-                <!-- =============================================
-                     IDENTITÉ ADMIN
-                     ============================================= -->
-                <div class="border-b border-zinc-200 px-6 py-6">
-
-                    <p
-                        class="
-                            text-xs
-                            font-black
-                            uppercase
-                            tracking-[0.3em]
-                            text-red-600
-                        "
-                    >
-                        BTT Admin
-                    </p>
-
-                    <p class="mt-2 text-sm font-bold text-zinc-900">
-                        {{ auth()->user()->pseudo }}
-                    </p>
-
-                    <p
-                        class="
-                            mt-1
-                            text-xs
-                            font-bold
-                            uppercase
-                            tracking-wider
-                            text-zinc-500
-                        "
-                    >
-                        @if (auth()->user()->isSuperAdmin())
-                            Super Admin
-                        @else
-                            Admin
-                        @endif
-                    </p>
-
-                </div>
-
-
-                <!-- =============================================
-                     NAVIGATION ADMIN
-                     ============================================= -->
-                <nav class="flex-1 px-4 py-6">
-
-                    <div class="space-y-1">
-
-
-                        <!-- TABLEAU DE BORD -->
-                        <a
-                            href="{{ route('admin.dashboard') }}"
-                            class="
-                                flex
-                                items-center
-                                rounded-md
-                                px-4
-                                py-3
-                                text-sm
-                                font-bold
-                                text-zinc-600
-                                transition
-                                hover:bg-zinc-200
-                                hover:text-red-600
-                            "
-                        >
-                            Tableau de bord
-                        </a>
-
-
-                        <!-- ADHÉRENTS -->
-                        <a
-                            href="{{ route('admin.members.index') }}"
-                            class="
-                                flex
-                                items-center
-                                rounded-md
-                                px-4
-                                py-3
-                                text-sm
-                                font-bold
-                                text-zinc-600
-                                transition
-                                hover:bg-zinc-200
-                                hover:text-red-600
-                            "
-                        >
-                            Adhérents
-                        </a>
-
-
-                        <!-- CALENDRIER -->
-                        <a
-                            href="{{ route('admin.courses.index') }}"
-                            class="
-                                flex
-                                items-center
-                                rounded-md
-                                px-4
-                                py-3
-                                text-sm
-                                font-bold
-                                text-zinc-600
-                                transition
-                                hover:bg-zinc-200
-                                hover:text-red-600
-                            "
-                        >
-                            Calendrier
-                        </a>
-
-
-                        <!-- ARTICLES -->
-                        <span
-                            class="
-                                block
-                                rounded-md
-                                px-4
-                                py-3
-                                text-sm
-                                font-bold
-                                text-zinc-400
-                            "
-                        >
-                            Articles
-                        </span>
-
-
-                        <!-- PRODUITS -->
-                        <span
-                            class="
-                                block
-                                rounded-md
-                                px-4
-                                py-3
-                                text-sm
-                                font-bold
-                                text-zinc-400
-                            "
-                        >
-                            Produits
-                        </span>
-
-
-                        <!-- MESSAGES -->
-                        <a
-                            href="{{ route('admin.messages.index') }}"
-                            class="
-                                flex
-                                items-center
-                                rounded-md
-                                bg-red-600
-                                px-4
-                                py-3
-                                text-sm
-                                font-bold
-                                text-white
-                            "
-                        >
-                            Messages
-                        </a>
-
-
-                        <!-- ADMINISTRATEURS -->
-                        @if (auth()->user()->isSuperAdmin())
-
-                            <a
-                                href="{{ route('admin.administrators.index') }}"
-                                class="
-                                    flex
-                                    items-center
-                                    rounded-md
-                                    px-4
-                                    py-3
-                                    text-sm
-                                    font-bold
-                                    text-zinc-600
-                                    transition
-                                    hover:bg-zinc-200
-                                    hover:text-red-600
-                                "
-                            >
-                                Administrateurs
-                            </a>
-
-                        @endif
-
-                    </div>
-
-                </nav>
-
-
-                <!-- =============================================
-                     RETOUR AU SITE
-                     ============================================= -->
-                <div class="border-t border-zinc-200 p-4">
-
-                    <a
-                        href="{{ route('member.dashboard') }}"
-                        class="
-                            block
-                            rounded-md
-                            px-4
-                            py-3
-                            text-sm
-                            font-bold
-                            text-zinc-600
-                            transition
-                            hover:bg-zinc-200
-                            hover:text-zinc-900
-                        "
-                    >
-                        ← Retour au site
-                    </a>
-
-                </div>
-
-            </aside>
+            @include('admin.partials.sidebar')
 
 
             <!-- =================================================

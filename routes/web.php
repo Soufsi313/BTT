@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminArticleImageController;
 use App\Http\Controllers\AdminCommentController;
+use App\Http\Controllers\AdminCommentReportController;
 use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
 use App\Http\Controllers\AdminMessageController;
@@ -702,6 +703,91 @@ Route::middleware([
             '/commentaires/{comment}',
             [AdminCommentController::class, 'destroy']
         )->name('comments.destroy');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SIGNALEMENTS DES COMMENTAIRES
+        |--------------------------------------------------------------------------
+        |
+        | Cette partie permet à l'administration de consulter et de
+        | modérer les signalements envoyés par les membres concernant
+        | les commentaires du blog.
+        |
+        | L'administration peut :
+        |
+        | - consulter tous les signalements ;
+        | - marquer un signalement comme examiné ;
+        | - rejeter un signalement non justifié ;
+        | - masquer le commentaire et résoudre un signalement justifié.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LISTE DES SIGNALEMENTS
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/signalements-commentaires',
+            [AdminCommentReportController::class, 'index']
+        )->name('comment-reports.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MARQUER UN SIGNALEMENT COMME EXAMINÉ
+        |--------------------------------------------------------------------------
+        |
+        | Cette action indique que l'administration a pris connaissance
+        | du signalement sans encore prendre de décision définitive
+        | concernant le commentaire.
+        |
+        */
+
+        Route::patch(
+            '/signalements-commentaires/{report}/examiner',
+            [AdminCommentReportController::class, 'review']
+        )->name('comment-reports.review');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REJETER UN SIGNALEMENT
+        |--------------------------------------------------------------------------
+        |
+        | Cette action est utilisée lorsque l'administration considère
+        | que le signalement n'est pas justifié.
+        |
+        | Le commentaire concerné reste alors dans son état actuel.
+        |
+        */
+
+        Route::patch(
+            '/signalements-commentaires/{report}/rejeter',
+            [AdminCommentReportController::class, 'reject']
+        )->name('comment-reports.reject');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MASQUER LE COMMENTAIRE ET TRAITER LE SIGNALEMENT
+        |--------------------------------------------------------------------------
+        |
+        | Cette action est utilisée lorsqu'un signalement est considéré
+        | comme justifié.
+        |
+        | Le commentaire passe au statut "hidden" et le signalement
+        | passe au statut "resolved".
+        |
+        */
+
+        Route::patch(
+            '/signalements-commentaires/{report}/traiter',
+            [AdminCommentReportController::class, 'resolve']
+        )->name('comment-reports.resolve');
 
 
         /*

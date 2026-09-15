@@ -15,24 +15,30 @@
     <!-- =========================================================
          BLOG PUBLIC
          =========================================================
+
          Cette page affiche tous les articles publics du BTT.
 
          Fonctionnalités présentes :
+
          - filtrage par catégorie ;
          - tri des articles ;
+         - compteur de commentaires publiés ;
          - compteur de likes ;
          - accès à l'article ;
          - partage Facebook ;
          - partage X ;
          - partage WhatsApp ;
          - copie du lien.
+
          ========================================================= -->
+
     <section class="min-h-screen bg-zinc-950 text-white">
 
 
         <!-- =====================================================
              HERO
              ===================================================== -->
+
         <section
             class="
                 border-b
@@ -98,6 +104,7 @@
         <!-- =====================================================
              CONTENU PRINCIPAL
              ===================================================== -->
+
         <section
             class="
                 px-6
@@ -113,6 +120,7 @@
                 <!-- =================================================
                      FILTRES PAR CATÉGORIE
                      ================================================= -->
+
                 <div
                     class="
                         flex
@@ -121,7 +129,10 @@
                     "
                 >
 
-                    <!-- TOUS LES ARTICLES -->
+                    <!-- =============================================
+                         TOUS LES ARTICLES
+                         ============================================= -->
+
                     <a
                         href="{{ route('blog', [
                             'sort' => $selectedSort
@@ -136,7 +147,6 @@
                             uppercase
                             tracking-wider
                             transition
-
                             {{ $selectedCategory === null
                                 ? 'border-red-600 bg-red-600 text-white'
                                 : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-red-600 hover:text-white'
@@ -147,7 +157,10 @@
                     </a>
 
 
-                    <!-- CATÉGORIES -->
+                    <!-- =============================================
+                         CATÉGORIES
+                         ============================================= -->
+
                     @foreach ($categories as $category)
 
                         <a
@@ -165,7 +178,6 @@
                                 uppercase
                                 tracking-wider
                                 transition
-
                                 {{ $selectedCategory === $category
                                     ? 'border-red-600 bg-red-600 text-white'
                                     : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-red-600 hover:text-white'
@@ -183,6 +195,7 @@
                 <!-- =================================================
                      TRI + RÉSUMÉ
                      ================================================= -->
+
                 <div
                     class="
                         mt-10
@@ -202,6 +215,7 @@
                     <!-- =============================================
                          RÉSUMÉ DE LA SÉLECTION
                          ============================================= -->
+
                     <div>
 
                         <p
@@ -226,7 +240,6 @@
                                 text-white
                             "
                         >
-
                             @if ($selectedCategory)
 
                                 {{ $selectedCategory }}
@@ -236,7 +249,6 @@
                                 Tous les articles
 
                             @endif
-
                         </h2>
 
 
@@ -266,6 +278,7 @@
                     <!-- =============================================
                          FORMULAIRE DE TRI
                          ============================================= -->
+
                     <form
                         action="{{ route('blog') }}"
                         method="GET"
@@ -276,7 +289,12 @@
                         "
                     >
 
-                        <!-- On conserve la catégorie actuelle -->
+                        <!--
+                            On conserve la catégorie actuellement
+                            sélectionnée lorsque le visiteur change
+                            simplement le tri.
+                        -->
+
                         @if ($selectedCategory)
 
                             <input
@@ -363,6 +381,7 @@
                 <!-- =================================================
                      LISTE DES ARTICLES
                      ================================================= -->
+
                 @if ($articles->count() > 0)
 
                     <div
@@ -377,9 +396,11 @@
 
                         @foreach ($articles as $article)
 
+
                             <!-- =========================================
                                  VIGNETTE D'ARTICLE
                                  ========================================= -->
+
                             <article
                                 class="
                                     group
@@ -399,8 +420,9 @@
 
 
                                 <!-- =====================================
-                                     IMAGE
+                                     IMAGE DE L'ARTICLE
                                      ===================================== -->
+
                                 <a
                                     href="{{ route('blog.show', $article->slug) }}"
                                     class="
@@ -428,7 +450,10 @@
 
                                     @else
 
-                                        <!-- IMAGE DE SECOURS -->
+                                        <!-- =================================
+                                             IMAGE DE SECOURS
+                                             ================================= -->
+
                                         <div
                                             class="
                                                 flex
@@ -459,6 +484,7 @@
                                     <!-- =================================
                                          CATÉGORIE
                                          ================================= -->
+
                                     <span
                                         class="
                                             absolute
@@ -481,6 +507,7 @@
                                     <!-- =================================
                                          ARTICLE À LA UNE
                                          ================================= -->
+
                                     @if ($article->is_featured)
 
                                         <span
@@ -510,6 +537,7 @@
                                 <!-- =====================================
                                      CORPS DE LA VIGNETTE
                                      ===================================== -->
+
                                 <div
                                     class="
                                         flex
@@ -521,8 +549,9 @@
 
 
                                     <!-- =================================
-                                         DATE
+                                         DATE DE PUBLICATION
                                          ================================= -->
+
                                     @if ($article->published_at)
 
                                         <time
@@ -544,6 +573,7 @@
                                     <!-- =================================
                                          TITRE
                                          ================================= -->
+
                                     <h2
                                         class="
                                             mt-3
@@ -571,6 +601,7 @@
                                     <!-- =================================
                                          EXTRAIT
                                          ================================= -->
+
                                     @if ($article->excerpt)
 
                                         <p
@@ -591,12 +622,28 @@
                                     <!-- =================================
                                          ZONE BASSE
                                          ================================= -->
+
                                     <div class="mt-auto pt-7">
 
 
                                         <!-- =================================
-                                             LIEN + COMPTEUR DE LIKES
+                                             LIEN + STATISTIQUES
+                                             =================================
+
+                                             Cette ligne contient maintenant :
+
+                                             - le lien vers l'article ;
+                                             - le compteur de commentaires ;
+                                             - le compteur de likes.
+
+                                             Le nombre de commentaires provient
+                                             de comments_count calculé directement
+                                             par le BlogController.
+
+                                             Seuls les commentaires ayant le
+                                             statut "published" sont comptés.
                                              ================================= -->
+
                                         <div
                                             class="
                                                 flex
@@ -609,7 +656,11 @@
                                             "
                                         >
 
-                                            <!-- LIRE L'ARTICLE -->
+
+                                            <!-- =============================
+                                                 LIRE L'ARTICLE
+                                                 ============================= -->
+
                                             <a
                                                 href="{{ route('blog.show', $article->slug) }}"
                                                 class="
@@ -633,52 +684,155 @@
                                             </a>
 
 
-                                            <!-- COMPTEUR DE LIKES -->
+                                            <!-- =============================
+                                                 STATISTIQUES DE L'ARTICLE
+                                                 ============================= -->
+
                                             <div
                                                 class="
-                                                    inline-flex
+                                                    flex
                                                     shrink-0
                                                     items-center
                                                     gap-2
-                                                    rounded-full
-                                                    border
-                                                    border-zinc-800
-                                                    bg-black
-                                                    px-3
-                                                    py-1.5
                                                 "
-                                                title="{{ $article->likes_count }} {{ $article->likes_count > 1 ? 'likes' : 'like' }}"
                                             >
 
-                                                <span
+
+                                                <!-- =========================
+                                                     COMPTEUR DE COMMENTAIRES
+                                                     =========================
+
+                                                     comments_count est fourni
+                                                     par le contrôleur.
+
+                                                     Il contient uniquement le
+                                                     nombre de commentaires
+                                                     actuellement publiés.
+
+                                                     Un commentaire masqué par
+                                                     la modération disparaît
+                                                     donc automatiquement de
+                                                     ce compteur.
+                                                     ========================= -->
+
+                                                <div
                                                     class="
-                                                        text-base
-                                                        leading-none
-
-                                                        {{ $article->likes_count > 0
-                                                            ? 'text-red-500'
-                                                            : 'text-zinc-600'
-                                                        }}
+                                                        inline-flex
+                                                        items-center
+                                                        gap-2
+                                                        rounded-full
+                                                        border
+                                                        border-zinc-800
+                                                        bg-black
+                                                        px-3
+                                                        py-1.5
                                                     "
-                                                    aria-hidden="true"
+                                                    title="{{ $article->comments_count }} {{ $article->comments_count > 1 ? 'commentaires' : 'commentaire' }}"
                                                 >
-                                                    ♥
-                                                </span>
+
+                                                    <!--
+                                                        Icône de commentaire.
+
+                                                        SVG utilisé plutôt qu'un
+                                                        emoji afin de conserver
+                                                        le même rendu graphique
+                                                        sur tous les systèmes.
+                                                    -->
+
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        stroke-width="2"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        class="
+                                                            h-4
+                                                            w-4
+                                                            {{ $article->comments_count > 0
+                                                                ? 'text-white'
+                                                                : 'text-zinc-600'
+                                                            }}
+                                                        "
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+                                                        />
+                                                    </svg>
 
 
-                                                <span
+                                                    <!-- NOMBRE DE COMMENTAIRES -->
+
+                                                    <span
+                                                        class="
+                                                            text-xs
+                                                            font-black
+                                                            {{ $article->comments_count > 0
+                                                                ? 'text-white'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        {{ $article->comments_count }}
+                                                    </span>
+
+                                                </div>
+
+
+                                                <!-- =========================
+                                                     COMPTEUR DE LIKES
+                                                     ========================= -->
+
+                                                <div
                                                     class="
-                                                        text-xs
-                                                        font-black
-
-                                                        {{ $article->likes_count > 0
-                                                            ? 'text-white'
-                                                            : 'text-zinc-500'
-                                                        }}
+                                                        inline-flex
+                                                        items-center
+                                                        gap-2
+                                                        rounded-full
+                                                        border
+                                                        border-zinc-800
+                                                        bg-black
+                                                        px-3
+                                                        py-1.5
                                                     "
+                                                    title="{{ $article->likes_count }} {{ $article->likes_count > 1 ? 'likes' : 'like' }}"
                                                 >
-                                                    {{ $article->likes_count }}
-                                                </span>
+
+                                                    <!-- CŒUR -->
+
+                                                    <span
+                                                        class="
+                                                            text-base
+                                                            leading-none
+                                                            {{ $article->likes_count > 0
+                                                                ? 'text-red-500'
+                                                                : 'text-zinc-600'
+                                                            }}
+                                                        "
+                                                        aria-hidden="true"
+                                                    >
+                                                        ♥
+                                                    </span>
+
+
+                                                    <!-- NOMBRE DE LIKES -->
+
+                                                    <span
+                                                        class="
+                                                            text-xs
+                                                            font-black
+                                                            {{ $article->likes_count > 0
+                                                                ? 'text-white'
+                                                                : 'text-zinc-500'
+                                                            }}
+                                                        "
+                                                    >
+                                                        {{ $article->likes_count }}
+                                                    </span>
+
+                                                </div>
 
                                             </div>
 
@@ -688,10 +842,13 @@
                                         <!-- =================================
                                              PARTAGE
                                              =================================
+
                                              Les boutons sont volontairement
                                              petits afin de ne pas voler la
                                              priorité au lien vers l'article.
+
                                              ================================= -->
+
                                         <div
                                             class="
                                                 mt-5
@@ -727,6 +884,7 @@
                                                 <!-- =========================
                                                      FACEBOOK
                                                      ========================= -->
+
                                                 <a
                                                     href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('blog.show', $article->slug)) }}"
                                                     target="_blank"
@@ -767,6 +925,7 @@
                                                 <!-- =========================
                                                      X
                                                      ========================= -->
+
                                                 <a
                                                     href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode(route('blog.show', $article->slug)) }}"
                                                     target="_blank"
@@ -809,6 +968,7 @@
                                                 <!-- =========================
                                                      WHATSAPP
                                                      ========================= -->
+
                                                 <a
                                                     href="https://wa.me/?text={{ urlencode($article->title . ' - ' . route('blog.show', $article->slug)) }}"
                                                     target="_blank"
@@ -849,6 +1009,7 @@
                                                 <!-- =========================
                                                      COPIER LE LIEN
                                                      ========================= -->
+
                                                 <button
                                                     type="button"
                                                     class="
@@ -885,6 +1046,7 @@
                                                         class="h-4 w-4"
                                                         aria-hidden="true"
                                                     >
+
                                                         <rect
                                                             width="14"
                                                             height="14"
@@ -897,6 +1059,7 @@
                                                         <path
                                                             d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
                                                         />
+
                                                     </svg>
 
                                                 </button>
@@ -909,6 +1072,7 @@
                                         <!-- =================================
                                              MESSAGE COPIE DU LIEN
                                              ================================= -->
+
                                         <p
                                             class="
                                                 blog-copy-message
@@ -937,6 +1101,7 @@
                     <!-- =================================================
                          PAGINATION
                          ================================================= -->
+
                     @if ($articles->hasPages())
 
                         <div class="mt-12">
@@ -948,9 +1113,11 @@
 
                 @else
 
+
                     <!-- =================================================
                          AUCUN ARTICLE
                          ================================================= -->
+
                     <div
                         class="
                             mt-12
@@ -1033,12 +1200,15 @@
     <!-- =========================================================
          JAVASCRIPT - COPIE DES LIENS
          =========================================================
+
          Chaque vignette possède son propre bouton de copie.
 
          Nous utilisons une classe commune afin de gérer tous les
          articles sans avoir besoin d'un identifiant HTML différent
          pour chaque bouton.
+
          ========================================================= -->
+
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -1070,6 +1240,7 @@
                         /*
                          * URL exacte de l'article concerné.
                          */
+
                         const articleUrl =
                             button.dataset.url;
 
@@ -1077,6 +1248,7 @@
                         /*
                          * On recherche la vignette contenant le bouton.
                          */
+
                         const articleCard =
                             button.closest('article');
 
@@ -1084,6 +1256,7 @@
                         /*
                          * Puis le message de confirmation de cette vignette.
                          */
+
                         const confirmationMessage =
                             articleCard
                                 ? articleCard.querySelector(
@@ -1097,6 +1270,7 @@
                             /*
                              * Copie moderne dans le presse-papiers.
                              */
+
                             await navigator.clipboard.writeText(
                                 articleUrl
                             );
@@ -1105,6 +1279,7 @@
                             /*
                              * Message temporaire.
                              */
+
                             if (confirmationMessage) {
 
                                 confirmationMessage.classList.remove(
@@ -1131,6 +1306,7 @@
                              * Solution de secours pour les navigateurs
                              * ne permettant pas Clipboard API.
                              */
+
                             window.prompt(
                                 'Copiez le lien de cet article :',
                                 articleUrl

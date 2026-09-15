@@ -153,22 +153,81 @@
 
 
                         <!-- =========================================
-                             ARTICLES
-                             Fonctionnalité à venir.
+                             ARTICLES DU BLOG
+                             =========================================
+                             La gestion des articles est maintenant
+                             fonctionnelle dans l'administration.
                              ========================================= -->
-                        <span
+                        <a
+                            href="{{ route('admin.articles.index') }}"
                             class="
-                                block
+                                flex
+                                items-center
                                 rounded-md
                                 px-4
                                 py-3
                                 text-sm
                                 font-bold
-                                text-zinc-500
+                                text-zinc-600
+                                transition
+                                hover:bg-zinc-200
+                                hover:text-red-600
                             "
                         >
                             Articles
-                        </span>
+                        </a>
+
+
+                        <!-- =========================================
+                             COMMENTAIRES DU BLOG
+                             =========================================
+                             Permet d'accéder à la modération générale
+                             des commentaires publiés sur le blog.
+                             ========================================= -->
+                        <a
+                            href="{{ route('admin.comments.index') }}"
+                            class="
+                                flex
+                                items-center
+                                rounded-md
+                                px-4
+                                py-3
+                                text-sm
+                                font-bold
+                                text-zinc-600
+                                transition
+                                hover:bg-zinc-200
+                                hover:text-red-600
+                            "
+                        >
+                            Commentaires
+                        </a>
+
+
+                        <!-- =========================================
+                             SIGNALEMENTS
+                             =========================================
+                             Permet d'accéder à la file de modération
+                             des commentaires signalés par les membres.
+                             ========================================= -->
+                        <a
+                            href="{{ route('admin.comment-reports.index') }}"
+                            class="
+                                flex
+                                items-center
+                                rounded-md
+                                px-4
+                                py-3
+                                text-sm
+                                font-bold
+                                text-zinc-600
+                                transition
+                                hover:bg-zinc-200
+                                hover:text-red-600
+                            "
+                        >
+                            Signalements
+                        </a>
 
 
                         <!-- =========================================

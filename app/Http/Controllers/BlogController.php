@@ -18,6 +18,7 @@ use Illuminate\View\View;
  * - le filtrage par catégorie ;
  * - le tri des articles ;
  * - le nombre de likes affiché sur chaque vignette ;
+ * - le nombre de commentaires publiés affiché sur chaque vignette ;
  * - l'affichage d'un article individuel ;
  * - les commentaires visibles publiquement ;
  * - le nombre de likes d'un article ;
@@ -37,7 +38,10 @@ class BlogController extends Controller
      * /blog
      *
      * Elle récupère uniquement les articles publics et charge
-     * également le nombre de likes de chaque article.
+     * également :
+     *
+     * - le nombre de likes de chaque article ;
+     * - le nombre de commentaires publiés de chaque article.
      *
      * ============================================================
      */
@@ -161,20 +165,92 @@ class BlogController extends Controller
         |
         | $article->likes_count
         |
-        | que nous pourrons afficher directement sur les vignettes.
+        | que nous pouvons afficher directement sur les vignettes.
+        |
+        | withCount(['comments' => ...])
+        | --------------------------------
+        | Compte les commentaires de l'article en appliquant
+        | volontairement un filtre :
+        |
+        | status = published
+        |
+        | Cela signifie qu'un commentaire masqué par la modération
+        | ou n'étant pas public ne sera pas comptabilisé.
+        |
+        | Laravel ajoute alors automatiquement :
+        |
+        | $article->comments_count
+        |
+        | Cette propriété sera utilisée dans blog.blade.php.
         |
         */
 
         $query = Article::query()
             ->with('author')
+
+            /*
+            |--------------------------------------------------------------------------
+            | COMPTEUR DE LIKES
+            |--------------------------------------------------------------------------
+            */
+
             ->withCount('likes')
+
+            /*
+            |--------------------------------------------------------------------------
+            | COMPTEUR DE COMMENTAIRES PUBLICS
+            |--------------------------------------------------------------------------
+            |
+            | Nous ne comptons que les commentaires ayant le statut
+            | "published".
+            |
+            | Exemple :
+            |
+            | - 4 commentaires publiés ;
+            | - 1 commentaire masqué ;
+            |
+            | Le compteur affiché publiquement sera donc :
+            |
+            | 4
+            |
+            */
+
+            ->withCount([
+                'comments' => function ($query) {
+                    $query->where(
+                        'status',
+                        'published'
+                    );
+                },
+            ])
+
+            /*
+            |--------------------------------------------------------------------------
+            | ARTICLE PUBLIÉ
+            |--------------------------------------------------------------------------
+            */
+
             ->where(
                 'status',
                 'published'
             )
+
+            /*
+            |--------------------------------------------------------------------------
+            | DATE DE PUBLICATION OBLIGATOIRE
+            |--------------------------------------------------------------------------
+            */
+
             ->whereNotNull(
                 'published_at'
             )
+
+            /*
+            |--------------------------------------------------------------------------
+            | PUBLICATION DÉJÀ EFFECTIVE
+            |--------------------------------------------------------------------------
+            */
+
             ->where(
                 'published_at',
                 '<=',

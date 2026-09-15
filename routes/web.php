@@ -10,6 +10,7 @@ use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommentReportController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MemberCourseController;
 use App\Http\Controllers\MemberMessageController;
@@ -122,6 +123,33 @@ Route::post(
 )
     ->middleware('auth')
     ->name('comments.store');
+
+
+/*
+|--------------------------------------------------------------------------
+| SIGNALER UN COMMENTAIRE
+|--------------------------------------------------------------------------
+|
+| Cette route permet à un membre connecté de signaler un commentaire
+| publié sous un article du blog.
+|
+| Le slug permet de vérifier que le commentaire appartient bien
+| à l'article actuellement consulté.
+|
+| Le paramètre {comment} utilise le Route Model Binding de Laravel
+| afin de récupérer automatiquement le commentaire concerné.
+|
+| Seuls les utilisateurs authentifiés peuvent effectuer
+| un signalement.
+|
+*/
+
+Route::post(
+    '/blog/{slug}/commentaires/{comment}/signaler',
+    [CommentReportController::class, 'store']
+)
+    ->middleware('auth')
+    ->name('comments.reports.store');
 
 
 /*

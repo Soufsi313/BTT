@@ -27,7 +27,8 @@
          - images intégrées au contenu ;
          - likes ;
          - partage ;
-         - commentaires.
+         - commentaires ;
+         - signalement des commentaires.
          ========================================================= -->
     <article class="min-h-screen bg-zinc-950 text-white">
 
@@ -375,10 +376,6 @@
 
                 <!-- =================================================
                      PARTAGE DESKTOP
-                     =================================================
-                     Sur grand écran, les réseaux sociaux restent
-                     visibles à gauche du contenu, comme sur un article
-                     de presse moderne.
                      ================================================= -->
                 <aside
                     class="
@@ -933,9 +930,6 @@
 
                     <!-- =================================================
                          LIKES
-                         =================================================
-                         Le lecteur arrive maintenant au bouton J'aime
-                         après avoir lu le contenu principal.
                          ================================================= -->
                     <section
                         class="
@@ -1340,7 +1334,7 @@
                             text-red-400
                         "
                     >
-                        Votre commentaire n'a pas pu être publié.
+                        Une erreur est survenue.
                     </p>
 
 
@@ -1761,6 +1755,302 @@
                                     "
                                 >{{ $comment->body }}</div>
 
+
+                                <!-- =====================================
+                                     SIGNALEMENT DU COMMENTAIRE
+                                     =====================================
+                                     Le signalement est réservé aux membres
+                                     connectés.
+
+                                     Un membre ne peut pas signaler son propre
+                                     commentaire depuis l'interface.
+                                     ===================================== -->
+                                @auth
+
+                                    @if ($comment->user_id !== auth()->id())
+
+                                        <details
+                                            class="
+                                                mt-5
+                                                border-t
+                                                border-zinc-900
+                                                pt-4
+                                            "
+                                        >
+
+                                            <summary
+                                                class="
+                                                    inline-flex
+                                                    cursor-pointer
+                                                    list-none
+                                                    items-center
+                                                    gap-2
+                                                    text-xs
+                                                    font-bold
+                                                    text-zinc-600
+                                                    transition
+                                                    hover:text-red-500
+                                                "
+                                            >
+
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    class="h-4 w-4"
+                                                    aria-hidden="true"
+                                                >
+                                                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                                                    <path d="M4 22v-7" />
+                                                </svg>
+
+                                                Signaler
+
+                                            </summary>
+
+
+                                            <form
+                                                action="{{ route(
+                                                    'comments.reports.store',
+                                                    [
+                                                        'slug' => $article->slug,
+                                                        'comment' => $comment->id,
+                                                    ]
+                                                ) }}"
+                                                method="POST"
+                                                class="
+                                                    mt-4
+                                                    rounded-md
+                                                    border
+                                                    border-zinc-800
+                                                    bg-zinc-950
+                                                    p-5
+                                                "
+                                            >
+
+                                                @csrf
+
+
+                                                <p
+                                                    class="
+                                                        text-sm
+                                                        font-black
+                                                        text-white
+                                                    "
+                                                >
+                                                    Signaler ce commentaire
+                                                </p>
+
+
+                                                <p
+                                                    class="
+                                                        mt-2
+                                                        text-xs
+                                                        leading-5
+                                                        text-zinc-500
+                                                    "
+                                                >
+                                                    Le signalement sera transmis
+                                                    à l'équipe de modération BTT.
+                                                </p>
+
+
+                                                <!-- =========================
+                                                     MOTIF DU SIGNALEMENT
+                                                     ========================= -->
+                                                <div class="mt-5">
+
+                                                    <label
+                                                        for="reason-{{ $comment->id }}"
+                                                        class="
+                                                            block
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            text-zinc-400
+                                                        "
+                                                    >
+                                                        Motif
+                                                    </label>
+
+
+                                                    <select
+                                                        id="reason-{{ $comment->id }}"
+                                                        name="reason"
+                                                        required
+                                                        class="
+                                                            mt-2
+                                                            w-full
+                                                            rounded-md
+                                                            border
+                                                            border-zinc-800
+                                                            bg-black
+                                                            px-4
+                                                            py-3
+                                                            text-sm
+                                                            text-white
+                                                            outline-none
+                                                            transition
+                                                            focus:border-red-600
+                                                        "
+                                                    >
+
+                                                        <option value="">
+                                                            Choisissez un motif
+                                                        </option>
+
+                                                        <option value="insultes">
+                                                            Insultes
+                                                        </option>
+
+                                                        <option value="harcelement">
+                                                            Harcèlement
+                                                        </option>
+
+                                                        <option value="spam">
+                                                            Spam
+                                                        </option>
+
+                                                        <option value="contenu_inapproprie">
+                                                            Contenu inapproprié
+                                                        </option>
+
+                                                        <option value="autre">
+                                                            Autre
+                                                        </option>
+
+                                                    </select>
+
+                                                </div>
+
+
+                                                <!-- =========================
+                                                     PRÉCISIONS FACULTATIVES
+                                                     ========================= -->
+                                                <div class="mt-5">
+
+                                                    <label
+                                                        for="details-{{ $comment->id }}"
+                                                        class="
+                                                            block
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            text-zinc-400
+                                                        "
+                                                    >
+                                                        Précisions
+
+                                                        <span
+                                                            class="
+                                                                font-medium
+                                                                normal-case
+                                                                tracking-normal
+                                                                text-zinc-600
+                                                            "
+                                                        >
+                                                            (facultatif)
+                                                        </span>
+                                                    </label>
+
+
+                                                    <textarea
+                                                        id="details-{{ $comment->id }}"
+                                                        name="details"
+                                                        rows="3"
+                                                        maxlength="1000"
+                                                        placeholder="Ajoutez une précision si nécessaire..."
+                                                        class="
+                                                            mt-2
+                                                            w-full
+                                                            resize-y
+                                                            rounded-md
+                                                            border
+                                                            border-zinc-800
+                                                            bg-black
+                                                            px-4
+                                                            py-3
+                                                            text-sm
+                                                            leading-6
+                                                            text-white
+                                                            outline-none
+                                                            transition
+                                                            placeholder:text-zinc-600
+                                                            focus:border-red-600
+                                                        "
+                                                    ></textarea>
+
+                                                </div>
+
+
+                                                <!-- =========================
+                                                     VALIDATION
+                                                     ========================= -->
+                                                <div
+                                                    class="
+                                                        mt-5
+                                                        flex
+                                                        flex-col
+                                                        gap-3
+                                                        sm:flex-row
+                                                        sm:items-center
+                                                        sm:justify-between
+                                                    "
+                                                >
+
+                                                    <p
+                                                        class="
+                                                            text-xs
+                                                            text-zinc-600
+                                                        "
+                                                    >
+                                                        Un seul signalement par
+                                                        membre et par commentaire.
+                                                    </p>
+
+
+                                                    <button
+                                                        type="submit"
+                                                        class="
+                                                            inline-flex
+                                                            items-center
+                                                            justify-center
+                                                            rounded-md
+                                                            border
+                                                            border-red-900
+                                                            bg-red-950/30
+                                                            px-5
+                                                            py-3
+                                                            text-xs
+                                                            font-black
+                                                            uppercase
+                                                            tracking-wider
+                                                            text-red-400
+                                                            transition
+                                                            hover:border-red-600
+                                                            hover:bg-red-600
+                                                            hover:text-white
+                                                        "
+                                                    >
+                                                        Envoyer le signalement
+                                                    </button>
+
+                                                </div>
+
+                                            </form>
+
+                                        </details>
+
+                                    @endif
+
+                                @endauth
+
                             </div>
 
                         </div>
@@ -1811,17 +2101,6 @@
 
     <!-- =========================================================
          STYLES DU CONTENU QUILL
-         =========================================================
-         Ces règles permettent de conserver correctement :
-         - paragraphes ;
-         - titres ;
-         - listes ;
-         - citations ;
-         - images ;
-         - alignements ;
-         - retraits ;
-         - tailles ;
-         - polices.
          ========================================================= -->
     <style>
 
@@ -2087,14 +2366,6 @@
             |--------------------------------------------------------------------------
             | PARTAGE NATIF
             |--------------------------------------------------------------------------
-            |
-            | Deux boutons existent :
-            |
-            | - un dans la colonne desktop ;
-            | - un dans la barre mobile.
-            |
-            | Ils utilisent la même Web Share API.
-            |--------------------------------------------------------------------------
             */
 
             const nativeShareButtons = [
@@ -2154,12 +2425,6 @@
             /*
             |--------------------------------------------------------------------------
             | COPIER LE LIEN
-            |--------------------------------------------------------------------------
-            |
-            | Plusieurs boutons "copier le lien" existent selon
-            | la taille de l'écran.
-            |
-            | Nous utilisons donc une classe commune.
             |--------------------------------------------------------------------------
             */
 

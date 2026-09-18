@@ -15,6 +15,9 @@ use App\Http\Controllers\CommentReportController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MemberCourseController;
 use App\Http\Controllers\MemberMessageController;
+use App\Notifications\RegistrationConfirmedNotification;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -111,10 +114,12 @@ Route::get(
 | PUBLIER UN COMMENTAIRE
 |--------------------------------------------------------------------------
 |
-| Seuls les utilisateurs connectés peuvent publier un commentaire.
+| Pour publier un commentaire, l'utilisateur doit maintenant :
 |
-| Les visiteurs non connectés peuvent lire les commentaires,
-| mais ils ne peuvent pas utiliser cette route.
+| - être connecté ;
+| - avoir vérifié son adresse email.
+|
+| Les visiteurs peuvent toujours consulter les commentaires.
 |
 */
 
@@ -122,7 +127,10 @@ Route::post(
     '/blog/{slug}/commentaires',
     [CommentController::class, 'store']
 )
-    ->middleware('auth')
+    ->middleware([
+        'auth',
+        'verified',
+    ])
     ->name('comments.store');
 
 
@@ -131,17 +139,12 @@ Route::post(
 | SIGNALER UN COMMENTAIRE
 |--------------------------------------------------------------------------
 |
-| Cette route permet à un membre connecté de signaler un commentaire
-| publié sous un article du blog.
+| Cette route permet à un membre de signaler un commentaire.
 |
-| Le slug permet de vérifier que le commentaire appartient bien
-| à l'article actuellement consulté.
+| Le membre doit :
 |
-| Le paramètre {comment} utilise le Route Model Binding de Laravel
-| afin de récupérer automatiquement le commentaire concerné.
-|
-| Seuls les utilisateurs authentifiés peuvent effectuer
-| un signalement.
+| - être authentifié ;
+| - avoir vérifié son adresse email.
 |
 */
 
@@ -149,7 +152,10 @@ Route::post(
     '/blog/{slug}/commentaires/{comment}/signaler',
     [CommentReportController::class, 'store']
 )
-    ->middleware('auth')
+    ->middleware([
+        'auth',
+        'verified',
+    ])
     ->name('comments.reports.store');
 
 
@@ -158,18 +164,12 @@ Route::post(
 | LIKER OU RETIRER SON LIKE
 |--------------------------------------------------------------------------
 |
-| Seuls les utilisateurs connectés peuvent utiliser cette route.
+| Pour utiliser le système de likes, l'utilisateur doit :
 |
-| Le fonctionnement est de type "toggle" :
+| - être connecté ;
+| - avoir vérifié son adresse email.
 |
-| - si l'utilisateur n'a pas encore liké l'article :
-|   le like est créé ;
-|
-| - s'il a déjà liké l'article :
-|   son like est supprimé.
-|
-| Les visiteurs non connectés pourront voir le nombre de likes,
-| mais ne pourront pas en ajouter.
+| Le fonctionnement reste de type "toggle".
 |
 */
 
@@ -177,7 +177,10 @@ Route::post(
     '/blog/{slug}/like',
     [ArticleLikeController::class, 'toggle']
 )
-    ->middleware('auth')
+    ->middleware([
+        'auth',
+        'verified',
+    ])
     ->name('article.likes.toggle');
 
 
@@ -246,6 +249,19 @@ Route::middleware('guest')->group(function () {
     )->name('register.store');
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | ANCIENNE PAGE DE CONFIRMATION
+    |--------------------------------------------------------------------------
+    |
+    | Cette route est conservée pour le moment afin de ne pas supprimer
+    | brutalement une ancienne fonctionnalité du projet.
+    |
+    | Le nouveau processus d'inscription utilise désormais directement
+    | la vérification de l'adresse email.
+    |
+    */
+
     Route::get('/inscription-reussie', function () {
         return view('register-success');
     })->name('register.success');
@@ -271,6 +287,229 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| VÉRIFICATION DE L'ADRESSE EMAIL
+|--------------------------------------------------------------------------
+|
+| Ces routes utilisent le système natif de vérification fourni
+| par Laravel.
+|
+| Fonctionnement :
+|
+| 1. l'utilisateur s'inscrit ;
+| 2. il reçoit notre email BTT personnalisé ;
+| 3. il clique sur le lien sécurisé ;
+| 4. Laravel vérifie la signature ;
+| 5. email_verified_at reçoit la date de vérification ;
+| 6. notre email de confirmation BTT est envoyé ;
+| 7. l'utilisateur peut accéder à son espace membre.
+|
+*/
+
+
+/*
+|--------------------------------------------------------------------------
+| PAGE DE DEMANDE DE VÉRIFICATION
+|--------------------------------------------------------------------------
+|
+| Cette route doit utiliser uniquement le middleware "auth".
+|
+| Il ne faut surtout pas utiliser "verified" ici puisque cette page
+| est précisément destinée aux utilisateurs qui ne sont pas encore
+| vérifiés.
+|
+*/
+
+Route::get('/email/verification', function (Request $request) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | UTILISATEUR DÉJÀ VÉRIFIÉ
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->user()->hasVerifiedEmail()) {
+        return redirect()->route('member.dashboard');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AFFICHAGE DE LA PAGE DE VÉRIFICATION
+    |--------------------------------------------------------------------------
+    */
+
+    return view('auth.verify-email');
+})
+    ->middleware('auth')
+    ->name('verification.notice');
+
+
+/*
+|--------------------------------------------------------------------------
+| TRAITEMENT DU LIEN DE VÉRIFICATION
+|--------------------------------------------------------------------------
+|
+| Cette route reçoit le lien contenu dans notre email BTT.
+|
+| EmailVerificationRequest contrôle notamment :
+|
+| - l'utilisateur connecté ;
+| - son identifiant ;
+| - le hash de son adresse email ;
+| - la signature du lien ;
+| - la date d'expiration.
+|
+*/
+
+Route::get(
+    '/email/verification/{id}/{hash}',
+    function (EmailVerificationRequest $request) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADRESSE DÉJÀ VÉRIFIÉE
+        |--------------------------------------------------------------------------
+        |
+        | Si le membre clique une deuxième fois sur son lien, nous ne
+        | devons surtout pas lui envoyer une nouvelle confirmation
+        | d'inscription.
+        |
+        */
+
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()
+                ->route('member.dashboard')
+                ->with(
+                    'success',
+                    'Votre adresse email est déjà vérifiée.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION DE L'ADRESSE EMAIL
+        |--------------------------------------------------------------------------
+        |
+        | fulfill() renseigne email_verified_at.
+        |
+        | Laravel considère alors officiellement l'adresse email
+        | comme vérifiée.
+        |
+        */
+
+        $request->fulfill();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | EMAIL DE CONFIRMATION D'INSCRIPTION BTT
+        |--------------------------------------------------------------------------
+        |
+        | L'adresse vient d'être vérifiée avec succès.
+        |
+        | Nous envoyons maintenant notre deuxième email personnalisé :
+        |
+        | "Bienvenue chez Brussels Top Team - Inscription confirmée"
+        |
+        | Cet email n'est donc jamais envoyé avant que l'utilisateur
+        | ait réellement confirmé son adresse.
+        |
+        */
+
+        $request->user()->notify(
+            new RegistrationConfirmedNotification()
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECTION VERS L'ESPACE MEMBRE
+        |--------------------------------------------------------------------------
+        |
+        | email_verified_at étant maintenant renseigné, le middleware
+        | "verified" autorisera l'accès au tableau de bord membre.
+        |
+        */
+
+        return redirect()
+            ->route('member.dashboard')
+            ->with(
+                'success',
+                'Votre adresse email a bien été vérifiée. Bienvenue chez BTT !'
+            );
+    }
+)
+    ->middleware([
+        'auth',
+        'signed',
+        'throttle:6,1',
+    ])
+    ->name('verification.verify');
+
+
+/*
+|--------------------------------------------------------------------------
+| RENVOYER L'EMAIL DE VÉRIFICATION
+|--------------------------------------------------------------------------
+|
+| Cette route correspond au bouton :
+|
+| "Renvoyer l'email de vérification"
+|
+| présent sur auth.verify-email.
+|
+*/
+
+Route::post(
+    '/email/verification-notification',
+    function (Request $request) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADRESSE DÉJÀ VÉRIFIÉE
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('member.dashboard');
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RENVOI DU LIEN
+        |--------------------------------------------------------------------------
+        |
+        | Grâce à la surcharge effectuée dans User.php, cette méthode
+        | utilise maintenant notre VerifyEmailNotification BTT.
+        |
+        */
+
+        $request->user()->sendEmailVerificationNotification();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MESSAGE DE CONFIRMATION
+        |--------------------------------------------------------------------------
+        */
+
+        return back()->with(
+            'status',
+            'verification-link-sent'
+        );
+    }
+)
+    ->middleware([
+        'auth',
+        'throttle:6,1',
+    ])
+    ->name('verification.send');
+
+
+/*
+|--------------------------------------------------------------------------
 | DÉCONNEXION
 |--------------------------------------------------------------------------
 */
@@ -287,9 +526,24 @@ Route::post(
 |--------------------------------------------------------------------------
 | ESPACE ADHÉRENT
 |--------------------------------------------------------------------------
+|
+| L'espace membre nécessite désormais DEUX conditions :
+|
+| 1. auth
+|    L'utilisateur doit être connecté.
+|
+| 2. verified
+|    Son adresse email doit avoir été vérifiée.
+|
+| Un utilisateur connecté mais non vérifié sera automatiquement
+| redirigé par Laravel vers la route "verification.notice".
+|
 */
 
-Route::middleware('auth')
+Route::middleware([
+    'auth',
+    'verified',
+])
     ->prefix('membre')
     ->name('member.')
     ->group(function () {
@@ -338,6 +592,7 @@ Route::middleware('auth')
          * afin que Laravel n'interprète pas "nouveau"
          * comme l'identifiant d'une conversation.
          */
+
         Route::get(
             '/messages/nouveau',
             [MemberMessageController::class, 'create']
@@ -435,6 +690,10 @@ Route::middleware('auth')
 |--------------------------------------------------------------------------
 | CONFIRMATION APRÈS SUPPRESSION DU COMPTE
 |--------------------------------------------------------------------------
+|
+| Cette page reste en dehors du groupe "verified" puisque le compte
+| vient précisément d'être déconnecté et supprimé logiquement.
+|
 */
 
 Route::get('/compte-supprime', function () {
@@ -446,6 +705,20 @@ Route::get('/compte-supprime', function () {
 |--------------------------------------------------------------------------
 | ESPACE ADMINISTRATION
 |--------------------------------------------------------------------------
+|
+| IMPORTANT :
+|
+| Nous ne rajoutons PAS encore le middleware "verified" ici.
+|
+| Les comptes administrateurs existants ont été créés avant la mise
+| en place de la vérification email et certains pourraient donc avoir
+| email_verified_at à NULL.
+|
+| Ajouter "verified" maintenant pourrait bloquer ton propre accès au
+| back-office.
+|
+| Nous traiterons les comptes historiques séparément.
+|
 */
 
 Route::middleware([

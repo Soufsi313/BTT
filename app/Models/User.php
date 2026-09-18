@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -21,14 +24,22 @@ use Illuminate\Notifications\Notifiable;
  * - super administrateurs.
  *
  * Il contient également les relations et méthodes permettant
- * de gérer les rôles, le genre, les likes et maintenant
- * les signalements de commentaires.
+ * de gérer :
+ *
+ * - les rôles ;
+ * - le genre ;
+ * - les likes ;
+ * - les signalements de commentaires ;
+ * - la vérification de l'adresse email.
  *
  * ================================================================
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory;
+    use MustVerifyEmailTrait;
+    use Notifiable;
+    use SoftDeletes;
 
 
     /**
@@ -66,6 +77,15 @@ class User extends Authenticatable
      * ============================================================
      * CONVERSIONS AUTOMATIQUES
      * ============================================================
+     *
+     * email_verified_at :
+     * Laravel convertit automatiquement cette colonne en date.
+     *
+     * password :
+     * Laravel hache automatiquement le mot de passe avant
+     * son enregistrement dans la base de données.
+     *
+     * ============================================================
      */
     protected function casts(): array
     {
@@ -73,6 +93,41 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+
+    /**
+     * ============================================================
+     * ENVOYER L'EMAIL DE VÉRIFICATION BTT
+     * ============================================================
+     *
+     * Laravel appelle automatiquement cette méthode lorsqu'une
+     * vérification d'adresse email doit être envoyée.
+     *
+     * Par défaut, Laravel utilise sa propre notification générique.
+     *
+     * Nous la remplaçons ici par :
+     *
+     * App\Notifications\VerifyEmailNotification
+     *
+     * Cela nous permet d'utiliser notre template personnalisé BTT
+     * tout en conservant le système sécurisé de vérification fourni
+     * par Laravel.
+     *
+     * Le lien reste :
+     *
+     * - temporaire ;
+     * - signé ;
+     * - associé à l'utilisateur ;
+     * - associé à son adresse email.
+     *
+     * ============================================================
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(
+            new VerifyEmailNotification()
+        );
     }
 
 

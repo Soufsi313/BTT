@@ -11,6 +11,25 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
+
+/**
+ * ================================================================
+ * CONTRÔLEUR D'AUTHENTIFICATION
+ * ================================================================
+ *
+ * Ce contrôleur gère notamment :
+ *
+ * - l'inscription ;
+ * - la connexion ;
+ * - la vérification de l'adresse email ;
+ * - le profil de l'adhérent ;
+ * - la modification de l'adresse email ;
+ * - la modification du mot de passe ;
+ * - la suppression logique du compte ;
+ * - la déconnexion.
+ *
+ * ================================================================
+ */
 class AuthController extends Controller
 {
     /*
@@ -18,6 +37,7 @@ class AuthController extends Controller
     | AFFICHER LA PAGE D'INSCRIPTION
     |--------------------------------------------------------------------------
     */
+
     public function showRegister()
     {
         return view('register');
@@ -29,8 +49,15 @@ class AuthController extends Controller
     | ENREGISTRER UN NOUVEL ADHÉRENT
     |--------------------------------------------------------------------------
     */
+
     public function register(Request $request)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION DES DONNÉES
+        |--------------------------------------------------------------------------
+        */
+
         $validated = $request->validate([
             'nom' => [
                 'required',
@@ -78,7 +105,14 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | CRÉATION DU COMPTE
         |--------------------------------------------------------------------------
+        |
+        | email_verified_at reste automatiquement à NULL.
+        |
+        | Le compte existe donc immédiatement, mais son adresse email
+        | n'est pas encore considérée comme vérifiée.
+        |
         */
+
         $user = User::create([
             'nom' => $validated['nom'],
             'prenom' => $validated['prenom'],
@@ -93,7 +127,12 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         | CONNEXION AUTOMATIQUE
         |--------------------------------------------------------------------------
+        |
+        | L'utilisateur doit être authentifié afin que Laravel puisse
+        | associer correctement le lien de vérification à son compte.
+        |
         */
+
         Auth::login($user);
 
         $request->session()->regenerate();
@@ -101,10 +140,30 @@ class AuthController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | REDIRECTION
+        | ENVOI DE L'EMAIL DE VÉRIFICATION
         |--------------------------------------------------------------------------
+        |
+        | Le modèle User implémente maintenant MustVerifyEmail.
+        |
+        | Laravel génère donc une URL temporaire et signée permettant
+        | de vérifier que l'utilisateur possède bien cette adresse.
+        |
         */
-        return redirect()->route('register.success');
+
+        $user->sendEmailVerificationNotification();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECTION VERS LA PAGE DE VÉRIFICATION
+        |--------------------------------------------------------------------------
+        |
+        | L'utilisateur reste connecté mais il est invité à vérifier
+        | son adresse avant de poursuivre.
+        |
+        */
+
+        return redirect()->route('verification.notice');
     }
 
 
@@ -112,7 +171,15 @@ class AuthController extends Controller
     |--------------------------------------------------------------------------
     | PAGE DE CONFIRMATION D'INSCRIPTION
     |--------------------------------------------------------------------------
+    |
+    | Cette méthode est conservée afin de ne pas supprimer brutalement
+    | une fonctionnalité existante du projet.
+    |
+    | Le nouveau processus d'inscription redirige cependant désormais
+    | vers verification.notice.
+    |
     */
+
     public function registerSuccess()
     {
         return view('register-success');
@@ -124,6 +191,7 @@ class AuthController extends Controller
     | AFFICHER LA PAGE DE CONNEXION
     |--------------------------------------------------------------------------
     */
+
     public function showLogin()
     {
         return view('login');
@@ -135,6 +203,7 @@ class AuthController extends Controller
     | CONNECTER UN UTILISATEUR
     |--------------------------------------------------------------------------
     */
+
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -155,6 +224,7 @@ class AuthController extends Controller
         | CLÉ DU LIMITEUR DE TENTATIVES
         |--------------------------------------------------------------------------
         */
+
         $throttleKey =
             Str::lower($credentials['email'])
             . '|'
@@ -166,6 +236,7 @@ class AuthController extends Controller
         | UTILISATEUR DÉJÀ BLOQUÉ
         |--------------------------------------------------------------------------
         */
+
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
 
             $seconds = RateLimiter::availableIn($throttleKey);
@@ -185,6 +256,7 @@ class AuthController extends Controller
         | OPTION "SE SOUVENIR DE MOI"
         |--------------------------------------------------------------------------
         */
+
         $remember = $request->boolean('remember');
 
 
@@ -193,11 +265,35 @@ class AuthController extends Controller
         | TENTATIVE DE CONNEXION
         |--------------------------------------------------------------------------
         */
+
         if (Auth::attempt($credentials, $remember)) {
 
             RateLimiter::clear($throttleKey);
 
             $request->session()->regenerate();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UTILISATEUR NON ENCORE VÉRIFIÉ
+            |--------------------------------------------------------------------------
+            |
+            | Si le compte existe mais que son adresse email n'est pas
+            | encore vérifiée, l'utilisateur est envoyé vers la page
+            | lui permettant de terminer la vérification.
+            |
+            */
+
+            if (! $request->user()->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice');
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UTILISATEUR VÉRIFIÉ
+            |--------------------------------------------------------------------------
+            */
 
             return redirect('/');
         }
@@ -208,6 +304,7 @@ class AuthController extends Controller
         | MAUVAISE TENTATIVE
         |--------------------------------------------------------------------------
         */
+
         RateLimiter::hit(
             $throttleKey,
             90
@@ -219,6 +316,7 @@ class AuthController extends Controller
         | CINQUIÈME MAUVAISE TENTATIVE
         |--------------------------------------------------------------------------
         */
+
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
 
             $seconds = RateLimiter::availableIn($throttleKey);
@@ -238,6 +336,7 @@ class AuthController extends Controller
         | ERREUR DE CONNEXION
         |--------------------------------------------------------------------------
         */
+
         return back()
             ->withInput($request->only('email'))
             ->withErrors([
@@ -251,6 +350,7 @@ class AuthController extends Controller
     | AFFICHER LE PROFIL DE L'ADHÉRENT
     |--------------------------------------------------------------------------
     */
+
     public function showProfile()
     {
         return view('member.profile');
@@ -262,6 +362,7 @@ class AuthController extends Controller
     | METTRE À JOUR LE PROFIL DE L'ADHÉRENT
     |--------------------------------------------------------------------------
     */
+
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -316,6 +417,7 @@ class AuthController extends Controller
     | AFFICHER LA PAGE DE MODIFICATION DE L'EMAIL
     |--------------------------------------------------------------------------
     */
+
     public function showEmail()
     {
         return view('member.email');
@@ -327,6 +429,7 @@ class AuthController extends Controller
     | METTRE À JOUR L'ADRESSE EMAIL
     |--------------------------------------------------------------------------
     */
+
     public function updateEmail(Request $request)
     {
         $user = $request->user();
@@ -351,6 +454,7 @@ class AuthController extends Controller
         | VÉRIFICATION DU MOT DE PASSE ACTUEL
         |--------------------------------------------------------------------------
         */
+
         if (! Hash::check(
             $validated['current_password'],
             $user->password
@@ -368,18 +472,72 @@ class AuthController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | ADRESSE EMAIL IDENTIQUE
+        |--------------------------------------------------------------------------
+        |
+        | Si l'utilisateur soumet exactement la même adresse que celle
+        | déjà enregistrée, nous ne devons pas remettre inutilement
+        | email_verified_at à NULL.
+        |
+        */
+
+        if (
+            Str::lower($validated['email'])
+            === Str::lower($user->email)
+        ) {
+            return redirect()
+                ->route('member.email')
+                ->with(
+                    'success',
+                    'Votre adresse email est déjà à jour.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
         | MISE À JOUR DE L'EMAIL
         |--------------------------------------------------------------------------
+        |
+        | Dès que l'adresse change, l'ancienne vérification ne doit plus
+        | être considérée comme valable.
+        |
+        | email_verified_at est donc remis à NULL.
+        |
         */
+
         $user->update([
             'email' => $validated['email'],
+            'email_verified_at' => null,
         ]);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | ENVOI DU NOUVEAU LIEN DE VÉRIFICATION
+        |--------------------------------------------------------------------------
+        |
+        | Un nouveau lien est envoyé vers la nouvelle adresse email.
+        |
+        */
+
+        $user->sendEmailVerificationNotification();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECTION
+        |--------------------------------------------------------------------------
+        |
+        | L'utilisateur doit maintenant confirmer sa nouvelle adresse.
+        |
+        */
+
         return redirect()
-            ->route('member.email')
+            ->route('verification.notice')
             ->with(
-                'success',
-                'Votre adresse email a bien été mise à jour.'
+                'status',
+                'verification-link-sent'
             );
     }
 
@@ -389,6 +547,7 @@ class AuthController extends Controller
     | AFFICHER LA PAGE DE MODIFICATION DU MOT DE PASSE
     |--------------------------------------------------------------------------
     */
+
     public function showPassword()
     {
         return view('member.password');
@@ -400,6 +559,7 @@ class AuthController extends Controller
     | METTRE À JOUR LE MOT DE PASSE
     |--------------------------------------------------------------------------
     */
+
     public function updatePassword(Request $request)
     {
         $user = $request->user();
@@ -424,6 +584,7 @@ class AuthController extends Controller
         | VÉRIFICATION DU MOT DE PASSE ACTUEL
         |--------------------------------------------------------------------------
         */
+
         if (! Hash::check(
             $validated['current_password'],
             $user->password
@@ -441,6 +602,7 @@ class AuthController extends Controller
         | EMPÊCHER LA RÉUTILISATION DU MÊME MOT DE PASSE
         |--------------------------------------------------------------------------
         */
+
         if (Hash::check(
             $validated['password'],
             $user->password
@@ -458,6 +620,7 @@ class AuthController extends Controller
         | MISE À JOUR DU MOT DE PASSE
         |--------------------------------------------------------------------------
         */
+
         $user->update([
             'password' => $validated['password'],
         ]);
@@ -468,6 +631,7 @@ class AuthController extends Controller
         | RENOUVELLEMENT DE LA SESSION
         |--------------------------------------------------------------------------
         */
+
         $request->session()->regenerate();
 
 
@@ -485,6 +649,7 @@ class AuthController extends Controller
     | AFFICHER LA PAGE DE SUPPRESSION DU COMPTE
     |--------------------------------------------------------------------------
     */
+
     public function showDeleteAccount()
     {
         return view('member.delete-account');
@@ -496,6 +661,7 @@ class AuthController extends Controller
     | SUPPRIMER LOGIQUEMENT LE COMPTE
     |--------------------------------------------------------------------------
     */
+
     public function deleteAccount(Request $request)
     {
         /*
@@ -503,6 +669,7 @@ class AuthController extends Controller
         | UTILISATEUR CONNECTÉ
         |--------------------------------------------------------------------------
         */
+
         $user = $request->user();
 
 
@@ -511,6 +678,7 @@ class AuthController extends Controller
         | VALIDATION
         |--------------------------------------------------------------------------
         */
+
         $validated = $request->validate([
             'current_password' => [
                 'required',
@@ -524,6 +692,7 @@ class AuthController extends Controller
         | VÉRIFICATION DU MOT DE PASSE
         |--------------------------------------------------------------------------
         */
+
         if (! Hash::check(
             $validated['current_password'],
             $user->password
@@ -549,6 +718,7 @@ class AuthController extends Controller
         | Le compte n'est ensuite plus considéré comme actif par Laravel.
         |
         */
+
         $user->delete();
 
 
@@ -557,6 +727,7 @@ class AuthController extends Controller
         | DÉCONNEXION IMMÉDIATE
         |--------------------------------------------------------------------------
         */
+
         Auth::logout();
 
 
@@ -565,6 +736,7 @@ class AuthController extends Controller
         | INVALIDATION DE LA SESSION
         |--------------------------------------------------------------------------
         */
+
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
@@ -575,6 +747,7 @@ class AuthController extends Controller
         | PAGE DE CONFIRMATION
         |--------------------------------------------------------------------------
         */
+
         return redirect()->route('account.deleted');
     }
 
@@ -584,6 +757,7 @@ class AuthController extends Controller
     | PAGE DE CONFIRMATION DE SUPPRESSION
     |--------------------------------------------------------------------------
     */
+
     public function accountDeleted()
     {
         return view('member.account-deleted');
@@ -595,6 +769,7 @@ class AuthController extends Controller
     | DÉCONNEXION
     |--------------------------------------------------------------------------
     */
+
     public function logout(Request $request)
     {
         Auth::logout();

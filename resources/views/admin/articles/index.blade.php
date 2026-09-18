@@ -236,6 +236,275 @@
 
 
                     <!-- =========================================
+                         STATISTIQUES DES ARTICLES
+                         =========================================
+
+                         Les compteurs ci-dessous sont indépendants
+                         du tri et de la pagination du tableau.
+
+                         Total :
+                         tous les articles, y compris ceux supprimés.
+
+                         Publiés / Brouillons / À la une :
+                         uniquement les articles non supprimés.
+
+                         Supprimés :
+                         uniquement les articles archivés avec
+                         SoftDeletes.
+
+                         ========================================= -->
+                    <section class="mb-8">
+
+                        <div
+                            class="
+                                grid
+                                gap-4
+                                sm:grid-cols-2
+                                xl:grid-cols-5
+                            "
+                        >
+
+
+                            <!-- =================================
+                                 TOTAL
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Total des articles
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $totalArticlesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Tous statuts confondus.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 PUBLIÉS
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Publiés
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $publishedArticlesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Articles actuellement publiés.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 BROUILLONS
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Brouillons
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $draftArticlesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Articles non encore publiés.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 À LA UNE
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    À la une
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-red-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $featuredArticlesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Articles actuellement mis en avant.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 SUPPRIMÉS
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Supprimés
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-red-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $deletedArticlesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Articles archivés temporairement.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =========================================
                          TABLEAU DES ARTICLES
                          ========================================= -->
                     <div

@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
  *
  * - d'afficher la liste des articles ;
  * - d'afficher les articles supprimés ;
+ * - d'afficher les statistiques des articles ;
  * - de trier les articles ;
  * - d'afficher le formulaire de création ;
  * - d'enregistrer un nouvel article ;
@@ -101,6 +102,88 @@ class AdminArticleController extends Controller
 
         /**
          * -----------------------------------------------------------
+         * STATISTIQUES DES ARTICLES
+         * -----------------------------------------------------------
+         *
+         * Les statistiques sont calculées indépendamment :
+         *
+         * - du tri du tableau ;
+         * - de la pagination.
+         *
+         * Le total comprend également les articles supprimés
+         * grâce à withTrashed().
+         *
+         * Les compteurs Publiés, Brouillons et À la une excluent
+         * volontairement les articles supprimés.
+         *
+         * Les articles supprimés disposent de leur propre compteur.
+         */
+
+
+        /**
+         * Nombre total d'articles.
+         *
+         * Comprend :
+         *
+         * - les articles publiés ;
+         * - les brouillons ;
+         * - les articles supprimés.
+         */
+        $totalArticlesCount = Article::withTrashed()
+            ->count();
+
+
+        /**
+         * Nombre d'articles actuellement publiés.
+         *
+         * Article::query() exclut automatiquement les articles
+         * supprimés par SoftDeletes.
+         */
+        $publishedArticlesCount = Article::query()
+            ->where(
+                'status',
+                'published'
+            )
+            ->count();
+
+
+        /**
+         * Nombre d'articles actuellement enregistrés
+         * comme brouillons.
+         */
+        $draftArticlesCount = Article::query()
+            ->where(
+                'status',
+                'draft'
+            )
+            ->count();
+
+
+        /**
+         * Nombre d'articles actuellement mis en avant.
+         *
+         * Les articles supprimés ne sont pas comptabilisés.
+         */
+        $featuredArticlesCount = Article::query()
+            ->where(
+                'is_featured',
+                true
+            )
+            ->count();
+
+
+        /**
+         * Nombre d'articles supprimés temporairement.
+         *
+         * onlyTrashed() récupère uniquement les articles dont
+         * la colonne deleted_at contient une date.
+         */
+        $deletedArticlesCount = Article::onlyTrashed()
+            ->count();
+
+
+        /**
+         * -----------------------------------------------------------
          * RÉCUPÉRATION DES ARTICLES
          * -----------------------------------------------------------
          *
@@ -131,8 +214,23 @@ class AdminArticleController extends Controller
             'admin.articles.index',
             [
                 'articles' => $articles,
+
                 'sort' => $sort,
+
                 'direction' => $direction,
+
+                /**
+                 * Statistiques globales des articles.
+                 */
+                'totalArticlesCount' => $totalArticlesCount,
+
+                'publishedArticlesCount' => $publishedArticlesCount,
+
+                'draftArticlesCount' => $draftArticlesCount,
+
+                'featuredArticlesCount' => $featuredArticlesCount,
+
+                'deletedArticlesCount' => $deletedArticlesCount,
             ]
         );
     }

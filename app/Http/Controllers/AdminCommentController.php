@@ -16,9 +16,10 @@ use Illuminate\View\View;
  * Ce contrôleur permet aux administrateurs de gérer les commentaires
  * publiés sous les articles du blog Brussels Top Team.
  *
- * Il permettra notamment :
+ * Il permet notamment :
  *
  * - d'afficher la liste des commentaires ;
+ * - d'afficher les statistiques des commentaires ;
  * - de trier les commentaires ;
  * - de masquer un commentaire ;
  * - de réafficher un commentaire ;
@@ -105,6 +106,92 @@ class AdminCommentController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | STATISTIQUES DES COMMENTAIRES
+        |--------------------------------------------------------------------------
+        |
+        | Ces statistiques sont totalement indépendantes :
+        |
+        | - du tri actuellement appliqué au tableau ;
+        | - de la pagination.
+        |
+        | Le compteur total inclut également les commentaires supprimés
+        | logiquement grâce à withTrashed().
+        |
+        | Les compteurs "Publiés" et "Masqués" concernent uniquement
+        | les commentaires qui ne sont pas supprimés.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL DES COMMENTAIRES
+        |--------------------------------------------------------------------------
+        |
+        | Comprend :
+        |
+        | - les commentaires publiés ;
+        | - les commentaires masqués ;
+        | - les commentaires supprimés logiquement.
+        |
+        */
+
+        $totalCommentsCount = Comment::withTrashed()
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COMMENTAIRES PUBLIÉS
+        |--------------------------------------------------------------------------
+        |
+        | Comment::query() exclut automatiquement les commentaires
+        | supprimés grâce au scope SoftDeletes de Laravel.
+        |
+        */
+
+        $publishedCommentsCount = Comment::query()
+            ->where(
+                'status',
+                'published'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COMMENTAIRES MASQUÉS
+        |--------------------------------------------------------------------------
+        |
+        | Un commentaire masqué reste présent dans la base de données
+        | mais n'est plus visible publiquement.
+        |
+        */
+
+        $hiddenCommentsCount = Comment::query()
+            ->where(
+                'status',
+                'hidden'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COMMENTAIRES SUPPRIMÉS
+        |--------------------------------------------------------------------------
+        |
+        | onlyTrashed() récupère uniquement les commentaires supprimés
+        | logiquement et possédant donc une valeur dans deleted_at.
+        |
+        */
+
+        $deletedCommentsCount = Comment::onlyTrashed()
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
         | RÉCUPÉRATION DES COMMENTAIRES
         |--------------------------------------------------------------------------
         |
@@ -142,8 +229,24 @@ class AdminCommentController extends Controller
             'admin.comments.index',
             [
                 'comments' => $comments,
+
                 'sort' => $sort,
+
                 'direction' => $direction,
+
+                /*
+                |--------------------------------------------------------------------------
+                | STATISTIQUES TRANSMISES À LA VUE
+                |--------------------------------------------------------------------------
+                */
+
+                'totalCommentsCount' => $totalCommentsCount,
+
+                'publishedCommentsCount' => $publishedCommentsCount,
+
+                'hiddenCommentsCount' => $hiddenCommentsCount,
+
+                'deletedCommentsCount' => $deletedCommentsCount,
             ]
         );
     }

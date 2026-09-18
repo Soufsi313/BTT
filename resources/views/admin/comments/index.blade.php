@@ -151,7 +151,7 @@
                                     text-zinc-900
                                 "
                             >
-                                {{ $comments->total() }}
+                                {{ $totalCommentsCount }}
                             </p>
 
                         </div>
@@ -256,6 +256,221 @@
                         </p>
 
                     </div>
+
+
+                    <!-- =========================================
+                         STATISTIQUES DES COMMENTAIRES
+                         =========================================
+                         
+                         Les compteurs sont indépendants du tri
+                         et de la pagination du tableau.
+                         
+                         Le total comprend également les commentaires
+                         supprimés logiquement.
+                         
+                         ========================================= -->
+                    <section class="mb-8">
+
+                        <div
+                            class="
+                                grid
+                                gap-4
+                                sm:grid-cols-2
+                                xl:grid-cols-4
+                            "
+                        >
+
+
+                            <!-- =================================
+                                 TOTAL
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Total des commentaires
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $totalCommentsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Tous statuts confondus.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 PUBLIÉS
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Publiés
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $publishedCommentsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Commentaires visibles publiquement.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 MASQUÉS
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Masqués
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-amber-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $hiddenCommentsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Commentaires masqués au public.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 SUPPRIMÉS
+                                 ================================= -->
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Supprimés
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-red-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $deletedCommentsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Commentaires supprimés temporairement.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </section>
 
 
                     <!-- =========================================

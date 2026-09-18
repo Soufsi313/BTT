@@ -115,6 +115,26 @@
 
         /*
         |--------------------------------------------------------------------------
+        | TYPE OPEN GRAPH
+        |--------------------------------------------------------------------------
+        |
+        | Les pages classiques utilisent "website".
+        |
+        | Une page particulière, comme un article du blog, peut remplacer
+        | cette valeur grâce à la section Blade "og_type".
+        |
+        */
+
+        $seoOgType = trim(
+            $__env->yieldContent(
+                'og_type',
+                'website'
+            )
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
         | PAGES À NE PAS INDEXER
         |--------------------------------------------------------------------------
         |
@@ -206,7 +226,7 @@
 
     <meta
         property="og:type"
-        content="website"
+        content="{{ $seoOgType }}"
     >
 
     <meta

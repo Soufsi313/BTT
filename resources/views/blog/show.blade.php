@@ -1,12 +1,53 @@
 @extends('layouts.app')
 
 
-@section('title', $article->title . ' - Brussels Top Team')
+<!-- =========================================================
+     SEO DYNAMIQUE DE L'ARTICLE
+     =========================================================
+     Chaque article possède ses propres informations SEO :
+
+     - titre ;
+     - description ;
+     - URL canonique ;
+     - image de partage ;
+     - type Open Graph "article".
+
+     Aucun de ces éléments ne modifie l'affichage visuel de la page.
+     ========================================================= -->
+
+@section(
+    'title',
+    $article->title . ' | Brussels Top Team'
+)
 
 
 @section(
     'meta_description',
     $article->excerpt
+        ?: \Illuminate\Support\Str::limit(
+            trim(strip_tags($article->content)),
+            155
+        )
+)
+
+
+@section(
+    'canonical',
+    route('blog.show', $article->slug)
+)
+
+
+@section(
+    'meta_image',
+    $article->banner_image
+        ? asset('storage/' . $article->banner_image)
+        : asset('images/BTTbanniere.png')
+)
+
+
+@section(
+    'og_type',
+    'article'
 )
 
 

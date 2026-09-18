@@ -94,6 +94,86 @@ class AdminMemberController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | STATISTIQUES DES ADHÉRENTS
+        |--------------------------------------------------------------------------
+        |
+        | Super Admin :
+        | - statistiques globales Hommes + Femmes.
+        |
+        | Admin normal :
+        | - statistiques limitées à son propre genre.
+        |
+        | Le filtre manuel "genre" du Super Admin reste réservé au tableau
+        | et ne modifie pas les statistiques générales affichées en haut.
+        |
+        */
+        $memberStatisticsQuery = User::withTrashed()
+            ->where('role', 'adherent');
+
+        if (! $admin->isSuperAdmin()) {
+            $memberStatisticsQuery->where(
+                'genre',
+                $admin->genre
+            );
+        }
+
+
+        /*
+        | Total = comptes actifs + comptes archivés.
+        */
+        $totalMembersCount = (clone $memberStatisticsQuery)
+            ->count();
+
+
+        /*
+        | Comptes actuellement actifs.
+        */
+        $activeMembersCount = (clone $memberStatisticsQuery)
+            ->withoutTrashed()
+            ->count();
+
+
+        /*
+        | Comptes archivés avec SoftDeletes.
+        */
+        $archivedMembersCount = (clone $memberStatisticsQuery)
+            ->onlyTrashed()
+            ->count();
+
+
+        /*
+        | Nouveaux adhérents actifs inscrits pendant le mois en cours.
+        */
+        $newMembersThisMonthCount = (clone $memberStatisticsQuery)
+            ->withoutTrashed()
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
+
+
+        /*
+        | Répartition Hommes / Femmes.
+        |
+        | Ces données sont uniquement destinées au Super Admin.
+        */
+        $maleMembersCount = null;
+        $femaleMembersCount = null;
+
+        if ($admin->isSuperAdmin()) {
+            $maleMembersCount = User::withTrashed()
+                ->where('role', 'adherent')
+                ->where('genre', 'homme')
+                ->count();
+
+            $femaleMembersCount = User::withTrashed()
+                ->where('role', 'adherent')
+                ->where('genre', 'femme')
+                ->count();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
         | REQUÊTE DES ADHÉRENTS
         |--------------------------------------------------------------------------
         |
@@ -180,6 +260,18 @@ class AdminMemberController extends Controller
                 'search' => $search,
                 'sort' => $sort,
                 'gender' => $gender,
+
+                /*
+                |--------------------------------------------------------------------------
+                | STATISTIQUES
+                |--------------------------------------------------------------------------
+                */
+                'totalMembersCount' => $totalMembersCount,
+                'activeMembersCount' => $activeMembersCount,
+                'archivedMembersCount' => $archivedMembersCount,
+                'newMembersThisMonthCount' => $newMembersThisMonthCount,
+                'maleMembersCount' => $maleMembersCount,
+                'femaleMembersCount' => $femaleMembersCount,
             ]
         );
     }
@@ -321,7 +413,6 @@ class AdminMemberController extends Controller
     | - les Admins Femmes.
     |
     | Le Super Admin peut :
-    |
     | - effectuer une recherche ;
     | - filtrer par genre ;
     | - trier alphabétiquement ;

@@ -15,11 +15,13 @@
     <!-- =========================================================
          ESPACE ADMINISTRATION - GESTION DES ADHÉRENTS
          =========================================================
+
          Cette page utilise désormais la barre latérale commune
          de l'administration.
 
          Toute la logique existante de gestion des adhérents est
          conservée :
+
          - recherche ;
          - tri ;
          - filtre par genre pour le Super Admin ;
@@ -27,13 +29,19 @@
          - réactivation des comptes ;
          - promotion en administrateur ;
          - pagination.
+
+         La page affiche également les statistiques relatives
+         aux adhérents accessibles par l'administrateur connecté.
+
          ========================================================= -->
+
     <section class="min-h-screen bg-white text-zinc-900">
 
         <div class="flex min-h-screen">
 
 
             {{--
+
             |--------------------------------------------------------------------------
             | BARRE LATÉRALE COMMUNE
             |--------------------------------------------------------------------------
@@ -46,6 +54,7 @@
             | l'administrateur navigue entre les différentes sections.
             |
             |--------------------------------------------------------------------------
+
             --}}
 
             @include('admin.partials.sidebar')
@@ -54,6 +63,7 @@
             <!-- =================================================
                  CONTENU PRINCIPAL
                  ================================================= -->
+
             <div class="min-w-0 flex-1">
 
                 <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -62,6 +72,7 @@
                     <!-- =================================================
                          EN-TÊTE
                          ================================================= -->
+
                     <div
                         class="
                             flex
@@ -125,12 +136,15 @@
                         <!-- =========================================
                              RETOUR AU TABLEAU DE BORD
                              =========================================
+
                              Ce bouton existait déjà dans la page.
 
                              Nous le conservons même si le tableau de bord
                              est désormais également accessible directement
                              depuis la barre latérale.
+
                              ========================================= -->
+
                         <a
                             href="{{ route('admin.dashboard') }}"
                             class="
@@ -159,6 +173,7 @@
                     <!-- =================================================
                          MESSAGE DE SUCCÈS
                          ================================================= -->
+
                     @if (session('success'))
 
                         <div
@@ -184,6 +199,7 @@
                     <!-- =================================================
                          INFORMATIONS SUR LES DROITS
                          ================================================= -->
+
                     <div class="mt-8">
 
                         @if (auth()->user()->isSuperAdmin())
@@ -242,8 +258,378 @@
 
 
                     <!-- =================================================
+                         STATISTIQUES DES ADHÉRENTS
+                         =================================================
+
+                         Les statistiques respectent les droits du compte
+                         administrateur actuellement connecté.
+
+                         Super Admin :
+                         - statistiques globales ;
+                         - répartition Hommes / Femmes.
+
+                         Admin normal :
+                         - statistiques limitées au genre de son compte.
+
+                         Le filtre de genre présent plus bas dans la page
+                         ne modifie volontairement pas ces indicateurs.
+
+                         ================================================= -->
+
+                    <section class="mt-8">
+
+                        <div
+                            class="
+                                grid
+                                gap-4
+                                sm:grid-cols-2
+                                xl:grid-cols-4
+                            "
+                        >
+
+
+                            <!-- =========================================
+                                 TOTAL DES ADHÉRENTS
+                                 ========================================= -->
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Total adhérents
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $totalMembersCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+
+                                    @if (auth()->user()->isSuperAdmin())
+
+                                        Hommes et femmes, actifs et archivés.
+
+                                    @else
+
+                                        Catégorie
+                                        {{ ucfirst(auth()->user()->genre) }},
+                                        actifs et archivés.
+
+                                    @endif
+
+                                </p>
+
+                            </div>
+
+
+                            <!-- =========================================
+                                 ADHÉRENTS ACTIFS
+                                 ========================================= -->
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Actifs
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $activeMembersCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Comptes actuellement actifs.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =========================================
+                                 ADHÉRENTS ARCHIVÉS
+                                 ========================================= -->
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Archivés
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $archivedMembersCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Comptes supprimés logiquement.
+                                </p>
+
+                            </div>
+
+
+                            <!-- =========================================
+                                 NOUVEAUX ADHÉRENTS DU MOIS
+                                 ========================================= -->
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Nouveaux ce mois
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-red-600
+                                    "
+                                >
+                                    +{{ number_format(
+                                        $newMembersThisMonthCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Inscriptions actives du mois en cours.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =============================================
+                             RÉPARTITION PAR GENRE - SUPER ADMIN
+                             =============================================
+
+                             Cette partie n'est visible que par le
+                             Super Admin.
+
+                             Les Admins standards restent limités à leur
+                             propre catégorie de genre.
+
+                             ============================================= -->
+
+                        @if (auth()->user()->isSuperAdmin())
+
+                            <div
+                                class="
+                                    mt-4
+                                    grid
+                                    gap-4
+                                    sm:grid-cols-2
+                                "
+                            >
+
+
+                                <!-- HOMMES -->
+
+                                <div
+                                    class="
+                                        flex
+                                        items-center
+                                        justify-between
+                                        gap-4
+                                        border
+                                        border-zinc-200
+                                        bg-zinc-50
+                                        px-5
+                                        py-4
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-zinc-600
+                                        "
+                                    >
+                                        Hommes
+                                    </span>
+
+
+                                    <span
+                                        class="
+                                            text-lg
+                                            font-black
+                                            text-zinc-900
+                                        "
+                                    >
+                                        {{ number_format(
+                                            $maleMembersCount,
+                                            0,
+                                            ',',
+                                            ' '
+                                        ) }}
+                                    </span>
+
+                                </div>
+
+
+                                <!-- FEMMES -->
+
+                                <div
+                                    class="
+                                        flex
+                                        items-center
+                                        justify-between
+                                        gap-4
+                                        border
+                                        border-zinc-200
+                                        bg-zinc-50
+                                        px-5
+                                        py-4
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-zinc-600
+                                        "
+                                    >
+                                        Femmes
+                                    </span>
+
+
+                                    <span
+                                        class="
+                                            text-lg
+                                            font-black
+                                            text-zinc-900
+                                        "
+                                    >
+                                        {{ number_format(
+                                            $femaleMembersCount,
+                                            0,
+                                            ',',
+                                            ' '
+                                        ) }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        @endif
+
+                    </section>
+
+
+                    <!-- =================================================
                          RECHERCHE ET FILTRES
                          ================================================= -->
+
                     <form
                         id="members-filter-form"
                         action="{{ route('admin.members.index') }}"
@@ -271,6 +657,7 @@
                             <!-- =========================================
                                  RECHERCHE
                                  ========================================= -->
+
                             <div
                                 class="
                                     md:col-span-2
@@ -325,6 +712,7 @@
                             <!-- =========================================
                                  TRI AUTOMATIQUE
                                  ========================================= -->
+
                             <div>
 
                                 <label
@@ -386,6 +774,7 @@
                             <!-- =========================================
                                  GENRE - SUPER ADMIN
                                  ========================================= -->
+
                             @if (auth()->user()->isSuperAdmin())
 
                                 <div>
@@ -461,6 +850,7 @@
                         <!-- =============================================
                              ACTIONS DE RECHERCHE
                              ============================================= -->
+
                         <div
                             class="
                                 mt-5
@@ -527,6 +917,7 @@
                     <!-- =================================================
                          LISTE DES ADHÉRENTS
                          ================================================= -->
+
                     <section class="mt-10">
 
                         <div
@@ -554,12 +945,14 @@
 
 
                             <p class="text-sm font-bold text-zinc-500">
+
                                 {{ $members->total() }}
 
                                 {{ $members->total() > 1
                                     ? 'adhérents trouvés'
                                     : 'adhérent trouvé'
                                 }}
+
                             </p>
 
                         </div>
@@ -568,6 +961,7 @@
                         <!-- =============================================
                              TABLEAU
                              ============================================= -->
+
                         <div
                             class="
                                 mt-5
@@ -713,6 +1107,7 @@
                                             <!-- =========================
                                                  IDENTITÉ
                                                  ========================= -->
+
                                             <td class="whitespace-nowrap px-5 py-4">
 
                                                 <p class="text-sm font-bold text-zinc-900">
@@ -731,6 +1126,7 @@
                                             <!-- =========================
                                                  PSEUDO
                                                  ========================= -->
+
                                             <td
                                                 class="
                                                     whitespace-nowrap
@@ -748,6 +1144,7 @@
                                             <!-- =========================
                                                  EMAIL
                                                  ========================= -->
+
                                             <td
                                                 class="
                                                     whitespace-nowrap
@@ -764,6 +1161,7 @@
                                             <!-- =========================
                                                  GENRE
                                                  ========================= -->
+
                                             <td class="whitespace-nowrap px-5 py-4">
 
                                                 <span
@@ -789,6 +1187,7 @@
                                             <!-- =========================
                                                  STATUT
                                                  ========================= -->
+
                                             <td class="whitespace-nowrap px-5 py-4">
 
                                                 @if ($member->trashed())
@@ -837,6 +1236,7 @@
                                             <!-- =========================
                                                  DATE D'INSCRIPTION
                                                  ========================= -->
+
                                             <td
                                                 class="
                                                     whitespace-nowrap
@@ -853,6 +1253,7 @@
                                             <!-- =========================
                                                  ACTIONS SUPER ADMIN
                                                  ========================= -->
+
                                             @if (auth()->user()->isSuperAdmin())
 
                                                 <td class="whitespace-nowrap px-5 py-4 text-right">
@@ -861,6 +1262,7 @@
                                                     <!-- =================
                                                          COMPTE SUPPRIMÉ
                                                          ================= -->
+
                                                     @if ($member->trashed())
 
                                                         <form
@@ -872,6 +1274,7 @@
                                                         >
 
                                                             @csrf
+
                                                             @method('PATCH')
 
 
@@ -900,6 +1303,7 @@
                                                     <!-- =================
                                                          COMPTE ACTIF
                                                          ================= -->
+
                                                     @else
 
                                                         <form
@@ -916,6 +1320,7 @@
                                                         >
 
                                                             @csrf
+
                                                             @method('PATCH')
 
 
@@ -982,6 +1387,7 @@
                         <!-- =============================================
                              PAGINATION
                              ============================================= -->
+
                         @if ($members->hasPages())
 
                             <div class="mt-6">

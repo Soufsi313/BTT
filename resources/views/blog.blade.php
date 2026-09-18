@@ -1,12 +1,22 @@
 @extends('layouts.app')
 
 
-@section('title', 'Blog - Brussels Top Team')
+<!-- =========================================================
+     SEO : PAGE BLOG
+     =========================================================
+     Le titre et la description permettent aux moteurs de
+     recherche d'identifier clairement cette page comme le
+     centre des actualités publiques de Brussels Top Team.
+     ========================================================= -->
+@section(
+    'title',
+    'Blog | Actualités Brussels Top Team à Bruxelles'
+)
 
 
 @section(
     'meta_description',
-    'Découvrez les actualités, événements et informations du Brussels Top Team.'
+    'Retrouvez les actualités de Brussels Top Team à Bruxelles : événements, boxe, HYROX, futsal, vie de l’association et informations du club.'
 )
 
 

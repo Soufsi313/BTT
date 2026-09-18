@@ -1,11 +1,25 @@
 @extends('layouts.app')
 
-@section('title', 'Nos disciplines - Brussels Top Team')
+
+<!-- =========================================================
+     SEO : PAGE DISCIPLINES
+     =========================================================
+     Le titre et la description indiquent clairement aux moteurs
+     de recherche :
+     - les principales disciplines proposées par BTT ;
+     - la localisation à Bruxelles ;
+     - le nom de l'association.
+     ========================================================= -->
+@section(
+    'title',
+    'Disciplines | Boxe, HYROX et Futsal à Bruxelles | BTT'
+)
 
 @section(
     'meta_description',
-    'Découvrez les disciplines proposées par Brussels Top Team à Bruxelles : futsal, HYROX, boxe anglaise hommes et boxe anglaise femmes.'
+    'Découvrez les disciplines de Brussels Top Team à Bruxelles : boxe anglaise hommes et femmes, HYROX, fitness et futsal avec des séances encadrées.'
 )
+
 
 @section('content')
 
@@ -61,7 +75,13 @@
                 Brussels Top Team
             </p>
 
-            <!-- Titre principal -->
+            <!-- =================================================
+                 TITRE PRINCIPAL
+                 =================================================
+                 Un seul H1 est utilisé sur cette page.
+                 Les différentes disciplines utilisent ensuite
+                 chacune un H2.
+                 ================================================= -->
             <h1
                 class="
                     mt-4
@@ -88,9 +108,10 @@
                     text-zinc-400
                 "
             >
-                Brussels Top Team propose plusieurs disciplines sportives
-                permettant de développer la technique, la condition physique,
-                l'endurance et l'esprit d'équipe dans un cadre encadré.
+                Brussels Top Team propose à Bruxelles plusieurs disciplines
+                sportives : futsal, HYROX et boxe anglaise pour hommes et femmes,
+                avec des séances encadrées permettant de développer la technique,
+                la condition physique, l'endurance et l'esprit d'équipe.
             </p>
 
         </div>
@@ -124,7 +145,7 @@
 
                     <img
                         src="{{ asset('images/BTTfutsal.png') }}"
-                        alt="Brussels Top Team Futsal"
+                        alt="Équipe de futsal Brussels Top Team à Bruxelles"
                         class="
                             absolute
                             inset-0
@@ -306,7 +327,7 @@
 
                     <img
                         src="{{ asset('images/BTThyrox.png') }}"
-                        alt="Entraînement HYROX Brussels Top Team"
+                        alt="Entraînement HYROX Brussels Top Team à Bruxelles"
                         class="
                             absolute
                             inset-0
@@ -343,7 +364,7 @@
 
                     <img
                         src="{{ asset('images/BTTring.jpg') }}"
-                        alt="Salle de boxe Brussels Top Team"
+                        alt="Salle de boxe anglaise Brussels Top Team à Bruxelles"
                         class="
                             absolute
                             inset-0
@@ -535,7 +556,7 @@
 
                     <img
                         src="{{ asset('images/BTTgirl2.jpg') }}"
-                        alt="BTT Boxe Femmes"
+                        alt="Séance de boxe anglaise femmes Brussels Top Team à Bruxelles"
                         class="
                             absolute
                             inset-0

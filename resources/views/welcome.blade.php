@@ -1,11 +1,27 @@
 @extends('layouts.app')
 
-@section('title', 'Brussels Top Team')
+
+<!-- =========================================================
+     SEO : PAGE D'ACCUEIL
+     =========================================================
+     Le titre et la description sont spécifiques à l'accueil.
+
+     Le titre permet aux moteurs de recherche de comprendre
+     immédiatement :
+     - le nom de l'association ;
+     - les principales activités ;
+     - la localisation à Bruxelles.
+     ========================================================= -->
+@section(
+    'title',
+    'Brussels Top Team | Boxe, HYROX et Futsal à Bruxelles'
+)
 
 @section(
     'meta_description',
-    'Découvrez Brussels Top Team, ses disciplines sportives, ses coachs et ses activités à Bruxelles.'
+    'Découvrez Brussels Top Team à Bruxelles : boxe anglaise hommes et femmes, HYROX, fitness et futsal, avec des séances sportives encadrées.'
 )
+
 
 @section('content')
 
@@ -14,12 +30,29 @@
          ========================================================= -->
     <section class="relative w-full overflow-hidden bg-black">
 
+        <!-- =====================================================
+             TITRE PRINCIPAL SEO
+             =====================================================
+             Le titre principal est présent dans le HTML afin que
+             les moteurs de recherche et les technologies
+             d'assistance puissent identifier clairement le sujet
+             de la page.
+
+             Il reste visuellement masqué avec "sr-only" puisque
+             le titre principal fait déjà partie de la bannière.
+             ===================================================== -->
+        <h1 class="sr-only">
+            Brussels Top Team - Boxe, HYROX, fitness et futsal à Bruxelles
+        </h1>
+
+
         <!-- Bannière principale du site BTT -->
         <img
             src="{{ asset('images/BTTbanniere.png') }}"
             alt="Brussels Top Team - Dépasse tes limites"
             class="block h-auto w-full"
         >
+
 
         <!-- =====================================================
              BOUTON : DÉCOUVRIR NOS DISCIPLINES
@@ -72,7 +105,7 @@
 
         <!-- =====================================================
              BOUTON : REJOINDRE BTT
-             Pointera vers la future page d'inscription.
+             Redirige vers la page d'inscription.
              ===================================================== -->
         <a
             href="{{ url('/inscription') }}"
@@ -191,7 +224,7 @@
 
                         <img
                             src="{{ asset('images/BTTfutsal.png') }}"
-                            alt="Équipe Futsal Brussels Top Team"
+                            alt="Équipe de futsal Brussels Top Team à Bruxelles"
                             class="
                                 h-full
                                 w-full
@@ -283,7 +316,7 @@
 
                         <img
                             src="{{ asset('images/BTThyrox.png') }}"
-                            alt="Entraînement HYROX Brussels Top Team"
+                            alt="Entraînement HYROX Brussels Top Team à Bruxelles"
                             class="
                                 h-full
                                 w-full
@@ -375,7 +408,7 @@
 
                         <img
                             src="{{ asset('images/BTTring.jpg') }}"
-                            alt="Salle de boxe Brussels Top Team"
+                            alt="Salle de boxe anglaise Brussels Top Team à Bruxelles"
                             class="
                                 h-full
                                 w-full
@@ -468,7 +501,7 @@
 
                         <img
                             src="{{ asset('images/BTTgirl2.jpg') }}"
-                            alt="BTT Boxe et remise en forme 100% féminine"
+                            alt="Boxe anglaise femmes Brussels Top Team à Bruxelles"
                             class="
                                 h-full
                                 w-full
@@ -531,8 +564,6 @@
 
                 </article>
 
-
-                
 
             </div>
 

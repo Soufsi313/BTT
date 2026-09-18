@@ -1,27 +1,26 @@
 @extends('layouts.app')
 
-
 @section(
     'title',
     'Calendrier des entraînements - BTT Admin'
 )
-
 
 @section(
     'meta_description',
     'Gestion du calendrier des entraînements Brussels Top Team.'
 )
 
-
 @section('content')
 
     {{-- =========================================================
          CALENDRIER ADMINISTRATION
          =========================================================
+
          Cette page utilise maintenant la barre latérale commune
          de l'administration.
 
          Toute la logique existante du calendrier est conservée :
+
          - recherche ;
          - filtres ;
          - tri directement depuis les colonnes ;
@@ -31,6 +30,10 @@
          - suppression ;
          - réactivation par le Super Admin ;
          - pagination.
+
+         Les statistiques des cours sont également affichées
+         sans modifier le fonctionnement du calendrier.
+
          ========================================================= --}}
 
     <section class="min-h-screen bg-white text-zinc-900">
@@ -41,6 +44,7 @@
             {{-- =====================================================
                  BARRE LATÉRALE COMMUNE
                  =====================================================
+
                  Le menu est centralisé dans :
 
                  resources/views/admin/partials/sidebar.blade.php
@@ -50,6 +54,7 @@
 
                  La section Calendrier devient automatiquement active
                  grâce à la détection des routes admin.courses.*.
+
                  ===================================================== --}}
 
             @include('admin.partials.sidebar')
@@ -111,7 +116,15 @@
                             </h1>
 
 
-                            <p class="mt-3 max-w-2xl text-sm leading-6 text-zinc-500">
+                            <p
+                                class="
+                                    mt-3
+                                    max-w-2xl
+                                    text-sm
+                                    leading-6
+                                    text-zinc-500
+                                "
+                            >
                                 Gérez les entraînements visibles dans le calendrier privé
                                 des adhérents Brussels Top Team.
                             </p>
@@ -243,6 +256,417 @@
                         @endif
 
                     </div>
+
+
+                    {{-- =================================================
+                         STATISTIQUES DES COURS
+                         =================================================
+
+                         Ces statistiques sont calculées indépendamment
+                         des filtres appliqués au tableau.
+
+                         Super Admin :
+                         - statistiques globales ;
+                         - répartition Homme / Femme.
+
+                         Admin normal :
+                         - statistiques limitées à sa catégorie.
+
+                         La logique des statuts est identique à celle
+                         utilisée dans le contrôleur et le tableau.
+
+                         ================================================= --}}
+
+                    <section class="mt-8">
+
+                        <div
+                            class="
+                                grid
+                                gap-4
+                                sm:grid-cols-2
+                                xl:grid-cols-5
+                            "
+                        >
+
+
+                            {{-- =========================================
+                                 TOTAL DES COURS
+                                 ========================================= --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Total des cours
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $totalCoursesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+
+                                    @if (auth()->user()->isSuperAdmin())
+
+                                        Hommes et femmes, tous statuts confondus.
+
+                                    @else
+
+                                        Catégorie
+                                        {{ ucfirst(auth()->user()->genre) }},
+                                        tous statuts confondus.
+
+                                    @endif
+
+                                </p>
+
+                            </div>
+
+
+                            {{-- =========================================
+                                 COURS ACTIFS
+                                 ========================================= --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Actifs
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $activeCoursesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Cours activés à venir ou en cours.
+                                </p>
+
+                            </div>
+
+
+                            {{-- =========================================
+                                 COURS INACTIFS
+                                 ========================================= --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Inactifs
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $inactiveCoursesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Cours désactivés qui ne sont pas terminés.
+                                </p>
+
+                            </div>
+
+
+                            {{-- =========================================
+                                 COURS TERMINÉS
+                                 ========================================= --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Terminés
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $completedCoursesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Cours dont l'heure de fin est passée.
+                                </p>
+
+                            </div>
+
+
+                            {{-- =========================================
+                                 COURS SUPPRIMÉS
+                                 ========================================= --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Supprimés
+                                </p>
+
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-red-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $deletedCoursesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Cours archivés via suppression logique.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- =============================================
+                             RÉPARTITION HOMME / FEMME - SUPER ADMIN
+                             ============================================= --}}
+
+                        @if (auth()->user()->isSuperAdmin())
+
+                            <div
+                                class="
+                                    mt-4
+                                    grid
+                                    gap-4
+                                    sm:grid-cols-2
+                                "
+                            >
+
+
+                                {{-- COURS HOMMES --}}
+
+                                <div
+                                    class="
+                                        flex
+                                        items-center
+                                        justify-between
+                                        gap-4
+                                        border
+                                        border-zinc-200
+                                        bg-zinc-50
+                                        px-5
+                                        py-4
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-zinc-600
+                                        "
+                                    >
+                                        Cours Hommes
+                                    </span>
+
+
+                                    <span
+                                        class="
+                                            text-lg
+                                            font-black
+                                            text-zinc-900
+                                        "
+                                    >
+                                        {{ number_format(
+                                            $maleCoursesCount,
+                                            0,
+                                            ',',
+                                            ' '
+                                        ) }}
+                                    </span>
+
+                                </div>
+
+
+                                {{-- COURS FEMMES --}}
+
+                                <div
+                                    class="
+                                        flex
+                                        items-center
+                                        justify-between
+                                        gap-4
+                                        border
+                                        border-zinc-200
+                                        bg-zinc-50
+                                        px-5
+                                        py-4
+                                    "
+                                >
+
+                                    <span
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-zinc-600
+                                        "
+                                    >
+                                        Cours Femmes
+                                    </span>
+
+
+                                    <span
+                                        class="
+                                            text-lg
+                                            font-black
+                                            text-zinc-900
+                                        "
+                                    >
+                                        {{ number_format(
+                                            $femaleCoursesCount,
+                                            0,
+                                            ',',
+                                            ' '
+                                        ) }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        @endif
+
+                    </section>
 
 
                     {{-- =================================================
@@ -679,7 +1103,12 @@
 
                                             @else
 
-                                                <span class="text-zinc-300 group-hover:text-red-400">
+                                                <span
+                                                    class="
+                                                        text-zinc-300
+                                                        group-hover:text-red-400
+                                                    "
+                                                >
                                                     ↕
                                                 </span>
 
@@ -736,7 +1165,12 @@
 
                                             @else
 
-                                                <span class="text-zinc-300 group-hover:text-red-400">
+                                                <span
+                                                    class="
+                                                        text-zinc-300
+                                                        group-hover:text-red-400
+                                                    "
+                                                >
                                                     ↕
                                                 </span>
 
@@ -793,7 +1227,12 @@
 
                                             @else
 
-                                                <span class="text-zinc-300 group-hover:text-red-400">
+                                                <span
+                                                    class="
+                                                        text-zinc-300
+                                                        group-hover:text-red-400
+                                                    "
+                                                >
                                                     ↕
                                                 </span>
 
@@ -850,7 +1289,12 @@
 
                                             @else
 
-                                                <span class="text-zinc-300 group-hover:text-red-400">
+                                                <span
+                                                    class="
+                                                        text-zinc-300
+                                                        group-hover:text-red-400
+                                                    "
+                                                >
                                                     ↕
                                                 </span>
 
@@ -907,7 +1351,12 @@
 
                                             @else
 
-                                                <span class="text-zinc-300 group-hover:text-red-400">
+                                                <span
+                                                    class="
+                                                        text-zinc-300
+                                                        group-hover:text-red-400
+                                                    "
+                                                >
                                                     ↕
                                                 </span>
 
@@ -1055,13 +1504,13 @@
                                                     class="
                                                         inline-flex
                                                         rounded-full
-                                                        bg-zinc-900
+                                                        bg-blue-50
                                                         px-3
                                                         py-1
                                                         text-xs
                                                         font-black
                                                         uppercase
-                                                        text-white
+                                                        text-blue-700
                                                     "
                                                 >
                                                     Homme
@@ -1073,13 +1522,13 @@
                                                     class="
                                                         inline-flex
                                                         rounded-full
-                                                        bg-red-100
+                                                        bg-pink-50
                                                         px-3
                                                         py-1
                                                         text-xs
                                                         font-black
                                                         uppercase
-                                                        text-red-700
+                                                        text-pink-700
                                                     "
                                                 >
                                                     Femme
@@ -1095,6 +1544,34 @@
                                              ===================================== --}}
 
                                         <td class="px-5 py-5">
+
+                                            @php
+
+                                                /*
+                                                |--------------------------------------------------------------------------
+                                                | CALCUL DU STATUT VISUEL
+                                                |--------------------------------------------------------------------------
+                                                |
+                                                | La date et l'heure de fin du cours
+                                                | déterminent automatiquement si celui-ci
+                                                | est terminé.
+                                                |
+                                                */
+
+                                                $courseEndDateTime = \Carbon\Carbon::parse(
+                                                    $course->course_date->format('Y-m-d')
+                                                    . ' '
+                                                    . $course->end_time,
+                                                    'Europe/Brussels'
+                                                );
+
+                                                $courseIsCompleted =
+                                                    ! $course->trashed()
+                                                    && $courseEndDateTime->lte(
+                                                        now('Europe/Brussels')
+                                                    );
+
+                                            @endphp
 
 
                                             {{-- =============================
@@ -1124,19 +1601,19 @@
                                                  2. TERMINÉ
                                                  ============================= --}}
 
-                                            @elseif ($course->hasEnded())
+                                            @elseif ($courseIsCompleted)
 
                                                 <span
                                                     class="
                                                         inline-flex
                                                         rounded-full
-                                                        bg-blue-100
+                                                        bg-zinc-800
                                                         px-3
                                                         py-1
                                                         text-xs
                                                         font-black
                                                         uppercase
-                                                        text-blue-700
+                                                        text-white
                                                     "
                                                 >
                                                     Terminé
@@ -1234,6 +1711,7 @@
                                                         >
 
                                                             @csrf
+
                                                             @method('PATCH')
 
 
@@ -1328,6 +1806,7 @@
                                                     >
 
                                                         @csrf
+
                                                         @method('DELETE')
 
 
@@ -1359,6 +1838,7 @@
                                         </td>
 
                                     </tr>
+
 
                                 @empty
 
@@ -1410,9 +1890,13 @@
                             {{ $courses->total() }}
 
                             @if ($courses->total() > 1)
+
                                 cours enregistrés.
+
                             @else
+
                                 cours enregistré.
+
                             @endif
 
                         </p>

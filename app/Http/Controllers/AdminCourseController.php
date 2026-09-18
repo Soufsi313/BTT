@@ -205,6 +205,132 @@ class AdminCourseController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | STATISTIQUES DES COURS
+        |--------------------------------------------------------------------------
+        |
+        | Les statistiques sont indépendantes des filtres du tableau.
+        |
+        | Super Admin :
+        | - statistiques globales Homme + Femme.
+        |
+        | Admin normal :
+        | - statistiques limitées à sa propre catégorie.
+        |
+        | La logique des statuts reste strictement identique à celle du
+        | tableau : la date et l'heure de fin déterminent si un cours est
+        | terminé.
+        |
+        */
+
+        $courseStatisticsQuery = Course::withTrashed();
+
+        if (! $admin->isSuperAdmin()) {
+
+            $courseStatisticsQuery->where(
+                'target_gender',
+                $admin->genre
+            );
+        }
+
+
+        /*
+        | Total = tous les cours, y compris les cours supprimés.
+        */
+        $totalCoursesCount = (clone $courseStatisticsQuery)
+            ->count();
+
+
+        /*
+        | Actifs :
+        | - non supprimés ;
+        | - activés manuellement ;
+        | - heure de fin pas encore passée.
+        */
+        $activeCoursesCount = (clone $courseStatisticsQuery)
+            ->whereNull('deleted_at')
+            ->where(
+                'is_active',
+                true
+            )
+            ->whereRaw(
+                'TIMESTAMP(course_date, end_time) > ?',
+                [$nowSql]
+            )
+            ->count();
+
+
+        /*
+        | Inactifs :
+        | - non supprimés ;
+        | - désactivés manuellement ;
+        | - heure de fin pas encore passée.
+        */
+        $inactiveCoursesCount = (clone $courseStatisticsQuery)
+            ->whereNull('deleted_at')
+            ->where(
+                'is_active',
+                false
+            )
+            ->whereRaw(
+                'TIMESTAMP(course_date, end_time) > ?',
+                [$nowSql]
+            )
+            ->count();
+
+
+        /*
+        | Terminés :
+        | - non supprimés ;
+        | - heure de fin passée ;
+        | - indépendamment de is_active.
+        */
+        $completedCoursesCount = (clone $courseStatisticsQuery)
+            ->whereNull('deleted_at')
+            ->whereRaw(
+                'TIMESTAMP(course_date, end_time) <= ?',
+                [$nowSql]
+            )
+            ->count();
+
+
+        /*
+        | Supprimés :
+        | cours archivés via SoftDeletes.
+        */
+        $deletedCoursesCount = (clone $courseStatisticsQuery)
+            ->onlyTrashed()
+            ->count();
+
+
+        /*
+        | Répartition Homme / Femme.
+        |
+        | Ces indicateurs supplémentaires sont uniquement destinés
+        | au Super Admin.
+        */
+        $maleCoursesCount = null;
+        $femaleCoursesCount = null;
+
+        if ($admin->isSuperAdmin()) {
+
+            $maleCoursesCount = Course::withTrashed()
+                ->where(
+                    'target_gender',
+                    'homme'
+                )
+                ->count();
+
+            $femaleCoursesCount = Course::withTrashed()
+                ->where(
+                    'target_gender',
+                    'femme'
+                )
+                ->count();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
         | DISCIPLINES DISPONIBLES
         |--------------------------------------------------------------------------
         */
@@ -587,6 +713,19 @@ class AdminCourseController extends Controller
                 'status' => $status,
                 'sortBy' => $sortBy,
                 'direction' => $direction,
+
+                /*
+                |--------------------------------------------------------------------------
+                | STATISTIQUES
+                |--------------------------------------------------------------------------
+                */
+                'totalCoursesCount' => $totalCoursesCount,
+                'activeCoursesCount' => $activeCoursesCount,
+                'inactiveCoursesCount' => $inactiveCoursesCount,
+                'completedCoursesCount' => $completedCoursesCount,
+                'deletedCoursesCount' => $deletedCoursesCount,
+                'maleCoursesCount' => $maleCoursesCount,
+                'femaleCoursesCount' => $femaleCoursesCount,
             ]
         );
     }

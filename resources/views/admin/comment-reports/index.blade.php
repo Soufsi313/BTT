@@ -177,7 +177,12 @@
                                     text-zinc-950
                                 "
                             >
-                                {{ $reports->total() }}
+                                {{ number_format(
+                                    $totalReportsCount,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) }}
                             </p>
 
                         </div>
@@ -239,6 +244,291 @@
                         </div>
 
                     @endif
+
+
+                    {{--
+                    |--------------------------------------------------------------------------
+                    | STATISTIQUES DES SIGNALEMENTS
+                    |--------------------------------------------------------------------------
+                    |
+                    | Les statistiques sont calculées dans le contrôleur et sont
+                    | indépendantes de la pagination du tableau.
+                    |
+                    | Elles permettent de suivre immédiatement :
+                    |
+                    | - tous les signalements ;
+                    | - ceux qui attendent une première intervention ;
+                    | - ceux qui ont été examinés ;
+                    | - ceux qui ont été traités ;
+                    | - ceux qui ont été rejetés.
+                    |
+                    |--------------------------------------------------------------------------
+                    --}}
+
+                    <section class="mb-8">
+
+                        <div
+                            class="
+                                grid
+                                gap-4
+                                sm:grid-cols-2
+                                xl:grid-cols-5
+                            "
+                        >
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | TOTAL
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Total des signalements
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $totalReportsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Tous statuts confondus.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | EN ATTENTE
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    En attente
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-amber-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $pendingReportsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Signalements à examiner.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | EXAMINÉS
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Examinés
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-blue-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $reviewedReportsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    En attente d'une décision.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | TRAITÉS
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Traités
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-green-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $resolvedReportsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Modération effectuée.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | REJETÉS
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Rejetés
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $rejectedReportsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Aucune modération nécessaire.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </section>
 
 
                     {{--

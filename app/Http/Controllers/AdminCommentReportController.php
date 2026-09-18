@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
  * L'administration peut :
  *
  * - consulter les signalements ;
+ * - consulter les statistiques des signalements ;
  * - identifier le membre ayant effectué le signalement ;
  * - consulter le commentaire concerné ;
  * - connaître l'auteur du commentaire ;
@@ -54,7 +55,109 @@ class AdminCommentReportController extends Controller
     {
         /*
         |--------------------------------------------------------------------------
-        | Récupération des signalements
+        | STATISTIQUES DES SIGNALEMENTS
+        |--------------------------------------------------------------------------
+        |
+        | Les statistiques sont calculées indépendamment de la pagination.
+        |
+        | Elles permettent de connaître :
+        |
+        | - le nombre total de signalements ;
+        | - le nombre de signalements en attente ;
+        | - le nombre de signalements examinés ;
+        | - le nombre de signalements traités ;
+        | - le nombre de signalements rejetés.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL DES SIGNALEMENTS
+        |--------------------------------------------------------------------------
+        */
+
+        $totalReportsCount = CommentReport::query()
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SIGNALEMENTS EN ATTENTE
+        |--------------------------------------------------------------------------
+        |
+        | Ces signalements n'ont pas encore été examinés par
+        | l'administration.
+        |
+        */
+
+        $pendingReportsCount = CommentReport::query()
+            ->where(
+                'status',
+                'pending'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SIGNALEMENTS EXAMINÉS
+        |--------------------------------------------------------------------------
+        |
+        | L'administration a pris connaissance du signalement,
+        | mais aucune décision définitive n'a encore été prise.
+        |
+        */
+
+        $reviewedReportsCount = CommentReport::query()
+            ->where(
+                'status',
+                'reviewed'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SIGNALEMENTS TRAITÉS
+        |--------------------------------------------------------------------------
+        |
+        | Ces signalements ont entraîné une action de modération.
+        |
+        | Dans le fonctionnement actuel du site, le commentaire
+        | concerné a été masqué.
+        |
+        */
+
+        $resolvedReportsCount = CommentReport::query()
+            ->where(
+                'status',
+                'resolved'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SIGNALEMENTS REJETÉS
+        |--------------------------------------------------------------------------
+        |
+        | Ces signalements ont été étudiés mais n'ont pas entraîné
+        | de modification du commentaire.
+        |
+        */
+
+        $rejectedReportsCount = CommentReport::query()
+            ->where(
+                'status',
+                'rejected'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RÉCUPÉRATION DES SIGNALEMENTS
         |--------------------------------------------------------------------------
         |
         | with() charge les relations nécessaires à l'affichage de la
@@ -74,7 +177,7 @@ class AdminCommentReportController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Affichage de la vue
+        | AFFICHAGE DE LA VUE
         |--------------------------------------------------------------------------
         */
 
@@ -82,6 +185,22 @@ class AdminCommentReportController extends Controller
             'admin.comment-reports.index',
             [
                 'reports' => $reports,
+
+                /*
+                |--------------------------------------------------------------------------
+                | STATISTIQUES TRANSMISES À LA VUE
+                |--------------------------------------------------------------------------
+                */
+
+                'totalReportsCount' => $totalReportsCount,
+
+                'pendingReportsCount' => $pendingReportsCount,
+
+                'reviewedReportsCount' => $reviewedReportsCount,
+
+                'resolvedReportsCount' => $resolvedReportsCount,
+
+                'rejectedReportsCount' => $rejectedReportsCount,
             ]
         );
     }

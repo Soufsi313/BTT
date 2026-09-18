@@ -1,12 +1,33 @@
 @extends('layouts.app')
 
 
-@section('title', 'Contact - Brussels Top Team')
+<!-- =========================================================
+     SEO - PAGE CONTACT
+     =========================================================
+     Cette page permet aux visiteurs et aux adhérents de
+     contacter Brussels Top Team pour toute demande concernant :
+
+     - les entraînements ;
+     - les abonnements et affiliations ;
+     - les inscriptions et comptes ;
+     - les autres demandes adressées à l'administration.
+
+     Le layout global prend déjà en charge :
+     - l'URL canonique ;
+     - Open Graph ;
+     - Twitter / X Card ;
+     - les directives robots.
+     ========================================================= -->
+
+@section(
+    'title',
+    'Contact | Brussels Top Team à Bruxelles'
+)
 
 
 @section(
     'meta_description',
-    'Contactez Brussels Top Team pour toute question concernant les entraînements, les affiliations, les inscriptions ou toute autre demande.'
+    'Contactez Brussels Top Team à Bruxelles pour toute question concernant les entraînements, abonnements, affiliations, inscriptions ou votre compte BTT.'
 )
 
 

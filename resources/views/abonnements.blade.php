@@ -1,11 +1,38 @@
 @extends('layouts.app')
 
-@section('title', 'Affiliation & tarifs - Brussels Top Team')
+
+<!-- =========================================================
+     SEO - PAGE AFFILIATION & TARIFS
+     =========================================================
+     Cette page présente le fonctionnement de l'affiliation
+     Brussels Top Team ainsi que les tarifs des séances.
+
+     Le contenu SEO met notamment en avant :
+
+     - Brussels Top Team ;
+     - Bruxelles ;
+     - le tarif de 5 € par séance ;
+     - l'absence d'abonnement mensuel obligatoire ;
+     - le fonctionnement du crédit de séances.
+
+     Le layout global prend déjà en charge :
+     - l'URL canonique ;
+     - Open Graph ;
+     - Twitter / X Card ;
+     - les directives robots.
+     ========================================================= -->
+
+@section(
+    'title',
+    'Affiliation & tarifs | Brussels Top Team à Bruxelles'
+)
+
 
 @section(
     'meta_description',
-    'Découvrez le fonctionnement de l’affiliation Brussels Top Team : séances à 5 €, paiement en espèces et crédit de séances valable pendant un an.'
+    'Découvrez les tarifs de Brussels Top Team à Bruxelles : 5 € par séance, sans abonnement mensuel obligatoire, avec possibilité de créditer plusieurs séances.'
 )
+
 
 @section('content')
 

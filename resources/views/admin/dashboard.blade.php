@@ -169,7 +169,7 @@
 
 
                     <!-- =========================================
-                         STATISTIQUES
+                         STATISTIQUES PRINCIPALES
                          ========================================= -->
                     <section class="mt-10">
 
@@ -215,7 +215,29 @@
                                         text-zinc-900
                                     "
                                 >
-                                    -
+                                    {{ number_format(
+                                        $totalMembersCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-2
+                                        text-xs
+                                        font-bold
+                                        text-zinc-500
+                                    "
+                                >
+                                    {{ number_format(
+                                        $newMembersThisMonthCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                    nouveau(x) ce mois-ci
                                 </p>
 
                             </div>
@@ -253,7 +275,29 @@
                                         text-zinc-900
                                     "
                                 >
-                                    -
+                                    {{ number_format(
+                                        $totalCoursesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-2
+                                        text-xs
+                                        font-bold
+                                        text-zinc-500
+                                    "
+                                >
+                                    {{ number_format(
+                                        $activeCoursesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                    actif(s)
                                 </p>
 
                             </div>
@@ -291,7 +335,29 @@
                                         text-zinc-900
                                     "
                                 >
-                                    -
+                                    {{ number_format(
+                                        $totalArticlesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-2
+                                        text-xs
+                                        font-bold
+                                        text-zinc-500
+                                    "
+                                >
+                                    {{ number_format(
+                                        $publishedArticlesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                    publié(s)
                                 </p>
 
                             </div>
@@ -299,11 +365,6 @@
 
                             <!-- =====================================
                                  STATISTIQUE MESSAGES
-                                 =====================================
-                                 Le compteur dynamique sera ajouté plus
-                                 tard au contrôleur du dashboard.
-
-                                 Pour le moment nous conservons le tiret.
                                  ===================================== -->
                             <div
                                 class="
@@ -334,10 +395,379 @@
                                         text-zinc-900
                                     "
                                 >
-                                    -
+                                    {{ number_format(
+                                        $totalConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-2
+                                        text-xs
+                                        font-bold
+                                        {{ $unreadConversationsCount > 0
+                                            ? 'text-red-600'
+                                            : 'text-zinc-500' }}
+                                    "
+                                >
+                                    {{ number_format(
+                                        $unreadConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                    avec nouveau(x) message(s)
                                 </p>
 
                             </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- =========================================
+                         GRAPHIQUES DYNAMIQUES
+                         =========================================
+                         Les quatre graphiques ci-dessous utilisent
+                         exclusivement les données calculées par Laravel.
+
+                         Chart.js récupère ces valeurs depuis les attributs
+                         data-* présents directement sur les canvas.
+                         ========================================= -->
+                    <section class="mt-10">
+
+                        <div>
+
+                            <p
+                                class="
+                                    text-xs
+                                    font-black
+                                    uppercase
+                                    tracking-[0.3em]
+                                    text-red-600
+                                "
+                            >
+                                Statistiques
+                            </p>
+
+
+                            <h2
+                                class="
+                                    mt-2
+                                    text-2xl
+                                    font-black
+                                    uppercase
+                                    text-zinc-900
+                                "
+                            >
+                                Vue d'ensemble
+                            </h2>
+
+
+                            <p
+                                class="
+                                    mt-3
+                                    max-w-3xl
+                                    text-sm
+                                    leading-6
+                                    text-zinc-500
+                                "
+                            >
+                                Les graphiques sont automatiquement mis à jour
+                                à partir des données enregistrées dans BTT.
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            class="
+                                mt-6
+                                grid
+                                gap-6
+                                xl:grid-cols-2
+                            "
+                        >
+
+
+                            <!-- =====================================
+                                 GRAPHIQUE :
+                                 ÉVOLUTION DES INSCRIPTIONS
+                                 ===================================== -->
+                            <article
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-6
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-red-600
+                                        "
+                                    >
+                                        Adhérents
+                                    </p>
+
+                                    <h3
+                                        class="
+                                            mt-2
+                                            text-lg
+                                            font-black
+                                            uppercase
+                                            text-zinc-900
+                                        "
+                                    >
+                                        Nouvelles inscriptions
+                                    </h3>
+
+                                    <p
+                                        class="
+                                            mt-2
+                                            text-sm
+                                            text-zinc-500
+                                        "
+                                    >
+                                        Évolution sur les six derniers mois.
+                                    </p>
+
+                                </div>
+
+
+                                <div class="mt-6 h-72">
+
+                                    <canvas
+                                        id="members-evolution-chart"
+                                        data-labels='@json(
+                                            $membersMonthlyEvolution
+                                                ->pluck("label")
+                                                ->values()
+                                        )'
+                                        data-values='@json(
+                                            $membersMonthlyEvolution
+                                                ->pluck("count")
+                                                ->values()
+                                        )'
+                                    ></canvas>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- =====================================
+                                 GRAPHIQUE :
+                                 ACTIFS / ARCHIVÉS
+                                 ===================================== -->
+                            <article
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-6
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-red-600
+                                        "
+                                    >
+                                        Adhérents
+                                    </p>
+
+                                    <h3
+                                        class="
+                                            mt-2
+                                            text-lg
+                                            font-black
+                                            uppercase
+                                            text-zinc-900
+                                        "
+                                    >
+                                        État des comptes
+                                    </h3>
+
+                                    <p
+                                        class="
+                                            mt-2
+                                            text-sm
+                                            text-zinc-500
+                                        "
+                                    >
+                                        Répartition entre les comptes actifs
+                                        et les comptes archivés.
+                                    </p>
+
+                                </div>
+
+
+                                <div class="mt-6 h-72">
+
+                                    <canvas
+                                        id="members-status-chart"
+                                        data-active="{{ $activeMembersCount }}"
+                                        data-archived="{{ $archivedMembersCount }}"
+                                    ></canvas>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- =====================================
+                                 GRAPHIQUE :
+                                 ÉTAT DES COURS
+                                 ===================================== -->
+                            <article
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-6
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-red-600
+                                        "
+                                    >
+                                        Calendrier
+                                    </p>
+
+                                    <h3
+                                        class="
+                                            mt-2
+                                            text-lg
+                                            font-black
+                                            uppercase
+                                            text-zinc-900
+                                        "
+                                    >
+                                        État des cours
+                                    </h3>
+
+                                    <p
+                                        class="
+                                            mt-2
+                                            text-sm
+                                            text-zinc-500
+                                        "
+                                    >
+                                        Cours actifs, inactifs, terminés
+                                        et supprimés.
+                                    </p>
+
+                                </div>
+
+
+                                <div class="mt-6 h-72">
+
+                                    <canvas
+                                        id="courses-status-chart"
+                                        data-active="{{ $activeCoursesCount }}"
+                                        data-inactive="{{ $inactiveCoursesCount }}"
+                                        data-completed="{{ $completedCoursesCount }}"
+                                        data-deleted="{{ $deletedCoursesCount }}"
+                                    ></canvas>
+
+                                </div>
+
+                            </article>
+
+
+                            <!-- =====================================
+                                 GRAPHIQUE :
+                                 ACTIVITÉ DU SITE
+                                 ===================================== -->
+                            <article
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-6
+                                "
+                            >
+
+                                <div>
+
+                                    <p
+                                        class="
+                                            text-xs
+                                            font-black
+                                            uppercase
+                                            tracking-wider
+                                            text-red-600
+                                        "
+                                    >
+                                        Activité
+                                    </p>
+
+                                    <h3
+                                        class="
+                                            mt-2
+                                            text-lg
+                                            font-black
+                                            uppercase
+                                            text-zinc-900
+                                        "
+                                    >
+                                        Activité du site
+                                    </h3>
+
+                                    <p
+                                        class="
+                                            mt-2
+                                            text-sm
+                                            text-zinc-500
+                                        "
+                                    >
+                                        Contenu, modération et messagerie.
+                                    </p>
+
+                                </div>
+
+
+                                <div class="mt-6 h-72">
+
+                                    <canvas
+                                        id="website-activity-chart"
+                                        data-published-articles="{{ $publishedArticlesCount }}"
+                                        data-draft-articles="{{ $draftArticlesCount }}"
+                                        data-comments="{{ $totalCommentsCount }}"
+                                        data-pending-reports="{{ $pendingReportsCount }}"
+                                        data-conversations="{{ $totalConversationsCount }}"
+                                        data-unread-conversations="{{ $unreadConversationsCount }}"
+                                    ></canvas>
+
+                                </div>
+
+                            </article>
 
                         </div>
 
@@ -586,5 +1016,22 @@
         </div>
 
     </section>
+
+
+    {{--
+    |--------------------------------------------------------------------------
+    | JAVASCRIPT DU DASHBOARD
+    |--------------------------------------------------------------------------
+    |
+    | Ce bundle Vite est chargé uniquement sur cette page.
+    |
+    | Il importe Chart.js et initialise les quatre graphiques présents
+    | ci-dessus.
+    |
+    | Le fichier resources/js/app.js reste totalement inchangé.
+    |
+    --}}
+
+    @vite('resources/js/admin-dashboard.js')
 
 @endsection

@@ -101,6 +101,117 @@ class AdminMessageController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | STATISTIQUES DE LA MESSAGERIE
+        |--------------------------------------------------------------------------
+        |
+        | Ces compteurs sont calculés indépendamment :
+        |
+        | - du tri actuellement sélectionné ;
+        | - de la pagination ;
+        | - de la page actuellement consultée.
+        |
+        | Ils représentent donc toujours l'état global de la messagerie.
+        |
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL DES CONVERSATIONS
+        |--------------------------------------------------------------------------
+        */
+        $totalConversationsCount = Conversation::query()
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONVERSATIONS OUVERTES
+        |--------------------------------------------------------------------------
+        */
+        $openConversationsCount = Conversation::query()
+            ->where(
+                'status',
+                'open'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONVERSATIONS FERMÉES
+        |--------------------------------------------------------------------------
+        */
+        $closedConversationsCount = Conversation::query()
+            ->where(
+                'status',
+                'closed'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONVERSATIONS AVEC DE NOUVEAUX MESSAGES
+        |--------------------------------------------------------------------------
+        |
+        | Une conversation est considérée comme ayant un nouveau message
+        | lorsqu'elle possède au moins un message entrant :
+        |
+        | - envoyé par un visiteur ;
+        | - ou envoyé par un adhérent ;
+        | - et qui n'a pas encore été lu par l'administration.
+        |
+        | whereHas() compte ici les conversations et non le nombre total
+        | de messages non lus.
+        |
+        */
+        $unreadConversationsCount = Conversation::query()
+            ->whereHas(
+                'messages',
+                function ($query) {
+                    $query
+                        ->where('is_read', false)
+                        ->whereIn(
+                            'sender_type',
+                            [
+                                'visitor',
+                                'member',
+                            ]
+                        );
+                }
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONVERSATIONS DES ADHÉRENTS
+        |--------------------------------------------------------------------------
+        |
+        | Une conversation liée à un compte utilisateur possède un user_id.
+        |
+        */
+        $memberConversationsCount = Conversation::query()
+            ->whereNotNull('user_id')
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CONVERSATIONS DES VISITEURS
+        |--------------------------------------------------------------------------
+        |
+        | Une conversation sans user_id provient d'un visiteur.
+        |
+        */
+        $visitorConversationsCount = Conversation::query()
+            ->whereNull('user_id')
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
         | REQUÊTE PRINCIPALE
         |--------------------------------------------------------------------------
         |
@@ -265,6 +376,18 @@ class AdminMessageController extends Controller
                 'conversations' => $conversations,
                 'sort' => $sort,
                 'direction' => $direction,
+
+                /*
+                |--------------------------------------------------------------------------
+                | STATISTIQUES TRANSMISES À LA VUE
+                |--------------------------------------------------------------------------
+                */
+                'totalConversationsCount' => $totalConversationsCount,
+                'openConversationsCount' => $openConversationsCount,
+                'closedConversationsCount' => $closedConversationsCount,
+                'unreadConversationsCount' => $unreadConversationsCount,
+                'memberConversationsCount' => $memberConversationsCount,
+                'visitorConversationsCount' => $visitorConversationsCount,
             ]
         );
     }

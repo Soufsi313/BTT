@@ -219,8 +219,346 @@
                                     text-zinc-900
                                 "
                             >
-                                {{ $conversations->total() }}
+                                {{ number_format(
+                                    $totalConversationsCount,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) }}
                             </p>
+
+                        </div>
+
+                    </section>
+
+
+                    {{--
+                    |--------------------------------------------------------------------------
+                    | STATISTIQUES DE LA MESSAGERIE
+                    |--------------------------------------------------------------------------
+                    |
+                    | Les compteurs sont calculés directement depuis l'ensemble
+                    | des conversations et ne dépendent donc ni du tri ni de
+                    | la pagination actuellement affichée.
+                    |
+                    |--------------------------------------------------------------------------
+                    --}}
+
+                    <section class="mt-8">
+
+                        <div
+                            class="
+                                grid
+                                gap-4
+                                sm:grid-cols-2
+                                lg:grid-cols-3
+                                xl:grid-cols-6
+                            "
+                        >
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | TOTAL DES CONVERSATIONS
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Total
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $totalConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Toutes les conversations.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | CONVERSATIONS OUVERTES
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Ouvertes
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-green-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $openConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Conversations actives.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | CONVERSATIONS FERMÉES
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Fermées
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-500
+                                    "
+                                >
+                                    {{ number_format(
+                                        $closedConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Conversations terminées.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | NOUVEAUX MESSAGES
+                            |--------------------------------------------------------------------------
+                            |
+                            | Le compteur représente le nombre de conversations
+                            | contenant au moins un message entrant non lu.
+                            |
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Nouveaux messages
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-red-600
+                                    "
+                                >
+                                    {{ number_format(
+                                        $unreadConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Conversations à consulter.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | CONVERSATIONS ADHÉRENTS
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Adhérents
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $memberConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Membres connectés.
+                                </p>
+
+                            </div>
+
+
+                            {{--
+                            |--------------------------------------------------------------------------
+                            | CONVERSATIONS VISITEURS
+                            |--------------------------------------------------------------------------
+                            --}}
+
+                            <div
+                                class="
+                                    border
+                                    border-zinc-200
+                                    bg-white
+                                    p-5
+                                "
+                            >
+
+                                <p
+                                    class="
+                                        text-xs
+                                        font-black
+                                        uppercase
+                                        tracking-wider
+                                        text-zinc-500
+                                    "
+                                >
+                                    Visiteurs
+                                </p>
+
+                                <p
+                                    class="
+                                        mt-3
+                                        text-3xl
+                                        font-black
+                                        text-zinc-900
+                                    "
+                                >
+                                    {{ number_format(
+                                        $visitorConversationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) }}
+                                </p>
+
+                                <p class="mt-2 text-xs text-zinc-500">
+                                    Visiteurs non connectés.
+                                </p>
+
+                            </div>
 
                         </div>
 

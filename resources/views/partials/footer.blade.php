@@ -1,3 +1,4 @@
+
 <!-- =============================================================
      FOOTER GLOBAL - BRUSSELS TOP TEAM
      ============================================================= -->
@@ -344,6 +345,41 @@
             <p>
                 © {{ date('Y') }} Brussels Top Team. Tous droits réservés.
             </p>
+
+
+            <!-- =====================================================
+                 GESTION DES COOKIES
+                 =====================================================
+                 Le composant de consentement écoute l'événement
+                 "btt:open-cookie-settings".
+
+                 Le bouton permet au visiteur de rouvrir ses paramètres
+                 et de modifier ses préférences à tout moment.
+                 ===================================================== -->
+            <button
+                type="button"
+                id="btt-footer-cookie-settings"
+                class="
+                    w-fit
+                    text-left
+                    font-semibold
+                    text-zinc-400
+                    underline
+                    decoration-zinc-600
+                    underline-offset-4
+                    transition
+                    hover:text-red-500
+                    hover:decoration-red-500
+                    focus-visible:rounded-sm
+                    focus-visible:outline
+                    focus-visible:outline-2
+                    focus-visible:outline-offset-4
+                    focus-visible:outline-red-500
+                "
+                onclick="window.dispatchEvent(new Event('btt:open-cookie-settings'))"
+            >
+                Gérer mes cookies
+            </button>
 
 
             <!-- Nom du club -->

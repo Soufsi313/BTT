@@ -13,8 +13,15 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommentReportController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CookieConsentController;
 use App\Http\Controllers\MemberCourseController;
 use App\Http\Controllers\MemberMessageController;
+use App\Models\Article;
+use App\Models\Comment;
+use App\Models\CommentReport;
+use App\Models\Conversation;
+use App\Models\Course;
+use App\Models\User;
 use App\Notifications\RegistrationConfirmedNotification;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -221,6 +228,28 @@ Route::post(
     '/contact',
     [ContactController::class, 'store']
 )->name('contact.store');
+
+
+/*
+ |--------------------------------------------------------------------------
+ | PRÉFÉRENCES DE COOKIES
+ |--------------------------------------------------------------------------
+ |
+ | Ces routes sont accessibles aux visiteurs anonymes et aux membres.
+ | GET retourne le choix actuel du navigateur.
+ | POST enregistre ou modifie les préférences (protection CSRF de Laravel).
+ |
+ */
+
+Route::get(
+    '/cookie-consent',
+    [CookieConsentController::class, 'show']
+)->name('cookie-consent.show');
+
+Route::post(
+    '/cookie-consent',
+    [CookieConsentController::class, 'store']
+)->name('cookie-consent.store');
 
 
 /*
@@ -736,8 +765,338 @@ Route::middleware([
         |--------------------------------------------------------------------------
         */
 
-        Route::get('/', function () {
-            return view('admin.dashboard');
+        Route::get('/', function (Request $request) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | ADMINISTRATEUR CONNECTÉ
+            |--------------------------------------------------------------------------
+            |
+            | Les statistiques genrées respectent les mêmes droits que les pages
+            | Adhérents et Calendrier :
+            |
+            | - Super Admin : toutes les données ;
+            | - Admin : uniquement les données correspondant à son genre.
+            |
+            */
+
+            $admin = $request->user();
+
+            $now = now('Europe/Brussels');
+            $nowSql = $now->format('Y-m-d H:i:s');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATISTIQUES ADHÉRENTS
+            |--------------------------------------------------------------------------
+            */
+
+            $membersScope = User::withTrashed()
+                ->where('role', 'adherent');
+
+            if (! $admin->isSuperAdmin()) {
+                $membersScope->where(
+                    'genre',
+                    $admin->genre
+                );
+            }
+
+
+            /*
+            | Total :
+            | comptes actifs + comptes archivés.
+            */
+
+            $totalMembersCount = (clone $membersScope)
+                ->count();
+
+
+            /*
+            | Comptes actifs.
+            */
+
+            $activeMembersCount = (clone $membersScope)
+                ->whereNull('deleted_at')
+                ->count();
+
+
+            /*
+            | Comptes archivés.
+            */
+
+            $archivedMembersCount = (clone $membersScope)
+                ->whereNotNull('deleted_at')
+                ->count();
+
+
+            /*
+            | Nouvelles inscriptions du mois.
+            |
+            | Comme dans les statistiques détaillées des adhérents,
+            | seuls les comptes actuellement actifs sont comptabilisés.
+            */
+
+            $newMembersThisMonthCount = (clone $membersScope)
+                ->whereNull('deleted_at')
+                ->whereYear(
+                    'created_at',
+                    $now->year
+                )
+                ->whereMonth(
+                    'created_at',
+                    $now->month
+                )
+                ->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | ÉVOLUTION DES INSCRIPTIONS SUR SIX MOIS
+            |--------------------------------------------------------------------------
+            |
+            | Ce tableau alimente directement le graphique du Dashboard.
+            |
+            | Aucune valeur n'est écrite en dur :
+            | chaque mois est recalculé depuis la table users.
+            |
+            */
+
+            $membersMonthlyEvolution = collect(
+                range(5, 0)
+            )
+                ->map(
+                    function (int $monthsAgo) use (
+                        $membersScope,
+                        $now
+                    ) {
+                        $month = $now
+                            ->copy()
+                            ->subMonths($monthsAgo);
+
+                        return [
+                            'label' => ucfirst(
+                                $month->translatedFormat('M')
+                            ),
+
+                            'count' => (clone $membersScope)
+                                ->whereNull('deleted_at')
+                                ->whereYear(
+                                    'created_at',
+                                    $month->year
+                                )
+                                ->whereMonth(
+                                    'created_at',
+                                    $month->month
+                                )
+                                ->count(),
+                        ];
+                    }
+                )
+                ->values();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATISTIQUES COURS
+            |--------------------------------------------------------------------------
+            */
+
+            $coursesScope = Course::withTrashed();
+
+
+            /*
+            | Un Admin classique reste limité aux cours
+            | correspondant à son genre.
+            */
+
+            if (! $admin->isSuperAdmin()) {
+                $coursesScope->where(
+                    'category',
+                    $admin->genre
+                );
+            }
+
+
+            /*
+            | Total :
+            | tous les cours, y compris les cours supprimés.
+            */
+
+            $totalCoursesCount = (clone $coursesScope)
+                ->count();
+
+
+            /*
+            | Actifs :
+            | - non supprimés ;
+            | - is_active = true ;
+            | - heure de fin encore dans le futur.
+            */
+
+            $activeCoursesCount = (clone $coursesScope)
+                ->whereNull('deleted_at')
+                ->where(
+                    'is_active',
+                    true
+                )
+                ->whereRaw(
+                    'TIMESTAMP(course_date, end_time) > ?',
+                    [$nowSql]
+                )
+                ->count();
+
+
+            /*
+            | Inactifs :
+            | - non supprimés ;
+            | - is_active = false ;
+            | - heure de fin encore dans le futur.
+            */
+
+            $inactiveCoursesCount = (clone $coursesScope)
+                ->whereNull('deleted_at')
+                ->where(
+                    'is_active',
+                    false
+                )
+                ->whereRaw(
+                    'TIMESTAMP(course_date, end_time) > ?',
+                    [$nowSql]
+                )
+                ->count();
+
+
+            /*
+            | Terminés :
+            | cours dont l'heure de fin est passée,
+            | indépendamment de is_active.
+            */
+
+            $completedCoursesCount = (clone $coursesScope)
+                ->whereNull('deleted_at')
+                ->whereRaw(
+                    'TIMESTAMP(course_date, end_time) <= ?',
+                    [$nowSql]
+                )
+                ->count();
+
+
+            /*
+            | Supprimés logiquement.
+            */
+
+            $deletedCoursesCount = (clone $coursesScope)
+                ->whereNotNull('deleted_at')
+                ->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATISTIQUES ARTICLES
+            |--------------------------------------------------------------------------
+            */
+
+            $totalArticlesCount = Article::withTrashed()
+                ->count();
+
+            $publishedArticlesCount = Article::query()
+                ->where(
+                    'status',
+                    'published'
+                )
+                ->count();
+
+            $draftArticlesCount = Article::query()
+                ->where(
+                    'status',
+                    'draft'
+                )
+                ->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATISTIQUES COMMENTAIRES ET SIGNALEMENTS
+            |--------------------------------------------------------------------------
+            */
+
+            $totalCommentsCount = Comment::withTrashed()
+                ->count();
+
+            $pendingReportsCount = CommentReport::query()
+                ->where(
+                    'status',
+                    'pending'
+                )
+                ->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STATISTIQUES MESSAGERIE
+            |--------------------------------------------------------------------------
+            */
+
+            $totalConversationsCount = Conversation::query()
+                ->count();
+
+
+            /*
+            | Une conversation est considérée comme ayant un nouveau message
+            | lorsqu'elle possède au moins un message entrant non lu provenant
+            | d'un visiteur ou d'un adhérent.
+            */
+
+            $unreadConversationsCount = Conversation::query()
+                ->whereHas(
+                    'messages',
+                    function ($query) {
+                        $query
+                            ->where(
+                                'is_read',
+                                false
+                            )
+                            ->whereIn(
+                                'sender_type',
+                                [
+                                    'visitor',
+                                    'member',
+                                ]
+                            );
+                    }
+                )
+                ->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | AFFICHAGE DU DASHBOARD
+            |--------------------------------------------------------------------------
+            */
+
+            return view(
+                'admin.dashboard',
+                compact(
+                    'totalMembersCount',
+                    'activeMembersCount',
+                    'archivedMembersCount',
+                    'newMembersThisMonthCount',
+                    'membersMonthlyEvolution',
+                    'totalCoursesCount',
+                    'activeCoursesCount',
+                    'inactiveCoursesCount',
+                    'completedCoursesCount',
+                    'deletedCoursesCount',
+                    'totalArticlesCount',
+                    'publishedArticlesCount',
+                    'draftArticlesCount',
+                    'totalCommentsCount',
+                    'pendingReportsCount',
+                    'totalConversationsCount',
+                    'unreadConversationsCount',
+                )
+            );
         })->name('dashboard');
 
 

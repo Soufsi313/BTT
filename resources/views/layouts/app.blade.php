@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -318,6 +319,20 @@
          Visible sur toutes les pages.
          ========================================================= -->
     @include('partials.footer')
+
+
+    <!-- =========================================================
+         CONSENTEMENT AUX COOKIES BTT
+         =========================================================
+         Le composant est chargé sur toutes les pages utilisant
+         ce layout, y compris les espaces membre et administration.
+
+         Il vérifie les préférences enregistrées et affiche le
+         bandeau lorsqu'aucun consentement valide n'existe.
+
+         Les catégories optionnelles restent désactivées par défaut.
+         ========================================================= -->
+    @include('partials.cookie-consent')
 
 
 </body>

@@ -15,7 +15,7 @@
 | - le contenu du menu reste identique quelle que soit la page ;
 | - seule la rubrique actuellement visitée passe en rouge ;
 | - Produits reste visible mais désactivé pour le moment ;
-| - Administrateurs reste réservé au Super Admin ;
+| - Administrateurs et Statistiques des cookies sont réservés au Super Admin ;
 | - le bouton "Retour au site" est conservé.
 |
 |--------------------------------------------------------------------------
@@ -379,6 +379,43 @@
                     ])
                 >
                     Administrateurs
+                </a>
+
+            @endif
+
+
+            {{--
+            |--------------------------------------------------------------------------
+            | STATISTIQUES DES COOKIES - SUPER ADMIN UNIQUEMENT
+            |--------------------------------------------------------------------------
+            |
+            | Le lien est masqué pour les administrateurs classiques.
+            | L'accès direct à la route doit également être protégé côté serveur.
+            |
+            |--------------------------------------------------------------------------
+            --}}
+            @if (auth()->user()->isSuperAdmin())
+
+                <a
+                    href="{{ route('admin.cookies.index') }}"
+                    @class([
+                        'flex',
+                        'items-center',
+                        'rounded-md',
+                        'px-4',
+                        'py-3',
+                        'text-sm',
+                        'font-bold',
+                        'transition',
+
+                        'bg-red-600 text-white' =>
+                            request()->routeIs('admin.cookies.*'),
+
+                        'text-zinc-600 hover:bg-zinc-200 hover:text-red-600' =>
+                            ! request()->routeIs('admin.cookies.*'),
+                    ])
+                >
+                    Statistiques des cookies
                 </a>
 
             @endif

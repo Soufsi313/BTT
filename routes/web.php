@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminCookieConsentController;
 use App\Http\Controllers\AdminArticleController;
 use App\Http\Controllers\AdminArticleImageController;
 use App\Http\Controllers\AdminCommentController;
@@ -1098,6 +1099,22 @@ Route::middleware([
                 )
             );
         })->name('dashboard');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATISTIQUES DES COOKIES
+        |--------------------------------------------------------------------------
+        |
+        | Consultation des préférences enregistrées par les visiteurs.
+        | La route hérite des middlewares auth et admin du groupe.
+        |
+        */
+
+        Route::get(
+            '/cookies',
+            [AdminCookieConsentController::class, 'index']
+        )->name('cookies.index');
 
 
         /*

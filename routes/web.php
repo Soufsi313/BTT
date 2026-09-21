@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminCommentController;
 use App\Http\Controllers\AdminCommentReportController;
 use App\Http\Controllers\AdminCourseController;
 use App\Http\Controllers\AdminMemberController;
+use App\Http\Controllers\AdminMemberStatisticsController;
 use App\Http\Controllers\AdminMessageController;
 use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\AuthController;
@@ -1127,6 +1128,28 @@ Route::middleware([
             '/adherents',
             [AdminMemberController::class, 'index']
         )->name('members.index');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATISTIQUES DES ADHÉRENTS
+        |--------------------------------------------------------------------------
+        |
+        | Consultation des inscriptions et export Excel (.xlsx).
+        | Le contrôleur applique les restrictions selon le rôle et le genre.
+        |
+        */
+
+        Route::get(
+            '/adherents/statistiques',
+            [AdminMemberStatisticsController::class, 'index']
+        )->name('members.statistics');
+
+
+        Route::get(
+            '/adherents/statistiques/export',
+            [AdminMemberStatisticsController::class, 'export']
+        )->name('members.statistics.export');
 
 
         Route::patch(
